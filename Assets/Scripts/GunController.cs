@@ -8,11 +8,17 @@ public class GunController : MonoBehaviour, IWeaponController
     [SerializeField] private float replenishTimePerBullet = 0.5f; // Time to replenish one bullet
     [SerializeField] private bool waitForFullAmmo = false; // Wait for all ammo to replenish?
     [SerializeField] private float fireRate = 0.2f; // Time between shots
+    [SerializeField] ShipAction activateOn;
 
     private int currentAmmo;
     private float replenishTimer;
     private float fireTimer;
     private bool isShooting;
+
+    public ShipAction GetActionType()
+    {
+        return activateOn;
+    }
 
     private void Awake()
     {

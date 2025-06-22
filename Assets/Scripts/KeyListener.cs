@@ -4,11 +4,10 @@ using System.Collections.Generic;
 
 public enum ShipAction
 {
-    ThrustForward,
-    ThrustBackward,
-    TurnLeft,
-    TurnRight,
-    Shoot
+    ShootPrimary,
+    ShootSecondary,
+    ShootTernary,
+    ShootUltimate
 }
 
 public class KeyListener : MonoBehaviour
@@ -21,23 +20,25 @@ public class KeyListener : MonoBehaviour
     }
 
     [SerializeField] private List<KeyActionPair> keyBindings = new List<KeyActionPair>();
-    private Dictionary<KeyCode, Action> keyActionMap = new Dictionary<KeyCode, Action>();
-
-    private ShipController shipController;
-    private IWeaponController weaponController;
+    private Dictionary<KeyCode, ShipAction> keyActionMap = new Dictionary<KeyCode, ShipAction>();
+    private Dictionary<ShipAction, List<IWeaponController>> actionControllers = new Dictionary<ShipAction, List<IWeaponController>>();
 
     private void Awake()
     {
-        shipController = GetComponent<ShipController>();
-        weaponController = GetComponentInChildren<IWeaponController>();
+        // Find all IWeaponController components in children
+        IWeaponController[] weaponControllers = GetComponentsInChildren<IWeaponController>();
 
-        if (shipController == null)
+        // Initialize actionControllers dictionary
+        foreach (ShipAction action in Enum.GetValues(typeof(ShipAction)))
         {
-            Debug.LogWarning("ShipController not found on GameObject!");
+            actionControllers[action] = new List<IWeaponController>();
         }
-        if (weaponController == null)
+
+        // Map controllers to their action types
+        foreach (var controller in weaponControllers)
         {
-            Debug.LogWarning("IWeaponController not found in children!");
+            ShipAction action = controller.GetActionType();
+            actionControllers[action].Add(controller);
         }
 
         // Initialize key bindings
@@ -49,72 +50,43 @@ public class KeyListener : MonoBehaviour
         keyActionMap.Clear();
         foreach (var binding in keyBindings)
         {
-            switch (binding.action)
+            if (keyActionMap.ContainsKey(binding.key))
             {
-                case ShipAction.ThrustForward:
-                    keyActionMap[binding.key] = () => shipController?.SetThrustInput(1f);
-                    break;
-                case ShipAction.ThrustBackward:
-                    keyActionMap[binding.key] = () => shipController?.SetThrustInput(-1f);
-                    break;
-                case ShipAction.TurnLeft:
-                    keyActionMap[binding.key] = () => shipController?.SetSteerInput(-1f);
-                    break;
-                case ShipAction.TurnRight:
-                    keyActionMap[binding.key] = () => shipController?.SetSteerInput(1f);
-                    break;
-                case ShipAction.Shoot:
-                    keyActionMap[binding.key] = () => weaponController?.SetShooting(true);
-                    break;
+                Debug.LogWarning($"Duplicate key binding for {binding.key} on {gameObject.name}");
+                continue;
             }
+            keyActionMap[binding.key] = binding.action;
         }
     }
 
     private void Update()
     {
-        bool isShooting = false;
-        bool isThrustingForward = false;
-        bool isThrustingBackward = false;
-        bool isTurningLeft = false;
-        bool isTurningRight = false;
+        // Track which actions are active
+        Dictionary<ShipAction, bool> activeActions = new Dictionary<ShipAction, bool>();
+        foreach (ShipAction action in Enum.GetValues(typeof(ShipAction)))
+        {
+            activeActions[action] = false;
+        }
 
+        // Process key presses
         foreach (var kvp in keyActionMap)
         {
             if (Input.GetKey(kvp.Key))
             {
-                kvp.Value?.Invoke();
-                var binding = keyBindings.Find(b => b.key == kvp.Key);
-                switch (binding.action)
-                {
-                    case ShipAction.Shoot:
-                        isShooting = true;
-                        break;
-                    case ShipAction.ThrustForward:
-                        isThrustingForward = true;
-                        break;
-                    case ShipAction.ThrustBackward:
-                        isThrustingBackward = true;
-                        break;
-                    case ShipAction.TurnLeft:
-                        isTurningLeft = true;
-                        break;
-                    case ShipAction.TurnRight:
-                        isTurningRight = true;
-                        break;
-                }
+                activeActions[kvp.Value] = true;
             }
         }
 
-        // Update input states
-        float thrustInput = (isThrustingForward ? 1f : 0f) + (isThrustingBackward ? -1f : 0f);
-        float steerInput = (isTurningRight ? 1f : 0f) + (isTurningLeft ? -1f : 0f);
-        shipController?.SetThrustInput(thrustInput);
-        shipController?.SetSteerInput(steerInput);
-
-        // Stop shooting if shoot key is not pressed
-        if (!isShooting)
+        // Notify controllers based on active actions (Observer Pattern)
+        foreach (var action in activeActions)
         {
-            weaponController?.SetShooting(false);
+            if (actionControllers.ContainsKey(action.Key))
+            {
+                foreach (var controller in actionControllers[action.Key])
+                {
+                    controller.SetShooting(action.Value);
+                }
+            }
         }
     }
 
@@ -123,7 +95,7 @@ public class KeyListener : MonoBehaviour
     {
         if (keyActionMap.ContainsKey(oldKey))
         {
-            Action action = keyActionMap[oldKey];
+            ShipAction action = keyActionMap[oldKey];
             keyActionMap.Remove(oldKey);
             keyActionMap[newKey] = action;
 

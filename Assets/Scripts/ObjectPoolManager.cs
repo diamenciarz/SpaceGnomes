@@ -68,6 +68,12 @@ public class ObjectPoolManager : MonoBehaviour
         return obj;
     }
 
+    public GameObject Spawn(GameObject obj, Vector3 position, Quaternion rotation)
+    {
+        GameObject newObject = Instantiate(obj);
+        return ActivateObject(newObject, position, rotation);
+    }
+
     public GameObject Spawn(string poolId, Vector3 position, Quaternion rotation)
     {
         if (!pools.ContainsKey(poolId) || string.IsNullOrEmpty(poolId))
@@ -101,7 +107,14 @@ public class ObjectPoolManager : MonoBehaviour
         obj.transform.position = position;
         obj.transform.rotation = rotation;
         obj.SetActive(true);
+        EntityCounter.Instance.RegisterEntity(obj);
         return obj;
+    }
+
+    public void Despawn(GameObject obj)
+    {
+        EntityCounter.Instance.UnregisterEntity(obj);
+        Destroy(obj);
     }
 
     public void Despawn(GameObject obj, string poolId)

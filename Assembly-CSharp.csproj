@@ -57,7 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\IDamage.cs" />
-    <Compile Include="Assets\Scripts\IInputController.cs" />
+    <Compile Include="Assets\Scripts\ShipControlInput.cs" />
     <Compile Include="Assets\Scripts\ShipController.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\BulletController.cs" />
@@ -68,6 +68,9 @@
     <Compile Include="Assets\Scripts\DamageOnTouch.cs" />
     <Compile Include="Assets\Scripts\DestroyOnCollision.cs" />
     <Compile Include="Assets\Scripts\ObjectPoolManager.cs" />
+    <Compile Include="Assets\Scripts\EntityCounter.cs" />
+    <Compile Include="Assets\Scripts\HasEntityType.cs" />
+    <Compile Include="Assets\Scripts\KeyboardControlInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

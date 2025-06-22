@@ -2,18 +2,11 @@ using UnityEngine;
 
 public class HealthManager : MonoBehaviour
 {
-    public enum EntityType
-    {
-        Wall,
-        Ship
-    }
 
-    [SerializeField] private EntityType entityType = EntityType.Ship;
     [SerializeField] private float maxHealth = 100f;
 
     private float currentHealth;
 
-    public EntityType Type => entityType;
     public float CurrentHealth => currentHealth;
 
     private void Awake()
@@ -33,6 +26,7 @@ public class HealthManager : MonoBehaviour
 
         if (currentHealth <= 0f)
         {
+            ObjectPoolManager.Instance.Despawn(gameObject);
             gameObject.SetActive(false); // Deactivate for pooling or destruction
         }
     }

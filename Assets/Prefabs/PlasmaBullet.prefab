@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -8632353263395128611}
   - component: {fileID: 3205544630134639897}
   - component: {fileID: 5802548090315600750}
+  - component: {fileID: -7580439671291849363}
   m_Layer: 0
   m_Name: PlasmaBullet
   m_TagString: Untagged
@@ -140,6 +141,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialVelocity: 20
   lifetime: 3
+  poolId: 
 --- !u!114 &3205544630134639897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,3 +168,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetEntityTypes: 0100000000000000
+  poolId: PlasmaBullet
+--- !u!114 &-7580439671291849363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3611232887168421049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdc5a25bf81dad749b32ae4052a3ca06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entityType: 2

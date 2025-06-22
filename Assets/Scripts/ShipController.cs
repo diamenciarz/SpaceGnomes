@@ -1,13 +1,14 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class ShipController : MonoBehaviour, IInputController
+public class ShipController : MonoBehaviour
 {
     [SerializeField] private float thrustForce = 10f;
     [SerializeField] private float steerTorque = 5f;
     [SerializeField, Range(0f, 1f)] private float perpendicularDamping = 0.9f;
     [SerializeField, Range(0f, 1f)] private float angularDamping = 0.8f;
     [SerializeField] private float maxAngularDampingTorque = 2f;
+    [SerializeField] ShipControlInput shipControlInput = null;
 
     private Rigidbody2D rb;
     private float thrustInput; // Set by KeyListener
@@ -22,30 +23,19 @@ public class ShipController : MonoBehaviour, IInputController
 
     private void FixedUpdate()
     {
+        UpdateInputs();
         HandleMovement();
         ApplyPerpendicularDamping();
         ApplyAngularDamping();
     }
 
-    public float GetThrustInput()
+    private void UpdateInputs()
     {
-        return thrustInput;
-    }
-
-    public float GetSteerInput()
-    {
-        return steerInput;
-    }
-
-    // Public methods for KeyListener to set input states
-    public void SetThrustInput(float value)
-    {
-        thrustInput = Mathf.Clamp(value, -1f, 1f);
-    }
-
-    public void SetSteerInput(float value)
-    {
-        steerInput = Mathf.Clamp(value, -1f, 1f);
+        if(shipControlInput != null)
+        {
+            thrustInput = shipControlInput.GetThrustInput();
+            steerInput = shipControlInput.GetSteerInput();
+        }
     }
 
     private void HandleMovement()
@@ -56,6 +46,8 @@ public class ShipController : MonoBehaviour, IInputController
 
         // Handle rotation torque
         float torque = CalculateRotationTorque(steerInput);
+        Debug.Log("Calculated torque" + torque);
+
         rb.AddTorque(torque);
     }
 
@@ -65,7 +57,7 @@ public class ShipController : MonoBehaviour, IInputController
         float desiredTorque = -steerInput * steerTorque;
 
         // Check if steer input is opposing the current rotation
-        if (steerInput != 0f && Mathf.Sign(steerInput) * Mathf.Sign(angularVelocity) < 0f)
+        if (steerInput != 0f && Mathf.Sign(steerInput) * Mathf.Sign(angularVelocity) > 0f)
         {
             // Apply the higher of steerTorque or maxAngularDampingTorque to decelerate
             float maxTorque = Mathf.Max(steerTorque, maxAngularDampingTorque);
