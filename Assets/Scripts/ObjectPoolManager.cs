@@ -1,0 +1,121 @@
+using UnityEngine;
+using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
+
+public class ObjectPoolManager : MonoBehaviour
+{
+    // Singleton instance
+    public static ObjectPoolManager Instance { get; private set; }
+
+    [System.Serializable]
+    public class PoolConfig
+    {
+        public string poolId; // Unique identifier for the pool
+        public GameObject prefab; // Prefab to pool
+        public int initialSize = 10; // Initial number of objects to create
+        public int expansionSize = 5; // Number of objects to add if pool runs out
+    }
+
+    [SerializeField] private List<PoolConfig> poolConfigs = new List<PoolConfig>();
+    private Dictionary<string, Queue<GameObject>> pools = new Dictionary<string, Queue<GameObject>>();
+    private Dictionary<string, PoolConfig> configMap = new Dictionary<string, PoolConfig>();
+    private Transform poolParent; // Parent transform for inactive objects
+
+    private void Awake()
+    {
+        // Singleton setup
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // Initialize pools
+        poolParent = new GameObject("PooledObjects").transform;
+        DontDestroyOnLoad(poolParent);
+
+        foreach (var config in poolConfigs)
+        {
+            if (config.prefab == null || string.IsNullOrEmpty(config.poolId))
+            {
+                Debug.LogWarning($"Invalid pool config: {config.poolId}");
+                continue;
+            }
+
+            // Store config for expansion
+            configMap[config.poolId] = config;
+
+            // Create pool
+            Queue<GameObject> pool = new Queue<GameObject>();
+            for (int i = 0; i < config.initialSize; i++)
+            {
+                GameObject obj = CreatePooledObject(config.prefab);
+                pool.Enqueue(obj);
+            }
+            pools[config.poolId] = pool;
+        }
+    }
+
+    private GameObject CreatePooledObject(GameObject prefab)
+    {
+        GameObject obj = Instantiate(prefab);
+        obj.SetActive(false);
+        obj.transform.SetParent(poolParent);
+        return obj;
+    }
+
+    public GameObject Spawn(string poolId, Vector3 position, Quaternion rotation)
+    {
+        if (!pools.ContainsKey(poolId) || string.IsNullOrEmpty(poolId))
+        {
+            Debug.LogError($"No pool found for ID: {poolId}");
+            return null;
+        }
+
+        Queue<GameObject> pool = pools[poolId];
+        GameObject obj;
+
+        // If pool is empty, expand it
+        if (pool.Count == 0)
+        {
+            PoolConfig config = configMap[poolId];
+            for (int i = 0; i < config.expansionSize; i++)
+            {
+                obj = CreatePooledObject(config.prefab);
+                pool.Enqueue(obj);
+            }
+            // Debug.Log($"Expanded pool {poolId} by {config.expansionSize} objects");
+        }
+
+        // Dequeue and activate object
+        obj = pool.Dequeue();
+        return ActivateObject(obj, position, rotation);
+    }
+
+    private GameObject ActivateObject(GameObject obj, Vector3 position, Quaternion rotation)
+    {
+        obj.transform.position = position;
+        obj.transform.rotation = rotation;
+        obj.SetActive(true);
+        return obj;
+    }
+
+    public void Despawn(GameObject obj, string poolId)
+    {
+        if (!pools.ContainsKey(poolId))
+        {
+            // Debug.LogWarning($"No pool found for ID: {poolId}. Destroying object.");
+            Destroy(obj);
+            return;
+        }
+
+        // Deactivate and return to pool
+        obj.SetActive(false);
+        obj.transform.SetParent(poolParent);
+        pools[poolId].Enqueue(obj);
+    }
+}
