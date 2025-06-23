@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\EntityCounter.cs" />
     <Compile Include="Assets\Scripts\HasEntityType.cs" />
     <Compile Include="Assets\Scripts\KeyboardControlInput.cs" />
+    <Compile Include="Assets\Scripts\DetectCollisions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
