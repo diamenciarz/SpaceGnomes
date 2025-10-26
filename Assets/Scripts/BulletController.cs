@@ -2,13 +2,11 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class BulletController : MonoBehaviour
+    // Consider making this into a generic forward movement controller
 {
     [SerializeField] private float initialVelocity = 20f;
-    [SerializeField] private float lifetime = 3f;
-    [SerializeField] private string poolId = ""; // Pool ID for this bullet
 
     private Rigidbody2D rb;
-    private float timer;
 
     private void Awake()
     {
@@ -20,16 +18,7 @@ public class BulletController : MonoBehaviour
     {
         // Set initial velocity along forward direction (transform.up)
         rb.velocity = transform.up * initialVelocity;
-        timer = 0f;
     }
 
-    private void Update()
-    {
-        // Update lifetime timer
-        timer += Time.deltaTime;
-        if (timer >= lifetime)
-        {
-            ObjectPoolManager.Instance.Despawn(gameObject, poolId);
-        }
-    }
+
 }
