@@ -161,9 +161,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b74bdb9f49f65b547a9ee87cbee7b447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 3611232887168421049, guid: 7694e6152e8c0f54b9ab8d6e6d3d59c1, type: 3}
+  bulletPoolId: PlasmaBullet
   firePoint: {fileID: 2539842589358749238}
   maxAmmo: 10
-  replenishTimePerBullet: 0.5
+  replenishTimePerBullet: 0.1
   waitForFullAmmo: 0
   fireRate: 0.2
+  activateOn: 0
