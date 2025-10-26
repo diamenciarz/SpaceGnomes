@@ -21,13 +21,17 @@ public class HealthManager : MonoBehaviour
             Debug.LogWarning("Damage cannot be negative!");
             return;
         }
+        //Debug.Log("Received " + damage + " damage!");
 
         currentHealth = Mathf.Max(currentHealth - damage, 0f);
 
         if (currentHealth <= 0f)
         {
             ObjectPoolManager.Instance.Despawn(gameObject);
-            gameObject.SetActive(false); // Deactivate for pooling or destruction
         }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //Debug.Log("Collided with: " + collision.gameObject);
     }
 }

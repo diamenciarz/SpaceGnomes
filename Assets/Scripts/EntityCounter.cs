@@ -1,11 +1,13 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class EntityCounter : MonoBehaviour
 {
     // Singleton instance
     public static EntityCounter Instance { get; private set; }
 
+    // Should only track active entities
     private Dictionary<HasEntityType.EntityType, HashSet<GameObject>> activeEntities = new Dictionary<HasEntityType.EntityType, HashSet<GameObject>>();
 
     private void Awake()
@@ -55,28 +57,12 @@ public class EntityCounter : MonoBehaviour
     // Get all active entities of a specific type
     public IEnumerable<GameObject> GetEntities(HasEntityType.EntityType type)
     {
-        return activeEntities[type];
+        return new List<GameObject>(activeEntities[type]);
     }
 
     // Find the closest entity of a specific type to a given position
     public GameObject FindClosestEntity(HasEntityType.EntityType type, Vector3 position)
     {
-        GameObject closest = null;
-        float minDistance = float.MaxValue;
-
-        foreach (var entity in activeEntities[type])
-        {
-            if (entity.activeInHierarchy)
-            {
-                float distance = Vector3.Distance(position, entity.transform.position);
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    closest = entity;
-                }
-            }
-        }
-
-        return closest;
+        return GeometryUtils.FindClosestEntity(activeEntities[type], position);
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.VisualScripting.FullSerializer;
+using System;
 
 public class ObjectPoolManager : MonoBehaviour
 {
@@ -101,34 +102,59 @@ public class ObjectPoolManager : MonoBehaviour
         obj = pool.Dequeue();
         return ActivateObject(obj, position, rotation);
     }
-
     private GameObject ActivateObject(GameObject obj, Vector3 position, Quaternion rotation)
     {
+        ActivateOnSpawned(obj);
         obj.transform.position = position;
         obj.transform.rotation = rotation;
         obj.SetActive(true);
         EntityCounter.Instance.RegisterEntity(obj);
         return obj;
     }
+    private void ActivateOnSpawned(GameObject obj)
+    {
+        ActivateOnSpawn[] activators = obj.GetComponents<ActivateOnSpawn>();
+        foreach (var activator in activators)
+        {
+            activator.Activate();
+        }
+    }
+    private void ActivateOnDespawned(GameObject obj)
+    {
+        ActivateOnDespawn[] activators = obj.GetComponents<ActivateOnDespawn>();
+        foreach (var activator in activators)
+        {
+            activator.Activate();
+        }
+    }
 
     public void Despawn(GameObject obj)
     {
+        ActivateOnDespawned(obj);
         EntityCounter.Instance.UnregisterEntity(obj);
         Destroy(obj);
     }
 
     public void Despawn(GameObject obj, string poolId)
     {
+        ActivateOnDespawned(obj);
         if (!pools.ContainsKey(poolId))
         {
             // Debug.LogWarning($"No pool found for ID: {poolId}. Destroying object.");
-            Destroy(obj);
+            Despawn(obj);
             return;
         }
 
         // Deactivate and return to pool
+        DeactivateObject(obj);
+        pools[poolId].Enqueue(obj);
+    }
+
+    private void DeactivateObject(GameObject obj)
+    {
         obj.SetActive(false);
         obj.transform.SetParent(poolParent);
-        pools[poolId].Enqueue(obj);
+        EntityCounter.Instance.UnregisterEntity(obj);
+
     }
 }
