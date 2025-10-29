@@ -190,10 +190,11 @@ public class EntityCounter : MonoBehaviour
         }
     }
 
-    public void UpdateForceEntityPosition(GameObject obj, ForceManager.ForceType type)
-    {
-        UpdatePosition(obj, typeof(ForceManager.ForceType), (int)type);
-    }
+    // It looks like this method is not needed since we handle force updates in UpdateEntityPosition
+    //public void UpdateForceEntityPosition(GameObject obj, ForceManager.ForceType type)
+    //{
+    //    UpdatePosition(obj, typeof(ForceManager.ForceType), (int)type);
+    //}
 
     public IEnumerable<GameObject> GetEntities(EntityType type)
     {
