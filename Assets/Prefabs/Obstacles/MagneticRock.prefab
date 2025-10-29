@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: -4393779095226146666}
   - component: {fileID: 3174631971331937772}
   m_Layer: 0
-  m_Name: Rock
+  m_Name: MagneticRock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 6b7db5a10f81913489776927f2207f55, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6226415, g: 0.6226415, b: 0.6226415, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -214,11 +214,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f38f2dd6a7921784094ac0a4793f9a69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forceType: 0
+  forceType: 1
   forceApplier: 1
   forceReceiver: 1
-  maxForceValue: 25
-  maxForceApplyRange: 10
+  maxForceValue: 200
+  maxForceApplyRange: 3
   forceFalloffType: 1
   forceFalloffCurve:
     serializedVersion: 2
