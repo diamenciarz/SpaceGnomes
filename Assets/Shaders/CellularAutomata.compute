@@ -1,0 +1,115 @@
+﻿#pragma kernel InitializeNoise
+#pragma kernel ApplyCellularAutomata
+
+RWTexture2D<float> InputGrid;
+RWTexture2D<float> OutputGrid;
+RWTexture2D<float> NoiseOutput; // For init kernel
+
+// Convolution uniforms
+float _Filter00, _Filter01, _Filter02;
+float _Filter10, _Filter11, _Filter12;
+float _Filter20, _Filter21, _Filter22;
+
+// Activation uniforms
+int _ActivationType; // 0=Identity,1=Abs,2=Sin,3=InvGauss,4=SlimeMold
+float _DampingFactor = 0.89;
+float _Offset = 1.0;
+
+// Threshold
+bool _ApplyThreshold;
+float _Threshold;
+
+// Init uniforms
+float _RandomSeed;
+float _AliveProb = 0.3;
+
+[numthreads(8, 8, 1)]
+void InitializeNoise(uint3 id : SV_DispatchThreadID)
+{
+    uint2 texDim;
+    NoiseOutput.GetDimensions(texDim.x, texDim.y);
+    uint2 pos = id.xy;
+    
+    if (pos.x >= texDim.x || pos.y >= texDim.y)
+        return;
+    
+    // Pseudo-random [0,1]
+    float2 p = (float2) pos + _RandomSeed * 10.0;
+    float hash = frac(sin(dot(pos * _RandomSeed, float2(127.1, 311.7))) * 43758.5453);
+    float noise = frac(sin(dot(hash * pos, float2(12.9898, 78.233))) * 43758.5453); // Double-hash
+    // float noise = frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
+    
+    // Sparse binary: > prob → 1.0 else 0.0 (if prob<1)
+    float val = (_AliveProb >= 1.0) ? noise : ((noise < _AliveProb) ? 1.0 : 0.0);
+    
+    NoiseOutput[pos] = val;
+}
+
+float ApplyActivation(float x)
+{
+    switch (_ActivationType)
+    {
+        case 0:
+            return x; // Identity
+        case 1:
+            return abs(x); // Abs
+        case 2:
+            return sin(x); // Sin
+        case 3:
+            return 1.0 / (1.0 + x * x); // InverseGaussian
+        case 4:
+            return -1.0 / (_DampingFactor * x * x + 1.0) + _Offset; // SlimeMold
+            //-1f / (activation.dampingFactor * x * x + 1f) + activation.offset
+        default:
+            return x;
+    }
+}
+
+[numthreads(8, 8, 1)]
+void ApplyCellularAutomata(uint3 id : SV_DispatchThreadID)
+{
+    uint2 texDim;
+    InputGrid.GetDimensions(texDim.x, texDim.y);
+    uint2 pos = id.xy;
+    
+    if (pos.x >= texDim.x || pos.y >= texDim.y)
+        return;
+    
+    // Convolve: Weighted sum
+    float sum = 0.0;
+    float filter[9];
+    filter[0] = _Filter00;
+    filter[1] = _Filter01;
+    filter[2] = _Filter02;
+    filter[3] = _Filter10;
+    filter[4] = _Filter11;
+    filter[5] = _Filter12;
+    filter[6] = _Filter20;
+    filter[7] = _Filter21;
+    filter[8] = _Filter22;
+    
+    int idx = 0;
+    for (int dy = -1; dy <= 1; ++dy)
+    {
+        for (int dx = -1; dx <= 1; ++dx)
+        {
+            uint2 neighbor = uint2(
+                (pos.x + dx + texDim.x) % texDim.x,
+                (pos.y + dy + texDim.y) % texDim.y
+            );
+            sum += InputGrid[neighbor] * filter[idx++];
+        }
+    }
+    
+    // Activate (exact CPU match)
+    float activated = ApplyActivation(sum);
+    
+    // Clamp [0,1]
+    float nextValue = saturate(activated);
+    
+    // Threshold
+    if (_ApplyThreshold)
+        nextValue = (nextValue > _Threshold) ? 1.0 : 0.0;
+    
+    OutputGrid[pos] = nextValue;
+}
