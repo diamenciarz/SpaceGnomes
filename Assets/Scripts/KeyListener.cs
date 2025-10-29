@@ -61,14 +61,14 @@ public class KeyListener : MonoBehaviour
 
     private void Update()
     {
-        // Track which actions are active
+        // Turn off all actions initially
         Dictionary<ShipAction, bool> activeActions = new Dictionary<ShipAction, bool>();
         foreach (ShipAction action in Enum.GetValues(typeof(ShipAction)))
         {
             activeActions[action] = false;
         }
 
-        // Process key presses
+        // Check key states and update active actions
         foreach (var kvp in keyActionMap)
         {
             if (Input.GetKey(kvp.Key))
