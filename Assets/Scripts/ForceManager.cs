@@ -24,17 +24,8 @@ public class ForceManager : MonoBehaviour
     // Should only track active entities
     private Dictionary<ForceType, HashSet<GameObject>> simulatedEntities = new Dictionary<ForceType, HashSet<GameObject>>();
 
-    [SerializeField] [Range(0.1f, 1f)] float clumpThresholdFactor = 0.5f;
     [SerializeField] bool showDebugForces = false;
 
-    private class Clump
-    {
-        public Vector3 position;
-        public float forceValue;
-        public float maxRange;
-        public ForceFalloffType falloffType;
-        public AnimationCurve falloffCurve;
-    }
     private void Awake()
     {
         // Singleton setup
@@ -66,133 +57,56 @@ public class ForceManager : MonoBehaviour
     private void HandleForceCategory(ForceType type)
     {
         List<GameObject> appliers = simulatedEntities[type].Where(go => go.GetComponent<ForceProperty>().forceApplier).ToList();
-        List<GameObject> receivers = simulatedEntities[type].Where(go => go.GetComponent<ForceProperty>().forceReceiver).ToList();
-
-        appliers = appliers.Distinct().ToList();
-        receivers = receivers.Distinct().ToList();
-
-        List<Clump> clumps = GroupIntoClumps(appliers);
-        //if (type ==ForceType.Gravity)
-        //{
-        //    Debug.Log($"ForceManager: Handling {type} with {appliers.Count} appliers grouped into {clumps.Count} clumps affecting {receivers.Count} receivers.");
-        //}
-        ApplyForces(receivers, clumps);
-    }
-
-    private List<Clump> GroupIntoClumps(List<GameObject> appliers)
-    {
-        List<Clump> allClumps = new List<Clump>();
-
-        // Separate attractors and repellers
-        List<GameObject> attractors = appliers.Where(go => go.GetComponent<ForceProperty>().maxForceValue > 0).ToList();
-        List<GameObject> repellers = appliers.Where(go => go.GetComponent<ForceProperty>().maxForceValue < 0).ToList();
-
-        // Group attractors separately
-        allClumps.AddRange(GroupSubList(attractors));
-
-        // Group repellers separately
-        allClumps.AddRange(GroupSubList(repellers));
-
-        return allClumps;
-    }
-
-    private List<Clump> GroupSubList(List<GameObject> subAppliers)
-    {
-        List<Clump> clumps = new List<Clump>();
-        HashSet<GameObject> assigned = new HashSet<GameObject>();
-        float averageRange = subAppliers.Count > 0 ? subAppliers.Average(go => go.GetComponent<ForceProperty>().forceMaxRange) : 10f;
-        float threshold = averageRange * clumpThresholdFactor;
-
-        foreach (GameObject applier in subAppliers)
+        
+        if(appliers.Count == 0)
         {
-            if (assigned.Contains(applier)) continue;
-
-            List<GameObject> group = new List<GameObject>();
-            Queue<GameObject> queue = new Queue<GameObject>();
-            queue.Enqueue(applier);
-            assigned.Add(applier);
-            group.Add(applier);
-
-            while (queue.Count > 0)
-            {
-                GameObject current = queue.Dequeue();
-                foreach (GameObject other in subAppliers)
-                {
-                    bool isNotAssigned = !assigned.Contains(other);
-                    bool isWithinThreshold = Vector3.Distance(current.transform.position, other.transform.position) < threshold;
-                    if (isNotAssigned && isWithinThreshold)
-                    {
-                        assigned.Add(other);
-                        queue.Enqueue(other);
-                        group.Add(other);
-                    }
-                }
-            }
-
-            // Calculate average position, force, range
-            Vector3 avgPos = Vector3.zero;
-            float totalForce = 0;
-            float totalRange = 0;
-            ForceFalloffType falloffType = ForceFalloffType.Linear;
-            AnimationCurve curve = null;
-
-            foreach (GameObject go in group)
-            {
-                ForceProperty fp = go.GetComponent<ForceProperty>();
-                avgPos += go.transform.position;
-                totalForce += fp.maxForceValue;
-                totalRange += fp.forceMaxRange;
-                falloffType = fp.forceFalloffType; // Use the last one's falloff
-                curve = fp.forceFalloffCurve;
-            }
-
-            avgPos /= group.Count;
-            totalForce /= group.Count;
-            totalRange /= group.Count;
-
-            clumps.Add(new Clump
-            {
-                position = avgPos,
-                forceValue = totalForce,
-                maxRange = totalRange,
-                falloffType = falloffType,
-                falloffCurve = curve
-            });
+            return;
         }
 
-        return clumps;
+        //Debug.Log("Found " + appliers.Count + " appliers and " + receivers.Count + " receivers for force type " + type);
+        appliers = appliers.Distinct().ToList();
+
+        ApplyForces(appliers);
     }
 
-    private void ApplyForces(List<GameObject> receivers, List<Clump> clumps)
+    private void ApplyForces(List<GameObject> appliers)
     {
-        foreach (GameObject receiver in receivers)
+        foreach (GameObject applier in appliers)
         {
-            Rigidbody2D rb = receiver.GetComponent<Rigidbody2D>();
-            if (rb == null) continue;
+            ForceProperty applierFp = applier.GetComponent<ForceProperty>();
+            Vector2 applierPos = applier.transform.position;
+            float applierMaxRange = applierFp.maxForceApplyRange;
 
-            ForceProperty fp = receiver.GetComponent<ForceProperty>();
-
-            foreach (Clump clump in clumps)
+            // Get nearby receivers using spatial query
+            var nearbyReceivers = EntityCounter.Instance.GetNearbyForceEntities(applierFp.forceType, applierPos, applierMaxRange)
+                .Where(go => go.GetComponent<ForceProperty>().forceReceiver)
+                .ToList();
+            Debug.Log("Applier " + applier.name + " found " + nearbyReceivers.Count + " nearby receivers.");
+            foreach (GameObject receiver in nearbyReceivers)
             {
-                Vector3 direction = clump.position - receiver.transform.position;
+                Rigidbody2D rb = receiver.GetComponent<Rigidbody2D>();
+                if (rb == null) continue;
+
+                Vector3 direction = applier.transform.position - receiver.transform.position;
                 float distance = direction.magnitude;
 
-                bool isOutOfRange = distance > clump.maxRange || distance == 0;
+                bool isOutOfRange = distance > applierMaxRange || distance == 0;
                 if (isOutOfRange) continue;
 
                 direction.Normalize();
 
-                bool isRepelling = clump.forceValue < 0;
+                bool isRepelling = applierFp.maxForceValue < 0;
                 if (isRepelling)
                 {
                     direction = -direction;
                 }
 
-                float forceMagnitude = CalculateForce(Mathf.Abs(clump.forceValue), distance, clump.maxRange, clump.falloffType, clump.falloffCurve);
+                float forceMagnitude = CalculateForce(Mathf.Abs(applierFp.maxForceValue), distance, applierMaxRange, applierFp.forceFalloffType, applierFp.forceFalloffCurve);
                 rb.AddForce(direction * forceMagnitude * Time.fixedDeltaTime);
+
                 if (showDebugForces)
                 {
-                    Color forceColor = clump.forceValue > 0 ? Color.green : Color.red;
+                    Color forceColor = applierFp.maxForceValue > 0 ? Color.green : Color.red;
                     Vector3 endPoint = receiver.transform.position + direction * forceMagnitude * 0.01f; // Scale for visibility
                     Debug.DrawLine(receiver.transform.position, endPoint, forceColor);
                 }
@@ -233,7 +147,7 @@ public class ForceManager : MonoBehaviour
         if (simulatedEntities.ContainsKey(type))
         {
             simulatedEntities[type].Add(entity);
-            //Debug.Log($"Registered entity {entity.name} for force type {type}");
+            EntityCounter.Instance.RegisterForceEntity(entity, type);
         }
     }
     public void UnregisterEntity(GameObject entity) {
@@ -242,6 +156,7 @@ public class ForceManager : MonoBehaviour
             if (simulatedEntities[key].Contains(entity))
             {
                 simulatedEntities[key].Remove(entity);
+                EntityCounter.Instance.UnregisterForceEntity(entity, key);
             }
         }
     }

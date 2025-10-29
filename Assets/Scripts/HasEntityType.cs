@@ -14,11 +14,20 @@ public class HasEntityType : MonoBehaviour
     }
     [SerializeField] private EntityType entityType;
     public EntityType Type => entityType;
+    private bool wasRegistered = false;
+
+    public void SetRegistered()
+    {
+        wasRegistered = true;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        if(!wasRegistered)
+        {
+            EntityCounter.Instance.RegisterEntity(gameObject);
+        }
     }
 
     // Update is called once per frame

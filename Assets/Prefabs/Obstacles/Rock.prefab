@@ -214,8 +214,8 @@ MonoBehaviour:
   forceType: 0
   forceApplier: 1
   forceReceiver: 1
-  maxForceValue: 100
-  forceMaxRange: 10
+  maxForceValue: 25
+  maxForceApplyRange: 10
   forceFalloffType: 1
   forceFalloffCurve:
     serializedVersion: 2

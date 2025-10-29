@@ -9,10 +9,14 @@ public class ForceProperty : MonoBehaviour
     [SerializeField] public bool forceApplier = true;
     [SerializeField] public bool forceReceiver = true;
     [SerializeField] public float maxForceValue = 100;
-    [SerializeField] [Tooltip("Force will scale between 0 and forceMaxRange")] public float forceMaxRange;
+    [SerializeField] [Tooltip("Force will scale between 0 and forceMaxRange")] public float maxForceApplyRange;
     [SerializeField] public ForceManager.ForceFalloffType forceFalloffType;
     [SerializeField] [Tooltip("Only used if ForceFallofType is CustomCurve")] public AnimationCurve forceFalloffCurve;
 
+    private void Start()
+    {
+        // Registration is handled in OnEnable
+    }
     private void OnEnable()
     {
         if (ForceManager.Instance != null)

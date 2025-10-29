@@ -104,11 +104,18 @@ public class ObjectPoolManager : MonoBehaviour
     }
     private GameObject ActivateObject(GameObject obj, Vector3 position, Quaternion rotation)
     {
-        ActivateOnSpawned(obj);
+        // Order, location, set as registered, register, set active, activate observers
         obj.transform.position = position;
         obj.transform.rotation = rotation;
-        obj.SetActive(true);
+        HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
+        if (hasEntityType != null)
+        {
+            hasEntityType.SetRegistered();
+        }
         EntityCounter.Instance.RegisterEntity(obj);
+        obj.SetActive(true);
+
+        ActivateOnSpawned(obj);
         return obj;
     }
     private void ActivateOnSpawned(GameObject obj)
