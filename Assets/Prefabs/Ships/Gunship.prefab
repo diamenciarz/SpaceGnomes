@@ -196,7 +196,7 @@ GameObject:
   - component: {fileID: 6514658271571309198}
   - component: {fileID: 581436516979897251}
   m_Layer: 0
-  m_Name: ShipComposite
+  m_Name: Gunship
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
