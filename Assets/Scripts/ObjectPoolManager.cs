@@ -108,11 +108,11 @@ public class ObjectPoolManager : MonoBehaviour
         obj.transform.position = position;
         obj.transform.rotation = rotation;
         HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
-        if (hasEntityType != null)
+        if (hasEntityType)
         {
             hasEntityType.SetRegistered();
+            EntityCounter.Instance.RegisterEntity(obj);
         }
-        EntityCounter.Instance.RegisterEntity(obj);
         obj.SetActive(true);
 
         ActivateOnSpawned(obj);
@@ -135,33 +135,42 @@ public class ObjectPoolManager : MonoBehaviour
         }
     }
 
+    /** Only objects with HasEntityType can be despawned **/
     public void Despawn(GameObject obj)
     {
         ActivateOnDespawned(obj);
-        EntityCounter.Instance.UnregisterEntity(obj);
+        HasEntityType hasEntityType = gameObject.GetComponent<HasEntityType>();
+        if (hasEntityType)
+        {
+            EntityCounter.Instance.UnregisterEntity(obj);
+        }
         Destroy(obj);
     }
 
     public void Despawn(GameObject obj, string poolId)
     {
-        ActivateOnDespawned(obj);
         if (!pools.ContainsKey(poolId))
         {
-            // Debug.LogWarning($"No pool found for ID: {poolId}. Destroying object.");
+             //Debug.LogWarning($"No pool found for ID: {poolId}. Destroying object.");
             Despawn(obj);
             return;
         }
 
         // Deactivate and return to pool
-        DeactivateObject(obj);
+        ActivateOnDespawned(obj);
+        ReturnObjToPool(obj);
         pools[poolId].Enqueue(obj);
     }
 
-    private void DeactivateObject(GameObject obj)
+    private void ReturnObjToPool(GameObject obj)
     {
         obj.SetActive(false);
         obj.transform.SetParent(poolParent);
-        EntityCounter.Instance.UnregisterEntity(obj);
+        HasEntityType hasEntityType = gameObject.GetComponent<HasEntityType>();
+        if (hasEntityType)
+        {
+            EntityCounter.Instance.UnregisterEntity(obj);
+        }
 
     }
 }

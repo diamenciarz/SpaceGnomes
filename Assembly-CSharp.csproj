@@ -83,6 +83,9 @@
     <Compile Include="Assets\Scripts\GPUCellularAutomata.cs" />
     <Compile Include="Assets\Scripts\AIControlInput.cs" />
     <Compile Include="Assets\Scripts\EntityPositionTracker.cs" />
+    <Compile Include="Assets\Scripts\DamageCounter.cs" />
+    <Compile Include="Assets\Scripts\TeamManager.cs" />
+    <Compile Include="Assets\Scripts\DestroyWithObjects.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

@@ -11,102 +11,153 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
     [System.Serializable]
     public struct ChildInfo
     {
-        [Tooltip("Will be used to relatively split the total mass coming from parent among all children")] 
+        [Tooltip("Will be used to relatively split the total mass coming from parent among all children")]
         public float relativeMass;
         public GameObject child;
     }
 
+    [SerializeField] private Rigidbody2D topRigidbody2D; // Make private after testing
     [SerializeField] private List<ChildInfo> childrenToDetach;
-    private float massToSplit;
+    [SerializeField] private DetachChildrenOnDestroy parentScript; // Make private after testing
+    [SerializeField] private float totalMass; // Make private after testing
+    [SerializeField] private float myRelativeMass = 1f; // Small fraction for itself
+
+    public void SetParentScript(DetachChildrenOnDestroy parent)
+    {
+        parentScript = parent;
+    }
 
     public void SetMassToSplit(float mass)
     {
-
-        massToSplit = mass;
-        float totalRelativeMass = childrenToDetach.Sum(childInfo => childInfo.relativeMass);
+        totalMass = mass;
+        float totalRelativeMass = childrenToDetach.Sum(childInfo => childInfo.relativeMass) + myRelativeMass;
         foreach (ChildInfo childInfo in childrenToDetach)
         {
-            // Recursively split the mass among all children
             DetachChildrenOnDestroy script = childInfo.child.GetComponent<DetachChildrenOnDestroy>();
             if (script)
             {
-                script.SetMassToSplit(massToSplit * (childInfo.relativeMass / totalRelativeMass));
-
+                script.SetParentScript(this);
+                script.SetMassToSplit(totalMass * (childInfo.relativeMass / totalRelativeMass));
             }
         }
     }
 
     private void Start()
     {
-        Rigidbody2D rb2d = GetComponent<Rigidbody2D>();
-        if (rb2d)
+        if (topRigidbody2D)
         {
-            SetMassToSplit(rb2d.mass);
-
+            totalMass = topRigidbody2D.mass;
         }
+        SetMassToSplit(totalMass);
 
+        // Subscribe to despawn and spawn events of each child
         foreach (ChildInfo childInfo in childrenToDetach)
         {
-            // Ensure the obj removes itself from the list when destroyed
-            ActivateOnDespawn[] despawnComponents = childInfo.child.GetComponents<ActivateOnDespawn>();
-            if (despawnComponents.Length == 0) despawnComponents = new ActivateOnDespawn[] { childInfo.child.AddComponent<ActivateOnDespawn>() };
-            despawnComponents[0].OnDespawned += RemoveChildFromList;
-
-            // Ensure the obj adds itself back to the list when it was temporarily removed but not deleted
-            ActivateOnSpawn[] spawnComponents = childInfo.child.GetComponents<ActivateOnSpawn>();
-            if (spawnComponents.Length == 0) spawnComponents = new ActivateOnSpawn[] { childInfo.child.AddComponent<ActivateOnSpawn>() };
-            spawnComponents[0].OnSpawned += AddChildToList;
+            SubscribeToChild(childInfo.child);
         }
     }
 
+    private void SubscribeToChild(GameObject child)
+    {
+        ActivateOnDespawn[] despawnComponents = child.GetComponents<ActivateOnDespawn>();
+        if (despawnComponents.Length == 0)
+        {
+            despawnComponents = new ActivateOnDespawn[] { child.AddComponent<ActivateOnDespawn>() };
+        }
+        despawnComponents[0].OnDespawned += RemoveChildFromList;
+
+        //ActivateOnSpawn[] spawnComponents = child.GetComponents<ActivateOnSpawn>();
+        //if (spawnComponents.Length == 0)
+        //{
+        //    spawnComponents = new ActivateOnSpawn[] { child.AddComponent<ActivateOnSpawn>() };
+        //}
+        //spawnComponents[0].OnSpawned += AddChildToList;
+    }
+
+    // Call this to add a child dynamically at runtime
     public void AddChildToList(GameObject obj)
     {
-        foreach (var childInfo in childrenToDetach)
+        if (childrenToDetach.Any(c => c.child == obj)) return;
+
+        float relativeMass = 1f;
+        Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
+        if (rb)
         {
-            if (childInfo.child == obj)
-            {
-                return;
-            }
+            relativeMass = rb.mass;
+            totalMass += rb.mass;
+            Destroy(rb);
         }
-        // If the child is not already in the list, add it
-       float defaultWeight = 1; // Will set it using some other logic later
-        // Maybe check if obj has a component that indicates weight?
-        childrenToDetach.Add(new ChildInfo() { relativeMass = defaultWeight, child = obj });
+        CompositeCollider2D comp = obj.GetComponent<CompositeCollider2D>();
+        if (comp) Destroy(comp);
+        Collider2D col = obj.GetComponent<Collider2D>();
+        if (col) col.usedByComposite = false;
+
+        childrenToDetach.Add(new ChildInfo { relativeMass = relativeMass, child = obj });
+        SetMassToSplit(totalMass);
+        SubscribeToChild(obj);
     }
 
     private void RemoveChildFromList(GameObject obj)
     {
-        for (int i = 0; i < childrenToDetach.Count; i++)
+        ChildInfo toRemove = childrenToDetach.Find(c => c.child == obj);
+        if (toRemove.child != null)
         {
-            ChildInfo childInfo = childrenToDetach[i];
-            if (childInfo.child == obj)
+            float oldTotalRelative = childrenToDetach.Sum(c => c.relativeMass) + myRelativeMass;
+            float removedPortion = toRemove.relativeMass / oldTotalRelative;
+            totalMass -= totalMass * removedPortion;
+            childrenToDetach.Remove(toRemove);
+            SetMassToSplit(totalMass);
+
+            if (parentScript)
             {
-                childrenToDetach.Remove(childInfo);
-                return;
+                parentScript.RemoveChildMass(toRemove.relativeMass);
             }
+        }
+    }
+
+    public void RemoveChildMass(float childRelativeMass)
+    {
+        float totalRelativeMass = childrenToDetach.Sum(c => c.relativeMass) + myRelativeMass;
+        float removedPortion = childRelativeMass / totalRelativeMass;
+        totalMass -= totalMass * removedPortion;
+        SetMassToSplit(totalMass);
+
+        if (parentScript)
+        {
+            parentScript.RemoveChildMass(myRelativeMass);
         }
     }
 
     public override void Activate()
     {
-        // Run the previous implementation
         base.Activate();
         DetachChildren();
+        // When I despawn, my mass will be removed from parent
     }
+
     private void DetachChildren()
     {
-        float totalRelativeMass = childrenToDetach.Sum(childInfo => childInfo.relativeMass);
+        float totalRelativeMass = childrenToDetach.Sum(childInfo => childInfo.relativeMass) + myRelativeMass;
+
         foreach (ChildInfo childInfo in childrenToDetach)
         {
             childInfo.child.transform.parent = null;
-            Rigidbody2D rb2d = childInfo.child.AddComponent<Rigidbody2D>();
+            Rigidbody2D rb2d = childInfo.child.GetComponent<Rigidbody2D>();
+            if (!rb2d) rb2d = childInfo.child.AddComponent<Rigidbody2D>();
+            rb2d.mass = totalMass * (childInfo.relativeMass / totalRelativeMass);
             rb2d.gravityScale = 0;
-            Debug.Log("Calculating mass for child with relative mass " + childInfo.relativeMass + " out of total " + totalRelativeMass + " from parent mass " + massToSplit);
-            rb2d.mass = massToSplit * (childInfo.relativeMass / totalRelativeMass);
             rb2d.interpolation = RigidbodyInterpolation2D.Interpolate;
-            CompositeCollider2D compositeCollider2D = childInfo.child.AddComponent<CompositeCollider2D>();
+
+            CompositeCollider2D compositeCollider2D = childInfo.child.GetComponent<CompositeCollider2D>();
+            if (!compositeCollider2D) compositeCollider2D = childInfo.child.AddComponent<CompositeCollider2D>();
             compositeCollider2D.geometryType = CompositeCollider2D.GeometryType.Polygons;
             compositeCollider2D.generationType = CompositeCollider2D.GenerationType.Synchronous;
+
+            Collider2D collider2D = childInfo.child.GetComponent<Collider2D>();
+            if (collider2D) collider2D.usedByComposite = true;
         }
+
+        // Clear the list after detaching
+        childrenToDetach.Clear();
     }
 }

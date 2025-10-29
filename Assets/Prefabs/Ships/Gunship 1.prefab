@@ -378,9 +378,9 @@ GameObject:
   - component: {fileID: 6543003814999245564}
   - component: {fileID: 4049380779284195394}
   - component: {fileID: 6514658271571309198}
-  - component: {fileID: 6968070201716844009}
+  - component: {fileID: 581436516979897251}
   m_Layer: 0
-  m_Name: Gunship
+  m_Name: Gunship 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -669,7 +669,7 @@ CompositeCollider2D:
       - {x: 0.8852079, y: 0.49787772}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
---- !u!114 &6968070201716844009
+--- !u!114 &581436516979897251
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -678,11 +678,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2369128004041744743}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b331eacbaeec4714c853133ac52712dc, type: 3}
+  m_Script: {fileID: 11500000, guid: 20b8806083331964889c100d69c5b59d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectsToDependOn:
-  - {fileID: 7228385878822119569}
+  childrenToDetach:
+  - relativeMass: 1
+    child: {fileID: 7228385878822119569}
 --- !u!1 &2405233771952785761
 GameObject:
   m_ObjectHideFlags: 0
@@ -1603,15 +1604,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20b8806083331964889c100d69c5b59d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topRigidbody2D: {fileID: 0}
   childrenToDetach:
   - relativeMass: 1
     child: {fileID: 437945584942461418}
   - relativeMass: 1
     child: {fileID: 5006939819209628731}
-  parentScript: {fileID: 0}
-  totalMass: 0
-  myRelativeMass: 1
 --- !u!1 &7228385878822119569
 GameObject:
   m_ObjectHideFlags: 0
@@ -1809,21 +1806,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20b8806083331964889c100d69c5b59d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topRigidbody2D: {fileID: 4275953901346360542}
   childrenToDetach:
-  - relativeMass: 1
+  - relativeMass: 2
     child: {fileID: 2405233771952785761}
-  - relativeMass: 3
+  - relativeMass: 2
     child: {fileID: 5905030987734287010}
-  - relativeMass: 2
-    child: {fileID: 5409615770571366803}
-  - relativeMass: 2
-    child: {fileID: 2265605512885640490}
   - relativeMass: 1
+    child: {fileID: 5409615770571366803}
+  - relativeMass: 1
+    child: {fileID: 2265605512885640490}
+  - relativeMass: 1.5
     child: {fileID: 5641312366177501074}
-  parentScript: {fileID: 0}
-  totalMass: 0
-  myRelativeMass: 1
 --- !u!1 &8662590800914166733
 GameObject:
   m_ObjectHideFlags: 0

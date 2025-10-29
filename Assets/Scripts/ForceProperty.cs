@@ -13,10 +13,6 @@ public class ForceProperty : MonoBehaviour
     [SerializeField] public ForceManager.ForceFalloffType forceFalloffType;
     [SerializeField] [Tooltip("Only used if ForceFallofType is CustomCurve")] public AnimationCurve forceFalloffCurve;
 
-    private void Start()
-    {
-        // Registration is handled in OnEnable
-    }
     private void OnEnable()
     {
         if (ForceManager.Instance != null)
