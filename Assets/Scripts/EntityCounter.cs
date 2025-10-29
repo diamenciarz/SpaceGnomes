@@ -10,6 +10,10 @@ public class EntityCounter : MonoBehaviour
     // Singleton instance
     public static EntityCounter Instance { get; private set; }
 
+
+    [Header("Trajectory Settings")]
+    [SerializeField] private float savedTrajectoryPositions = 1000;
+    [Header("Grid Settings")]
     // Grid cell size (tune to your query radii, e.g., 10f for distance-10 searches)
     public float CellSize = 10f;
 
@@ -27,7 +31,6 @@ public class EntityCounter : MonoBehaviour
         public Dictionary<Vector2Int, HashSet<GameObject>> Cells = new Dictionary<Vector2Int, HashSet<GameObject>>();
         public Dictionary<GameObject, Vector2Int> EntityToCell = new Dictionary<GameObject, Vector2Int>();
     }
-
     private void Awake()
     {
         // Singleton setup
@@ -81,6 +84,23 @@ public class EntityCounter : MonoBehaviour
         RemovePositionTracker(obj);
     }
 
+    // Call this when an entity moves to update its spatial bucket
+    public void UpdateEntityPosition(GameObject obj)
+    {
+        HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
+        if (hasEntityType != null)
+        {
+            UpdatePosition(obj, typeof(EntityType), (int)hasEntityType.Type);
+        }
+
+        // Also update force position if applicable
+        ForceProperty fp = obj.GetComponent<ForceProperty>();
+        if (fp != null)
+        {
+            UpdatePosition(obj, typeof(ForceManager.ForceType), (int)fp.forceType);
+        }
+    }
+
     private void UpdatePosition(GameObject obj, System.Type enumType, int enumValue)
     {
         var tracker = trackers[enumType][enumValue];
@@ -99,7 +119,7 @@ public class EntityCounter : MonoBehaviour
         }
     }
 
-    private IEnumerable<GameObject> GetNearby(System.Type enumType, int enumValue, Vector2 center, float radius)
+    private List<GameObject> GetNearby(System.Type enumType, int enumValue, Vector2 center, float radius)
     {
         var tracker = trackers[enumType][enumValue];
         var candidates = new HashSet<GameObject>();
@@ -173,41 +193,24 @@ public class EntityCounter : MonoBehaviour
         Unregister(obj, typeof(ForceManager.ForceType), (int)type);
     }
 
-    // Call this when an entity moves to update its spatial bucket
-    public void UpdateEntityPosition(GameObject obj)
-    {
-        HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
-        if (hasEntityType != null)
-        {
-            UpdatePosition(obj, typeof(EntityType), (int)hasEntityType.Type);
-        }
-
-        // Also update force position if applicable
-        ForceProperty fp = obj.GetComponent<ForceProperty>();
-        if (fp != null)
-        {
-            UpdatePosition(obj, typeof(ForceManager.ForceType), (int)fp.forceType);
-        }
-    }
-
     // It looks like this method is not needed since we handle force updates in UpdateEntityPosition
     //public void UpdateForceEntityPosition(GameObject obj, ForceManager.ForceType type)
     //{
     //    UpdatePosition(obj, typeof(ForceManager.ForceType), (int)type);
     //}
 
-    public IEnumerable<GameObject> GetEntities(EntityType type)
+    public List<GameObject> GetEntities(EntityType type)
     {
         return new List<GameObject>(trackers[typeof(EntityType)][(int)type].AllEntities);
     }
 
     // New: Get entities of type within radius of center (2D circle query)
-    public IEnumerable<GameObject> GetNearbyEntities(EntityType type, Vector2 center, float radius)
+    public List<GameObject> GetNearbyEntities(EntityType type, Vector2 center, float radius)
     {
         return GetNearby(typeof(EntityType), (int)type, center, radius);
     }
 
-    public IEnumerable<GameObject> GetNearbyForceEntities(ForceManager.ForceType type, Vector2 center, float radius)
+    public List<GameObject> GetNearbyForceEntities(ForceManager.ForceType type, Vector2 center, float radius)
     {
         return GetNearby(typeof(ForceManager.ForceType), (int)type, center, radius);
     }
@@ -274,7 +277,6 @@ public class EntityCounter : MonoBehaviour
             Gizmos.DrawWireCube(center, size);
         }
     }
-
     // Helpers
     private Vector2Int GetCellKey(Vector2 pos)
     {
@@ -283,7 +285,6 @@ public class EntityCounter : MonoBehaviour
             Mathf.FloorToInt(pos.y / CellSize)
         );
     }
-
     private void AddToCell(EntityTracker tracker, GameObject obj, Vector2Int cell)
     {
         if (!tracker.Cells.TryGetValue(cell, out HashSet<GameObject> cellSet))
@@ -293,7 +294,6 @@ public class EntityCounter : MonoBehaviour
         }
         cellSet.Add(obj);
     }
-
     private void RemoveFromCell(EntityTracker tracker, GameObject obj, Vector2Int cell)
     {
         if (tracker.Cells.TryGetValue(cell, out HashSet<GameObject> cellSet))
@@ -305,21 +305,19 @@ public class EntityCounter : MonoBehaviour
             }
         }
     }
-
     private void AttachPositionTracker(GameObject obj)
     {
-        if (obj.GetComponent<EntityPositionTracker>() == null)
+        if (obj.GetComponent<Trajectory>() == null)
         {
-            obj.AddComponent<EntityPositionTracker>();
+            obj.AddComponent<Trajectory>();
         }
     }
-
     private void RemovePositionTracker(GameObject obj)
     {
-        var tracker = obj.GetComponent<EntityPositionTracker>();
-        if (tracker != null)
+        var trajectory = obj.GetComponent<Trajectory>();
+        if (trajectory != null)
         {
-            Destroy(tracker);
+            Destroy(trajectory);
         }
     }
 }
