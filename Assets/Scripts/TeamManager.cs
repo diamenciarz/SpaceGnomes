@@ -23,6 +23,21 @@ public class TeamManager : MonoBehaviour
         }
     }
 
+    private bool IsAlly(Team myTeam, Team otherTeam)
+    {
+        if (myTeam == Team.Neutral || myTeam == Team.EnemyToAll) return false;
+        if (otherTeam == Team.Neutral || otherTeam == Team.EnemyToAll) return false;
+        return myTeam == otherTeam;
+    }
+
+    private bool IsEnemy(Team myTeam, Team otherTeam)
+    {
+        if (otherTeam == Team.Neutral) return false;
+        if (otherTeam == Team.EnemyToAll) return true;
+        if (myTeam == Team.EnemyToAll) return true;
+        return myTeam != otherTeam;
+    }
+
     public List<GameObject> GetNearbyEntitiesInTeam(List<EntityType> types, Vector2 center, float radius, Team team)
     {
         List<GameObject> entitiesInTeam = new List<GameObject>();
@@ -46,7 +61,29 @@ public class TeamManager : MonoBehaviour
         }
         return entitiesInTeam;
     }
+    public List<GameObject> GetNearbyEntitiesInTeams(List<EntityType> types, Vector2 center, float radius, List<Team> teams)
+    {
+        List<GameObject> entitiesInTeam = new List<GameObject>();
+        foreach (EntityType type in types)
+        {
+            entitiesInTeam.AddRange(GetNearbyEntitiesInTeams(type, center, radius, teams));
+        }
+        return entitiesInTeam;
+    }
 
+    public List<GameObject> GetNearbyEntitiesInTeams(EntityType type, Vector2 center, float radius, List<Team> teams)
+    {
+        List<GameObject> entitiesInTeam = new List<GameObject>();
+        foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
+        {
+            HealthManager hm = entity.GetComponent<HealthManager>();
+            if (hm != null && teams.Contains(hm.team))
+            {
+                entitiesInTeam.Add(entity);
+            }
+        }
+        return entitiesInTeam;
+    }
     public List<GameObject> GetEntitiesInTeam(List<EntityType> types, Team team)
     {
         List<GameObject> entitiesInTeam = new List<GameObject>();
@@ -73,41 +110,45 @@ public class TeamManager : MonoBehaviour
 
     public List<GameObject> GetNearbyAllies(List<EntityType> types, Vector2 center, float radius, Team myTeam)
     {
-        return GetNearbyEntitiesInTeam(types, center, radius, myTeam);
+        List<GameObject> allies = new List<GameObject>();
+        foreach (EntityType type in types)
+        {
+            allies.AddRange(GetNearbyAllies(type, center, radius, myTeam));
+        }
+        return allies;
     }
 
     public List<GameObject> GetNearbyAllies(EntityType type, Vector2 center, float radius, Team myTeam)
     {
-        return GetNearbyEntitiesInTeam(type, center, radius, myTeam);
+        List<GameObject> allies = new List<GameObject>();
+        foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
+        {
+            HealthManager hm = entity.GetComponent<HealthManager>();
+            if (hm != null && IsAlly(myTeam, hm.team))
+            {
+                allies.Add(entity);
+            }
+        }
+        return allies;
     }
 
     public List<GameObject> GetNearbyEnemies(List<EntityType> types, Vector2 center, float radius, Team myTeam)
     {
-        List<GameObject> allNearby = new List<GameObject>();
+        List<GameObject> enemies = new List<GameObject>();
         foreach (EntityType type in types)
         {
-            allNearby.AddRange(EntityCounter.Instance.GetNearbyEntities(type, center, radius));
-        }
-        List<GameObject> enemies = new List<GameObject>();
-        foreach (GameObject entity in allNearby)
-        {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && hm.team != myTeam)
-            {
-                enemies.Add(entity);
-            }
+            enemies.AddRange(GetNearbyEnemies(type, center, radius, myTeam));
         }
         return enemies;
     }
 
     public List<GameObject> GetNearbyEnemies(EntityType type, Vector2 center, float radius, Team myTeam)
     {
-        List<GameObject> allNearby = EntityCounter.Instance.GetNearbyEntities(type, center, radius);
         List<GameObject> enemies = new List<GameObject>();
-        foreach (GameObject entity in allNearby)
+        foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
         {
             HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && hm.team != myTeam)
+            if (hm != null && IsEnemy(myTeam, hm.team))
             {
                 enemies.Add(entity);
             }
@@ -117,41 +158,45 @@ public class TeamManager : MonoBehaviour
 
     public List<GameObject> GetAllies(List<EntityType> types, Team myTeam)
     {
-        return GetEntitiesInTeam(types, myTeam);
+        List<GameObject> allies = new List<GameObject>();
+        foreach (EntityType type in types)
+        {
+            allies.AddRange(GetAllies(type, myTeam));
+        }
+        return allies;
     }
 
     public List<GameObject> GetAllies(EntityType type, Team myTeam)
     {
-        return GetEntitiesInTeam(type, myTeam);
+        List<GameObject> allies = new List<GameObject>();
+        foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))
+        {
+            HealthManager hm = entity.GetComponent<HealthManager>();
+            if (hm != null && IsAlly(myTeam, hm.team))
+            {
+                allies.Add(entity);
+            }
+        }
+        return allies;
     }
 
     public List<GameObject> GetEnemies(List<EntityType> types, Team myTeam)
     {
-        List<GameObject> allEntities = new List<GameObject>();
+        List<GameObject> enemies = new List<GameObject>();
         foreach (EntityType type in types)
         {
-            allEntities.AddRange(EntityCounter.Instance.GetEntities(type));
-        }
-        List<GameObject> enemies = new List<GameObject>();
-        foreach (GameObject entity in allEntities)
-        {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && hm.team != myTeam)
-            {
-                enemies.Add(entity);
-            }
+            enemies.AddRange(GetEnemies(type, myTeam));
         }
         return enemies;
     }
 
     public List<GameObject> GetEnemies(EntityType type, Team myTeam)
     {
-        List<GameObject> allEntities = EntityCounter.Instance.GetEntities(type);
         List<GameObject> enemies = new List<GameObject>();
-        foreach (GameObject entity in allEntities)
+        foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))
         {
             HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && hm.team != myTeam)
+            if (hm != null && IsEnemy(myTeam, hm.team))
             {
                 enemies.Add(entity);
             }
