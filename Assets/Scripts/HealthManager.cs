@@ -19,13 +19,34 @@ public class HealthManager : MonoBehaviour
     [SerializeField] private float maxHealth = 100f;
 
     [SerializeField] private float currentHealth;
+    [SerializeField] private Team myTeam = Team.Neutral;
     public bool isInvulnerable = false;
+    private HealthManager parentScript;
 
     public float CurrentHealth => currentHealth;
+    public HealthManager ParentScript { get { return parentScript; } }
+    public Team team => myTeam;
+    public void SetTeam(Team newTeam) => myTeam = newTeam;
 
     private void Awake()
     {
         currentHealth = maxHealth;
+        parentScript = GetParentHealthManager(gameObject, GetComponent<HealthManager>());
+    }
+
+    private HealthManager GetParentHealthManager(GameObject obj, HealthManager currentHighest)
+    {
+        GameObject parent = obj.transform.parent?.gameObject;
+        if (parent == null)
+        {
+            return currentHighest;
+        }
+        HealthManager parentHM = parent.GetComponent<HealthManager>();
+        if (parentHM != null)
+        {
+            currentHighest = parentHM;
+        }
+        return GetParentHealthManager(parent, currentHighest);
     }
 
     public void TakeDamage(float damage)
