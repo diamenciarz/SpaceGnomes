@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Trajectory))]
 public class HasEntityType : MonoBehaviour
 {
     public enum EntityType

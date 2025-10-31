@@ -11,33 +11,23 @@ public class Trajectory : MonoBehaviour
     private List<Vector2> positions = new List<Vector2>();
     private Vector2 previousVelocity = Vector2.zero;
     private Vector2 currentAcceleration = Vector2.zero;
-    private bool hasPreviousVelocity = false;
     private Vector2 previousPosition;
-    private bool hasPreviousPosition = false;
-    private Rigidbody2D rb;
+
+    // This position is used to track movement for EntityCounter updates, so it measures distance, not velocity
+    private Vector2 lastMovedPosition = Vector2.zero;
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        if (rb == null)
-        {
-            Debug.LogWarning("Trajectory requires a Rigidbody2D component.");
-            enabled = false;
-            return;
-        }
         previousPosition = transform.position;
     }
 
     private void LateUpdate()
     {
-        // Your movement code here, e.g.:
-        // transform.position += velocity * Time.deltaTime;
-
         Vector2 currentPos = transform.position;
-        if (Vector2.Distance(currentPos, previousPosition) > 0.05f) // Threshold to avoid micro-moves
+        if (Vector2.Distance(currentPos, lastMovedPosition) > 0.01f) // Threshold to avoid micro-moves
         {
             EntityCounter.Instance.UpdateEntityPosition(gameObject);
-            previousPosition = currentPos;
+            lastMovedPosition = currentPos;
         }
     }
 
@@ -52,29 +42,10 @@ public class Trajectory : MonoBehaviour
             positions.RemoveAt(0);
         }
 
-        // Estimate velocity from position change
         Vector2 currentVelocity;
-        if (hasPreviousPosition)
-        {
-            currentVelocity = (currentPosition - previousPosition) / Time.fixedDeltaTime;
-        }
-        else
-        {
-            currentVelocity = rb != null && !rb.isKinematic ? rb.velocity : Vector2.zero;
-            hasPreviousPosition = true;
-        }
-
-        // Calculate acceleration from velocity change
-        if (hasPreviousVelocity)
-        {
-            currentAcceleration = (currentVelocity - previousVelocity) / Time.fixedDeltaTime;
-        }
-        else
-        {
-            currentAcceleration = Vector2.zero;
-            hasPreviousVelocity = true;
-        }
-
+        currentVelocity = (currentPosition - previousPosition) / Time.fixedDeltaTime;
+        currentAcceleration = (currentVelocity - previousVelocity) / Time.fixedDeltaTime;
+        
         previousVelocity = currentVelocity;
         previousPosition = currentPosition;
     }

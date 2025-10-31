@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2056778045222474935}
   - component: {fileID: -4393779095226146666}
   - component: {fileID: 3174631971331937772}
+  - component: {fileID: -8248571703601960689}
   m_Layer: 0
   m_Name: MagneticRock
   m_TagString: Untagged
@@ -120,12 +121,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2685383631660251024}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d33b87b214b8df4cbf58f6fd899050c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0814752c8f2f08a499f9feee1ca5d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  currentHealth: 0
-  team: 0
   isInvulnerable: 0
 --- !u!114 &983950700476121779
 MonoBehaviour:
@@ -244,3 +243,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-8248571703601960689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2685383631660251024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPositions: 100

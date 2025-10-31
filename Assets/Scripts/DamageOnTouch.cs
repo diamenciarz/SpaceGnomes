@@ -12,7 +12,7 @@ public class DamageOnTouch : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (damageEntityTypes.Count == 0) return;
-        HealthManager healthManager = other.GetComponent<HealthManager>();
+        Health healthManager = other.GetComponent<Health>();
         if (healthManager == null) return;
         HasEntityType otherEntityType = other.GetComponent<HasEntityType>();
         if (otherEntityType == null) return; // Only damage objects with an Entity Type

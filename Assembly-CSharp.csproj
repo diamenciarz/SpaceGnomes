@@ -58,20 +58,25 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\DestroyAfterDelay.cs" />
     <Compile Include="Assets\Scripts\ShipControlInput.cs" />
+    <Compile Include="Assets\Scripts\TeamManager.cs" />
     <Compile Include="Assets\Scripts\ActivateOnDespawn.cs" />
     <Compile Include="Assets\Scripts\ObjectPoolManager.cs" />
     <Compile Include="Assets\Scripts\GunController.cs" />
+    <Compile Include="Assets\Scripts\Health.cs" />
     <Compile Include="Assets\Scripts\DamageOnTouch.cs" />
     <Compile Include="Assets\Scripts\BulletController.cs" />
+    <Compile Include="Assets\Scripts\Trajectory.cs" />
     <Compile Include="Assets\Scripts\IWeaponController.cs" />
     <Compile Include="Assets\Scripts\HasEntityType.cs" />
     <Compile Include="Assets\Scripts\ForceProperty.cs" />
     <Compile Include="Assets\Scripts\GeometryUtils.cs" />
-    <Compile Include="Assets\Scripts\HealthManager.cs" />
+    <Compile Include="Assets\Scripts\AIControlInput.cs" />
     <Compile Include="Assets\Scripts\ShipController.cs" />
     <Compile Include="Assets\Scripts\IDamage.cs" />
+    <Compile Include="Assets\Scripts\DamageCounter.cs" />
     <Compile Include="Assets\Scripts\CPUCellularAutomata.cs" />
     <Compile Include="Assets\Scripts\DetectCollisions.cs" />
+    <Compile Include="Assets\Scripts\EntityTeam.cs" />
     <Compile Include="Assets\Scripts\KeyboardControlInput.cs" />
     <Compile Include="Assets\Scripts\ActivateOnSpawn.cs" />
     <Compile Include="Assets\Scripts\ForceManager.cs" />
@@ -79,13 +84,10 @@
     <Compile Include="Assets\Scripts\DetachChildrenOnDestroy.cs" />
     <Compile Include="Assets\Scripts\DestroyOnCollision.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
+    <Compile Include="Assets\Scripts\DestroyWithObjects.cs" />
     <Compile Include="Assets\Scripts\EntityCounter.cs" />
     <Compile Include="Assets\Scripts\GPUCellularAutomata.cs" />
-    <Compile Include="Assets\Scripts\AIControlInput.cs" />
     <Compile Include="Assets\Scripts\EntityPositionTracker.cs" />
-    <Compile Include="Assets\Scripts\DamageCounter.cs" />
-    <Compile Include="Assets\Scripts\TeamManager.cs" />
-    <Compile Include="Assets\Scripts\DestroyWithObjects.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static EntityTeam;
 using static HasEntityType;
-using static HealthManager;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class TeamManager : MonoBehaviour
 {
@@ -21,6 +22,42 @@ public class TeamManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
+
+    public Team GetEntityTeam(GameObject entity)
+    {
+        Health hm = entity.GetComponent<Health>();
+        if (hm != null)
+        {
+            return hm.team;
+        }
+        EntityTeam et = GetParentEntityTeam(entity);
+        if (et != null)
+        {
+            return et.team;
+        }
+        Debug.LogError("Entity does not have Health or EntityTeam component to determine team!");
+        return Team.Neutral;
+    }
+
+    public EntityTeam GetParentEntityTeam(GameObject obj)
+    {
+        return GetParentEntityTeamRecursive(obj, obj.GetComponent<EntityTeam>());
+    }
+
+    public EntityTeam GetParentEntityTeamRecursive(GameObject obj, EntityTeam currentHighest)
+    {
+        GameObject parent = obj.transform.parent?.gameObject;
+        if (parent == null)
+        {
+            return currentHighest;
+        }
+        EntityTeam parentScript = parent.GetComponent<EntityTeam>();
+        if (parentScript != null)
+        {
+            currentHighest = parentScript;
+        }
+        return GetParentEntityTeamRecursive(parent, currentHighest);
     }
 
     private bool IsAlly(Team myTeam, Team otherTeam)
@@ -53,8 +90,7 @@ public class TeamManager : MonoBehaviour
         List<GameObject> entitiesInTeam = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
         {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && hm.team == team)
+            if (GetEntityTeam(entity)==team)
             {
                 entitiesInTeam.Add(entity);
             }
@@ -76,8 +112,7 @@ public class TeamManager : MonoBehaviour
         List<GameObject> entitiesInTeam = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
         {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && teams.Contains(hm.team))
+            if (teams.Contains(GetEntityTeam(entity)))
             {
                 entitiesInTeam.Add(entity);
             }
@@ -99,8 +134,7 @@ public class TeamManager : MonoBehaviour
         List<GameObject> entitiesInTeam = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))
         {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && hm.team == team)
+            if (GetEntityTeam(entity)==team)
             {
                 entitiesInTeam.Add(entity);
             }
@@ -123,8 +157,7 @@ public class TeamManager : MonoBehaviour
         List<GameObject> allies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
         {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && IsAlly(myTeam, hm.team))
+            if (IsAlly(myTeam, GetEntityTeam(entity)))
             {
                 allies.Add(entity);
             }
@@ -147,8 +180,7 @@ public class TeamManager : MonoBehaviour
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
         {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && IsEnemy(myTeam, hm.team))
+            if (IsEnemy(myTeam, GetEntityTeam(entity)))
             {
                 enemies.Add(entity);
             }
@@ -171,8 +203,7 @@ public class TeamManager : MonoBehaviour
         List<GameObject> allies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))
         {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && IsAlly(myTeam, hm.team))
+            if (IsAlly(myTeam, GetEntityTeam(entity)))
             {
                 allies.Add(entity);
             }
@@ -195,8 +226,7 @@ public class TeamManager : MonoBehaviour
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))
         {
-            HealthManager hm = entity.GetComponent<HealthManager>();
-            if (hm != null && IsEnemy(myTeam, hm.team))
+            if (IsEnemy(myTeam, GetEntityTeam(entity)))
             {
                 enemies.Add(entity);
             }

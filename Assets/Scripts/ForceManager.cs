@@ -81,7 +81,6 @@ public class ForceManager : MonoBehaviour
             var nearbyReceivers = EntityCounter.Instance.GetNearbyForceEntities(applierFp.forceType, applierPos, applierMaxRange)
                 .Where(go => go.GetComponent<ForceProperty>().forceReceiver)
                 .ToList();
-            Debug.Log("Applier " + applier.name + " found " + nearbyReceivers.Count + " nearby receivers.");
             foreach (GameObject receiver in nearbyReceivers)
             {
                 Rigidbody2D rb = receiver.GetComponent<Rigidbody2D>();

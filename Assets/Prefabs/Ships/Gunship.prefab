@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2209478391882349295}
   - component: {fileID: 6142592300072487393}
   - component: {fileID: 8762576224269574553}
+  - component: {fileID: 5231569232446714194}
   m_Layer: 0
   m_Name: RightEngine
   m_TagString: Untagged
@@ -130,12 +131,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2265605512885640490}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d33b87b214b8df4cbf58f6fd899050c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0814752c8f2f08a499f9feee1ca5d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  currentHealth: 0
-  team: 0
+  maxHealth: 100
   isInvulnerable: 0
 --- !u!60 &6142592300072487393
 PolygonCollider2D:
@@ -183,6 +182,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entityType: 1
+--- !u!114 &5231569232446714194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2265605512885640490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPositions: 100
 --- !u!1 &2369128004041744743
 GameObject:
   m_ObjectHideFlags: 0
@@ -198,6 +210,8 @@ GameObject:
   - component: {fileID: 4049380779284195394}
   - component: {fileID: 6514658271571309198}
   - component: {fileID: 6968070201716844009}
+  - component: {fileID: 2405805016719162628}
+  - component: {fileID: 5747292331280976720}
   m_Layer: 0
   m_Name: Gunship
   m_TagString: Untagged
@@ -449,6 +463,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectsToDependOn:
   - {fileID: 7228385878822119569}
+--- !u!114 &2405805016719162628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2369128004041744743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3344549f500bd5541a369b6663217fcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myTeam: 2
+--- !u!114 &5747292331280976720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2369128004041744743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6045741e038df4847ab70e98b65af53e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chaseRange: 20
+  stopRange: 2
+  avoidRange: 10
+  chaseEntityTypes: 01000000
+  avoidEntityTypes: 00000000
 --- !u!1 &2405233771952785761
 GameObject:
   m_ObjectHideFlags: 0
@@ -461,8 +505,9 @@ GameObject:
   - component: {fileID: 7927990959763055270}
   - component: {fileID: 5133975644343501789}
   - component: {fileID: 5592646250845420988}
-  - component: {fileID: 5732680962693035463}
   - component: {fileID: 2182608447106469223}
+  - component: {fileID: 5732680962693035463}
+  - component: {fileID: 7383123166221299098}
   m_Layer: 0
   m_Name: LeftWing
   m_TagString: Untagged
@@ -578,26 +623,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2405233771952785761}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d33b87b214b8df4cbf58f6fd899050c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0814752c8f2f08a499f9feee1ca5d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  currentHealth: 0
-  team: 0
+  maxHealth: 100
   isInvulnerable: 0
---- !u!114 &5732680962693035463
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2405233771952785761}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdc5a25bf81dad749b32ae4052a3ca06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  entityType: 1
 --- !u!60 &2182608447106469223
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -630,6 +660,32 @@ PolygonCollider2D:
       - {x: -0.405, y: -0.7}
       - {x: -0.05015576, y: -0.6941246}
       - {x: 0.4120517, y: -0.09711225}
+--- !u!114 &5732680962693035463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2405233771952785761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdc5a25bf81dad749b32ae4052a3ca06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entityType: 1
+--- !u!114 &7383123166221299098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2405233771952785761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPositions: 100
 --- !u!1 &5409615770571366803
 GameObject:
   m_ObjectHideFlags: 0
@@ -644,6 +700,7 @@ GameObject:
   - component: {fileID: 2376448015372351620}
   - component: {fileID: 6616381370577395401}
   - component: {fileID: 1418900749659437092}
+  - component: {fileID: 2907729226733595951}
   m_Layer: 0
   m_Name: LeftEngine
   m_TagString: Untagged
@@ -760,12 +817,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5409615770571366803}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d33b87b214b8df4cbf58f6fd899050c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0814752c8f2f08a499f9feee1ca5d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  currentHealth: 0
-  team: 0
+  maxHealth: 100
   isInvulnerable: 0
 --- !u!60 &6616381370577395401
 PolygonCollider2D:
@@ -813,6 +868,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entityType: 1
+--- !u!114 &2907729226733595951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5409615770571366803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPositions: 100
 --- !u!1 &5641312366177501074
 GameObject:
   m_ObjectHideFlags: 0
@@ -827,6 +895,7 @@ GameObject:
   - component: {fileID: 6073876041726630381}
   - component: {fileID: 5033700563489854107}
   - component: {fileID: 3788911925009004955}
+  - component: {fileID: 33310897422781163}
   m_Layer: 0
   m_Name: FrontBumper
   m_TagString: Untagged
@@ -924,12 +993,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5641312366177501074}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d33b87b214b8df4cbf58f6fd899050c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0814752c8f2f08a499f9feee1ca5d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  currentHealth: 0
-  team: 0
+  maxHealth: 100
   isInvulnerable: 0
 --- !u!60 &5033700563489854107
 PolygonCollider2D:
@@ -995,6 +1062,19 @@ PolygonCollider2D:
       - {x: -0.43913722, y: 0.19304955}
       - {x: -0.61117125, y: -0.4063025}
       - {x: -0.20440674, y: -0.66879815}
+--- !u!114 &33310897422781163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5641312366177501074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPositions: 100
 --- !u!1 &5905030987734287010
 GameObject:
   m_ObjectHideFlags: 0
@@ -1007,8 +1087,9 @@ GameObject:
   - component: {fileID: 6643935994179817251}
   - component: {fileID: 5671065295789464785}
   - component: {fileID: 810730131022599895}
-  - component: {fileID: 9048203142756143015}
   - component: {fileID: 3296430752102418205}
+  - component: {fileID: 9048203142756143015}
+  - component: {fileID: 964162937309924184}
   m_Layer: 0
   m_Name: RightWing
   m_TagString: Untagged
@@ -1124,26 +1205,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5905030987734287010}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d33b87b214b8df4cbf58f6fd899050c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0814752c8f2f08a499f9feee1ca5d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 20
-  currentHealth: 0
-  team: 0
+  maxHealth: 100
   isInvulnerable: 0
---- !u!114 &9048203142756143015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5905030987734287010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdc5a25bf81dad749b32ae4052a3ca06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  entityType: 1
 --- !u!60 &3296430752102418205
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -1176,6 +1242,32 @@ PolygonCollider2D:
       - {x: -0.16105095, y: 0.700623}
       - {x: -0.412966, y: -0.1095538}
       - {x: 0.052801732, y: -0.6941246}
+--- !u!114 &9048203142756143015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5905030987734287010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdc5a25bf81dad749b32ae4052a3ca06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entityType: 1
+--- !u!114 &964162937309924184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5905030987734287010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPositions: 100
 --- !u!1 &7228385878822119569
 GameObject:
   m_ObjectHideFlags: 0
@@ -1191,6 +1283,7 @@ GameObject:
   - component: {fileID: 8013265557963345279}
   - component: {fileID: 1632331820}
   - component: {fileID: 3233389426223708372}
+  - component: {fileID: 6507211662738974301}
   m_Layer: 0
   m_Name: Cockpit
   m_TagString: Untagged
@@ -1324,12 +1417,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7228385878822119569}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d33b87b214b8df4cbf58f6fd899050c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0814752c8f2f08a499f9feee1ca5d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  currentHealth: 0
-  team: 0
   isInvulnerable: 0
 --- !u!60 &1632331820
 PolygonCollider2D:
@@ -1389,6 +1480,19 @@ MonoBehaviour:
   parentScript: {fileID: 0}
   totalMass: 0
   myRelativeMass: 1
+--- !u!114 &6507211662738974301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7228385878822119569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPositions: 100
 --- !u!1 &8662590800914166733
 GameObject:
   m_ObjectHideFlags: 0

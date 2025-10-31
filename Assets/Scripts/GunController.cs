@@ -10,6 +10,7 @@ public class GunController : MonoBehaviour, IWeaponController
     [SerializeField] private float fireRate = 0.2f; // Time between shots
     [SerializeField] ShipAction activateOn;
 
+    private EntityTeam parentEntityTeam;
     private int currentAmmo;
     private float replenishTimer;
     private float fireTimer;
@@ -25,6 +26,12 @@ public class GunController : MonoBehaviour, IWeaponController
         currentAmmo = maxAmmo;
         replenishTimer = 0f;
         fireTimer = 0f;
+        UpdateParentEntityTeam();
+    }
+
+    public void UpdateParentEntityTeam()
+    {
+        parentEntityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
     }
 
     private void Update()
@@ -75,7 +82,9 @@ public class GunController : MonoBehaviour, IWeaponController
         }
 
         // Spawn bullet from pool
-        ObjectPoolManager.Instance.Spawn(bulletPoolId, firePoint.position, firePoint.rotation);
         currentAmmo--;
+        GameObject projectile = ObjectPoolManager.Instance.Spawn(bulletPoolId, firePoint.position, firePoint.rotation);
+        EntityTeam entityTeam = GetComponentInParent<EntityTeam>();
+        if (entityTeam) entityTeam.SetTeam(parentEntityTeam.team);
     }
 }

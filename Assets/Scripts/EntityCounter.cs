@@ -11,8 +11,6 @@ public class EntityCounter : MonoBehaviour
     public static EntityCounter Instance { get; private set; }
 
 
-    [Header("Trajectory Settings")]
-    [SerializeField] private float savedTrajectoryPositions = 1000;
     [Header("Grid Settings")]
     // Grid cell size (tune to your query radii, e.g., 10f for distance-10 searches)
     public float CellSize = 10f;
@@ -61,7 +59,6 @@ public class EntityCounter : MonoBehaviour
 
     private void Register(GameObject obj, System.Type enumType, int enumValue)
     {
-        AttachPositionTracker(obj);
         Vector2 pos = obj.transform.position;
         Vector2Int cell = GetCellKey(pos);
 
@@ -81,7 +78,6 @@ public class EntityCounter : MonoBehaviour
             tracker.EntityToCell.Remove(obj);
         }
         tracker.AllEntities.Remove(obj);
-        RemovePositionTracker(obj);
     }
 
     // Call this when an entity moves to update its spatial bucket
@@ -125,8 +121,8 @@ public class EntityCounter : MonoBehaviour
         var candidates = new HashSet<GameObject>();
 
         // Find cells that intersect the query circle
-        Vector2Int minCell = GetCellKey(center - Vector2.one * radius);
-        Vector2Int maxCell = GetCellKey(center + Vector2.one * radius);
+        Vector2Int minCell = GetCellKey(center - Vector2.one * (radius*1.41f));
+        Vector2Int maxCell = GetCellKey(center + Vector2.one * (radius*1.41f));
 
         for (int x = minCell.x; x <= maxCell.x; x++)
         {
@@ -303,21 +299,6 @@ public class EntityCounter : MonoBehaviour
             {
                 tracker.Cells.Remove(cell); // Clean up empty cells
             }
-        }
-    }
-    private void AttachPositionTracker(GameObject obj)
-    {
-        if (obj.GetComponent<Trajectory>() == null)
-        {
-            obj.AddComponent<Trajectory>();
-        }
-    }
-    private void RemovePositionTracker(GameObject obj)
-    {
-        var trajectory = obj.GetComponent<Trajectory>();
-        if (trajectory != null)
-        {
-            Destroy(trajectory);
         }
     }
 }

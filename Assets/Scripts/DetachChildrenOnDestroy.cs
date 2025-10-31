@@ -5,6 +5,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static DetachChildrenOnDestroy;
 
 public class DetachChildrenOnDestroy : ActivateOnDespawn
 {
@@ -89,6 +90,14 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
         }
         CompositeCollider2D comp = obj.GetComponent<CompositeCollider2D>();
         if (comp) Destroy(comp);
+
+        Trajectory trajectory = obj.GetComponent<Trajectory>();
+        if (trajectory) Destroy(trajectory);
+
+        EntityTeam entityTeam = obj.GetComponent<EntityTeam>();
+        if (entityTeam) Destroy(entityTeam);
+
+
         Collider2D col = obj.GetComponent<Collider2D>();
         if (col) col.usedByComposite = false;
 
@@ -153,8 +162,18 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
             compositeCollider2D.geometryType = CompositeCollider2D.GeometryType.Polygons;
             compositeCollider2D.generationType = CompositeCollider2D.GenerationType.Synchronous;
 
+            Trajectory trajectory = childInfo.child.GetComponent<Trajectory>();
+            if (!trajectory) trajectory = childInfo.child.AddComponent<Trajectory>();
+
+            EntityTeam entityTeam = childInfo.child.GetComponent<EntityTeam>();
+            if (!entityTeam) entityTeam = childInfo.child.AddComponent<EntityTeam>();
+            entityTeam.SetTeam(TeamManager.Instance.GetEntityTeam(gameObject));
+
             Collider2D collider2D = childInfo.child.GetComponent<Collider2D>();
             if (collider2D) collider2D.usedByComposite = true;
+
+            Health health = childInfo.child.GetComponent<Health>();
+            if (health) health.UpdateParentEntityTeam();
         }
 
         // Clear the list after detaching
