@@ -60,14 +60,14 @@ public class TeamManager : MonoBehaviour
         return GetParentEntityTeamRecursive(parent, currentHighest);
     }
 
-    private bool IsAlly(Team myTeam, Team otherTeam)
+    public bool IsAlly(Team myTeam, Team otherTeam)
     {
         if (myTeam == Team.Neutral || myTeam == Team.EnemyToAll) return false;
         if (otherTeam == Team.Neutral || otherTeam == Team.EnemyToAll) return false;
         return myTeam == otherTeam;
     }
 
-    private bool IsEnemy(Team myTeam, Team otherTeam)
+    public bool IsEnemy(Team myTeam, Team otherTeam)
     {
         if (otherTeam == Team.Neutral) return false;
         if (otherTeam == Team.EnemyToAll) return true;

@@ -17,12 +17,12 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
         public GameObject child;
     }
 
-    [SerializeField] private Rigidbody2D topRigidbody2D; // Make private after testing
     [SerializeField] private List<ChildInfo> childrenToDetach;
     [SerializeField] private DetachChildrenOnDestroy parentScript; // Make private after testing
-    [SerializeField] private float totalMass; // Make private after testing
     [SerializeField] private float myRelativeMass = 1f; // Small fraction for itself
 
+    private Rigidbody2D topRigidbody2D; // Make private after testing
+    private float totalMass; // Make private after testing
     public void SetParentScript(DetachChildrenOnDestroy parent)
     {
         parentScript = parent;
@@ -67,6 +67,7 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
         }
         despawnComponents[0].OnDespawned += RemoveChildFromList;
 
+        // If an object is re-spawned from the pool, it is not attached to this obj
         //ActivateOnSpawn[] spawnComponents = child.GetComponents<ActivateOnSpawn>();
         //if (spawnComponents.Length == 0)
         //{
@@ -140,8 +141,18 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
     public override void Activate()
     {
         base.Activate();
-        DetachChildren();
+        DetachWeaponControllers(); // Must be first
+        DetachChildren(); // Must be second
         // When I despawn, my mass will be removed from parent
+    }
+
+    private void DetachWeaponControllers()
+    {
+        IWeaponController[] weaponControllers = GetComponentsInChildren<IWeaponController>();
+        foreach (IWeaponController controller in weaponControllers)
+        {
+            controller.Detach();
+        }
     }
 
     private void DetachChildren()

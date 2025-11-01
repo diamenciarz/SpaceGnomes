@@ -11,7 +11,6 @@ public class ActivateOnDespawn : MonoBehaviour
     // This method is called when the object is despawned from the pool
     public virtual void Activate()
     {
-        Debug.Log("ActivateOnDespawn activated for " + gameObject.name);
         if (OnDespawned != null)
         {
             OnDespawned(gameObject);

@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static EntityTeam;
 
 public class EntityTeam : MonoBehaviour
 {

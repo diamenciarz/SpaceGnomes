@@ -139,7 +139,7 @@ public class ObjectPoolManager : MonoBehaviour
     public void Despawn(GameObject obj)
     {
         ActivateOnDespawned(obj);
-        HasEntityType hasEntityType = gameObject.GetComponent<HasEntityType>();
+        HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
         if (hasEntityType)
         {
             EntityCounter.Instance.UnregisterEntity(obj);

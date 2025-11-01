@@ -15,18 +15,25 @@ public class GunController : MonoBehaviour, IWeaponController
     private float replenishTimer;
     private float fireTimer;
     private bool isShooting;
+    private bool isDetached = false;
 
     public ShipAction GetActionType()
     {
         return activateOn;
     }
 
-    private void Awake()
+    private void Start()
     {
         currentAmmo = maxAmmo;
         replenishTimer = 0f;
         fireTimer = 0f;
         UpdateParentEntityTeam();
+        DeactivateOnDetach();
+    }
+
+    private void DeactivateOnDetach()
+    {
+        isShooting = false;
     }
 
     public void UpdateParentEntityTeam()
@@ -47,6 +54,8 @@ public class GunController : MonoBehaviour, IWeaponController
             }
         }
 
+        if (isDetached) return;
+
         // Handle shooting
         if (isShooting && CanShoot())
         {
@@ -57,6 +66,12 @@ public class GunController : MonoBehaviour, IWeaponController
                 fireTimer = 0f;
             }
         }
+    }
+
+    public void Detach()
+    {
+        isDetached = true;
+        isShooting = false;
     }
 
     public void SetShooting(bool isShooting)
@@ -85,6 +100,9 @@ public class GunController : MonoBehaviour, IWeaponController
         currentAmmo--;
         GameObject projectile = ObjectPoolManager.Instance.Spawn(bulletPoolId, firePoint.position, firePoint.rotation);
         EntityTeam entityTeam = GetComponentInParent<EntityTeam>();
-        if (entityTeam) entityTeam.SetTeam(parentEntityTeam.team);
+        if (entityTeam)
+        {
+            entityTeam.SetTeam(parentEntityTeam.team);
+        }
     }
 }

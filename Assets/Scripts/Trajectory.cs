@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Trajectory : MonoBehaviour
 {
@@ -68,5 +69,9 @@ public class Trajectory : MonoBehaviour
     public Vector2 GetVelocity()
     {
         return previousVelocity;
+    }
+    public Vector2 ExtrapolateFuturePosition(float deltaTime)
+    {
+        return previousPosition + previousVelocity * deltaTime + (currentAcceleration * deltaTime * deltaTime / 2);
     }
 }

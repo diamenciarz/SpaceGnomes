@@ -71,7 +71,6 @@ public class EntityCounter : MonoBehaviour
     private void Unregister(GameObject obj, System.Type enumType, int enumValue)
     {
         var tracker = trackers[enumType][enumValue];
-
         if (tracker.EntityToCell.TryGetValue(obj, out Vector2Int cell))
         {
             RemoveFromCell(tracker, obj, cell);

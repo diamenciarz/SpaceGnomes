@@ -2,13 +2,11 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    
-
     [SerializeField] private float maxHealth = 100f;
-
-    private float currentHealth;
     public bool isInvulnerable = false;
     public float CurrentHealth => currentHealth;
+
+    private float currentHealth;
     private EntityTeam parentEntityTeam;
     public EntityTeam.Team team => parentEntityTeam? parentEntityTeam.team : EntityTeam.Team.Neutral;
 

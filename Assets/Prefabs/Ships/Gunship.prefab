@@ -490,9 +490,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseRange: 20
   stopRange: 2
-  avoidRange: 10
+  avoidRange: 3
+  maxAvoidanceFraction: 0.7
   chaseEntityTypes: 01000000
-  avoidEntityTypes: 00000000
+  avoidEntityTypes: 0000000004000000
 --- !u!1 &2405233771952785761
 GameObject:
   m_ObjectHideFlags: 0
@@ -1467,13 +1468,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   topRigidbody2D: {fileID: 4275953901346360542}
   childrenToDetach:
-  - relativeMass: 1
+  - relativeMass: 2.5
     child: {fileID: 2405233771952785761}
-  - relativeMass: 3
+  - relativeMass: 2.5
     child: {fileID: 5905030987734287010}
-  - relativeMass: 2
+  - relativeMass: 1.5
     child: {fileID: 5409615770571366803}
-  - relativeMass: 2
+  - relativeMass: 1.5
     child: {fileID: 2265605512885640490}
   - relativeMass: 1
     child: {fileID: 5641312366177501074}
