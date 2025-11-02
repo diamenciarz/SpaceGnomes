@@ -169,7 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05dea601342ed124984e193ba70b549b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetEntityTypes: 0100000000000000
+  targetEntityTypes: 010000000000000004000000
   poolId: PlasmaBullet
 --- !u!114 &-7580439671291849363
 MonoBehaviour:

@@ -11,13 +11,16 @@ public class AIControlInput : ShipControlInput
     [SerializeField] private float chaseRange = 20f;
     [SerializeField] private float stopRange = 5;
     [SerializeField] private float avoidRange = 10f;
-    [SerializeField] private float maxAvoidanceFraction = 0.7f;
+    [SerializeField] [Range(0,1)] private float maxAvoidanceFraction = 0.7f;
 
     [Header("Instances")]
     private EntityTeam myTeam; // Get the team
 
     [SerializeField] private List<EntityType> chaseEntityTypes;
     [SerializeField] private List<EntityType> avoidEntityTypes;
+
+    [Header("Debugging Settings")]
+    [SerializeField] private bool debug = false;
 
     private Vector2 controlVector = Vector2.zero;
     private void Awake()
@@ -44,10 +47,7 @@ public class AIControlInput : ShipControlInput
         Vector2 scaledChase = chaseVector * (1 - scaledAvoidance.magnitude); // 1 -> 0.3
         Vector2 output = scaledAvoidance + scaledChase;
         if (output.magnitude > 1) output.Normalize();
-        Debug.DrawRay(transform.position, output, Color.yellow);
-        //RaycastHit2D[] hits = GeometryUtils.GetRaycastHits(chaseEntity.transform.position, transform.position);
-        //Debug.Log("Raycast hits count: " + hits.Length);
-        //Debug.DrawLine(transform.position, chaseEntity.transform.position, Color.red);
+        if (debug) Debug.DrawRay(transform.position, output, Color.yellow);
         controlVector = WorldCoordsToLocal(output);
     }
     private Vector2 CalculateChaseVector()
@@ -57,7 +57,7 @@ public class AIControlInput : ShipControlInput
         if (!chaseEntity) return Vector2.zero;
 
         Vector2 directionToTarget = GeometryUtils.CalculateVectorBetweenColliderEdges(chaseEntity, gameObject);
-        Debug.DrawRay(transform.position, directionToTarget, Color.red);
+        if (debug) Debug.DrawRay(transform.position, directionToTarget, Color.red);
         if (directionToTarget.magnitude > 1) directionToTarget.Normalize();
         return directionToTarget;
     }
@@ -68,7 +68,6 @@ public class AIControlInput : ShipControlInput
         foreach (GameObject obstacle in avoidEntities)
         {
             Vector2 dirToObstacle = GeometryUtils.CalculateVectorBetweenColliderEdges(obstacle, gameObject);
-            //Debug.DrawRay(transform.position, dirToObstacle, Color.cyan);
             if (dirToObstacle.magnitude < avoidRange)
             {
                 // The closer the obstacle, the stronger the avoidance
