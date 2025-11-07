@@ -69,6 +69,7 @@ public class TeamManager : MonoBehaviour
 
     public bool IsEnemy(Team myTeam, Team otherTeam)
     {
+        if(myTeam == Team.Neutral) return false;
         if (otherTeam == Team.Neutral) return false;
         if (otherTeam == Team.EnemyToAll) return true;
         if (myTeam == Team.EnemyToAll) return true;

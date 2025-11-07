@@ -1,8 +1,8 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class BulletController : MonoBehaviour
-    // Consider making this into a generic forward movement controller
+public class BulletController : ActivateOnSpawn
+// Consider making this into a generic forward movement controller
 {
     [SerializeField] private float initialVelocity = 20f;
 
@@ -14,7 +14,7 @@ public class BulletController : MonoBehaviour
         rb.isKinematic = true; // Ensure kinematic for manual velocity control
     }
 
-    private void OnEnable()
+    public override void Activate()
     {
         // Set initial velocity along forward direction (transform.up)
         rb.velocity = transform.up * initialVelocity;

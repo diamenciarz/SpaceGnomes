@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GunController : MonoBehaviour, IWeaponController
+public class GunController : AbstractWeaponController
 {
     [SerializeField] private string bulletPoolId = "PlasmaBullet"; // Pool ID for bullets
     [SerializeField] private Transform firePoint; // Where bullets spawn
@@ -15,9 +15,8 @@ public class GunController : MonoBehaviour, IWeaponController
     private float replenishTimer;
     private float fireTimer;
     private bool isShooting;
-    private bool isDetached = false;
 
-    public ShipAction GetActionType()
+    public override ShipAction GetActionType()
     {
         return activateOn;
     }
@@ -28,19 +27,11 @@ public class GunController : MonoBehaviour, IWeaponController
         replenishTimer = 0f;
         fireTimer = 0f;
         UpdateParentEntityTeam();
-        DeactivateOnDetach();
     }
-
-    private void DeactivateOnDetach()
-    {
-        isShooting = false;
-    }
-
     public void UpdateParentEntityTeam()
     {
         parentEntityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
     }
-
     private void Update()
     {
         // Handle ammo replenishment
@@ -54,8 +45,6 @@ public class GunController : MonoBehaviour, IWeaponController
             }
         }
 
-        if (isDetached) return;
-
         // Handle shooting
         if (isShooting && CanShoot())
         {
@@ -68,13 +57,13 @@ public class GunController : MonoBehaviour, IWeaponController
         }
     }
 
-    public void Detach()
+    public override void Detach()
     {
-        isDetached = true;
+        //gameObject.SetActive(false);
         isShooting = false;
     }
 
-    public void SetShooting(bool isShooting)
+    public override void SetShooting(bool isShooting)
     {
         this.isShooting = isShooting;
     }

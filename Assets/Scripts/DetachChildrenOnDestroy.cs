@@ -148,8 +148,8 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
 
     private void DetachWeaponControllers()
     {
-        IWeaponController[] weaponControllers = GetComponentsInChildren<IWeaponController>();
-        foreach (IWeaponController controller in weaponControllers)
+        AbstractWeaponController[] weaponControllers = GetComponentsInChildren<AbstractWeaponController>();
+        foreach (AbstractWeaponController controller in weaponControllers)
         {
             controller.Detach();
         }

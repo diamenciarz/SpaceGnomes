@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 6409203748316748609}
   - component: {fileID: -6234091980034668709}
   - component: {fileID: 6787757148709373545}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PlasmaBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}

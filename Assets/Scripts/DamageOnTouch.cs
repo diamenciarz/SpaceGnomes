@@ -30,6 +30,7 @@ public class DamageOnTouch : MonoBehaviour
         
         if (TeamManager.Instance.IsEnemy(entityTeam.team, healthManager.team))
         {
+            Debug.Log($"Bullet team {entityTeam.team} other team {healthManager.team}");
             healthManager.TakeDamage(damage);
         }
     }

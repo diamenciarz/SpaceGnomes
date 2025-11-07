@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 using static HasEntityType;
 
 [RequireComponent(typeof(EntityTeam))]
-public class AIControlInput : ShipControlInput
+public class AIChaseInput : ShipControlInput
 {
     [Header("Distance settings")]
     [SerializeField] private float chaseRange = 20f;
@@ -53,7 +53,7 @@ public class AIControlInput : ShipControlInput
     private Vector2 CalculateChaseVector()
     {
         List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(chaseEntityTypes, gameObject.transform.position, chaseRange, myTeam.team);
-        GameObject chaseEntity = GeometryUtils.FindClosestEntity(entities, gameObject.transform.position, stopRange);
+        GameObject chaseEntity = GeometryUtils.FindClosestEntityToPosition(entities, gameObject.transform.position, stopRange);
         if (!chaseEntity) return Vector2.zero;
 
         Vector2 directionToTarget = GeometryUtils.CalculateVectorBetweenColliderEdges(chaseEntity, gameObject);
@@ -83,6 +83,7 @@ public class AIControlInput : ShipControlInput
     {
         List<EntityTeam.Team> teams = new List<EntityTeam.Team>() {
             EntityTeam.Team.Neutral,
+            EntityTeam.Team.EnemyToAll,
             myTeam.team
         };
         // The avoid range is counted from the middle of the entity, so we need to check in a larger range than avoidRange

@@ -1,0 +1,8 @@
+using UnityEngine;
+
+public abstract class AbstractWeaponController: MonoBehaviour
+{
+    public abstract void SetShooting(bool isShooting);
+    public abstract ShipAction GetActionType();
+    public abstract void Detach();
+}

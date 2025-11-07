@@ -115,6 +115,7 @@ public class ObjectPoolManager : MonoBehaviour
         }
         obj.SetActive(true);
 
+
         ActivateOnSpawned(obj);
         return obj;
     }

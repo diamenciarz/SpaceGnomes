@@ -9,14 +9,19 @@ public class HasEntityType : MonoBehaviour
     {
         Wall,
         Ship,
-        Bullet,
+        Projectile,
         Explosion,
-        SpaceDebris
+        SpaceDebris,
+        Missile
     }
     [SerializeField] private EntityType entityType;
     public EntityType Type => entityType;
     private bool wasRegistered = false;
 
+    public EntityType[] GetCollidableEntityTypes()
+    {
+        return new EntityType[] { EntityType.Wall, EntityType.Ship, EntityType.SpaceDebris };
+    }
     public void SetRegistered()
     {
         wasRegistered = true;
