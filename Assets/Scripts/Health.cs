@@ -4,7 +4,7 @@ public class Health : MonoBehaviour
 {
     [SerializeField] private float maxHealth = 100f;
     public bool isInvulnerable = false;
-    public float CurrentHealth => currentHealth;
+    public float value => currentHealth;
 
     private float currentHealth;
     private EntityTeam parentEntityTeam;

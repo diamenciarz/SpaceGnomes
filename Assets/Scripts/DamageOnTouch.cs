@@ -20,18 +20,17 @@ public class DamageOnTouch : MonoBehaviour
     {
         if (damageEntityTypes.Count == 0) return;
         
-        Health healthManager = other.GetComponent<Health>();
-        if (healthManager == null) return;
+        Health health = other.GetComponent<Health>();
+        if (health == null) return;
         
         HasEntityType otherEntityType = other.GetComponent<HasEntityType>();
         if (otherEntityType == null) return; // Only damage objects with an Entity Type
         
         if (!damageEntityTypes.Contains(otherEntityType.Type)) return;
         
-        if (TeamManager.Instance.IsEnemy(entityTeam.team, healthManager.team))
+        if (TeamManager.Instance.IsEnemy(entityTeam.team, health.team))
         {
-            Debug.Log($"Bullet team {entityTeam.team} other team {healthManager.team}");
-            healthManager.TakeDamage(damage);
+            health.TakeDamage(damage);
         }
     }
 }

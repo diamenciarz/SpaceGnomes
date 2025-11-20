@@ -8,6 +8,8 @@ public class BulletController : ActivateOnSpawn
 
     private Rigidbody2D rb;
 
+    public float InitialVelocity => initialVelocity;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();

@@ -213,6 +213,7 @@ GameObject:
   - component: {fileID: 2405805016719162628}
   - component: {fileID: 5747292331280976720}
   - component: {fileID: 8076816269696358030}
+  - component: {fileID: 463842373566036617}
   m_Layer: 6
   m_Name: Gunship
   m_TagString: Untagged
@@ -508,10 +509,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d05c9941f5ae474aa71fa5dbcf96dba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  predictTrajectories: 0
   weaponConfigs:
   - weaponController: {fileID: 5947397178258161119}
     cameraSensor: {fileID: 1554176347}
     rotator: {fileID: 5671608571878104450}
+--- !u!114 &463842373566036617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2369128004041744743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPositions: 100
 --- !u!1 &2405233771952785761
 GameObject:
   m_ObjectHideFlags: 0

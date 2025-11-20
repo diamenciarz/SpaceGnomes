@@ -102,6 +102,21 @@ public class ObjectPoolManager : MonoBehaviour
         obj = pool.Dequeue();
         return ActivateObject(obj, position, rotation);
     }
+    public float GetInitialObjectSpeed(string poolId)
+    {
+        configMap.TryGetValue(poolId, out PoolConfig config);
+        if (config == null) throw new Exception($"No pool config found for ID: {poolId}");
+        return GetInitialObjectSpeed(config.prefab);
+    }
+    public float GetInitialObjectSpeed(GameObject obj)
+    {
+        BulletController bulletController = obj.GetComponent<BulletController>();
+        if (bulletController != null) return bulletController.InitialVelocity;
+
+        // Handle other cases as needed
+
+        return 0;
+    }
     private GameObject ActivateObject(GameObject obj, Vector3 position, Quaternion rotation)
     {
         // Order, location, set as registered, register, set active, activate observers

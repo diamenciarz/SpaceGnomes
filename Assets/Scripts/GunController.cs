@@ -16,10 +16,9 @@ public class GunController : AbstractWeaponController
     private float fireTimer;
     private bool isShooting;
 
-    public override ShipAction GetActionType()
-    {
-        return activateOn;
-    }
+    public override ShipAction GetActionType() => activateOn;
+    public override Transform GetShootingPointTransform() => firePoint;
+    public override float GetProjectileSpeed() => ObjectPoolManager.Instance.GetInitialObjectSpeed(bulletPoolId);
 
     private void Start()
     {
@@ -63,6 +62,7 @@ public class GunController : AbstractWeaponController
         isShooting = false;
     }
 
+
     public override void SetShooting(bool isShooting)
     {
         this.isShooting = isShooting;
@@ -88,7 +88,7 @@ public class GunController : AbstractWeaponController
         // Spawn bullet from pool
         currentAmmo--;
         GameObject projectile = ObjectPoolManager.Instance.Spawn(bulletPoolId, firePoint.position, firePoint.rotation);
-        EntityTeam entityTeam = GetComponentInParent<EntityTeam>();
+        EntityTeam entityTeam = projectile.GetComponentInParent<EntityTeam>();
         if (entityTeam)
         {
             entityTeam.SetTeam(parentEntityTeam.team);

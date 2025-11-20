@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +11,8 @@ public class AIWeaponController : MonoBehaviour
         public CameraSensor cameraSensor;
         public Rotator rotator;
     }
+    [SerializeField][Tooltip("Targets a position the target will be when the bullet reaches it")] 
+    bool predictTrajectories;
     [SerializeField] List<WeaponConfig> weaponConfigs = new List<WeaponConfig>();
     // Start is called before the first frame update
     void Start()
@@ -21,6 +22,10 @@ public class AIWeaponController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        ControlWeapons();
+    }
+    private void ControlWeapons()
     {
         foreach (WeaponConfig config in weaponConfigs)
         {
@@ -34,7 +39,25 @@ public class AIWeaponController : MonoBehaviour
 
             GameObject target = GeometryUtils.FindClosestEntityToPosition(enemies, config.cameraSensor.transform.position);
             config.weaponController.SetShooting(true);
-            config.rotator.SetTarget(target);
+            RotateToTarget(config, target);
         }
+    }
+    private void RotateToTarget(WeaponConfig config, GameObject target)
+    {
+        if (!predictTrajectories)
+        {
+            config.rotator.SetTarget(target);
+            return;
+        }
+        Trajectory targetTrajectory = target.GetComponent<Trajectory>();
+        if (!targetTrajectory)
+        {
+            config.rotator.SetTarget(target);
+            return;
+        }
+        Vector2 shootingPoint = config.weaponController.GetShootingPointTransform().position;
+        Vector2 hitPosition = GeometryUtils.CalculateTrajectoryHitCoordinates(targetTrajectory, shootingPoint, config.weaponController.GetProjectileSpeed());
+        config.rotator.SetTarget(hitPosition);
+
     }
 }

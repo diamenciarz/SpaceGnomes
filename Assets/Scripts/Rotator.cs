@@ -15,6 +15,10 @@ public class Rotator : MonoBehaviour
     private GameObject targetObject;
     private Vector2 targetPosition;
     private bool usePosition = false;
+    public Vector2 GetCurrentDirection()
+    {
+        return GeometryUtils.AngleToDirectionVector(rotator.rotation.eulerAngles.z);
+    }
     public void SetTarget(GameObject obj)
     {
         targetObject = obj;

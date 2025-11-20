@@ -32,7 +32,7 @@ public class Trajectory : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         Vector2 currentPosition = transform.position;
 
@@ -44,8 +44,8 @@ public class Trajectory : MonoBehaviour
         }
 
         Vector2 currentVelocity;
-        currentVelocity = (currentPosition - previousPosition) / Time.fixedDeltaTime;
-        currentAcceleration = (currentVelocity - previousVelocity) / Time.fixedDeltaTime;
+        currentVelocity = (currentPosition - previousPosition) / Time.deltaTime;
+        currentAcceleration = (currentVelocity - previousVelocity) / Time.deltaTime;
         
         previousVelocity = currentVelocity;
         previousPosition = currentPosition;

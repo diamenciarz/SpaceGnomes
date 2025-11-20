@@ -281,4 +281,21 @@ public static class GeometryUtils
         }
         return closest;
     }
+    public static Vector2 CalculateTrajectoryHitCoordinates(Trajectory targetTrajectory, Vector2 startingPosition, float projectileSpeed)
+    {
+        if (projectileSpeed <= 0f) return targetTrajectory.GetCurrentPosition();
+
+        const int maxIterations = 3;
+        Vector2 targetPosition = targetTrajectory.GetCurrentPosition();
+        float distanceToTarget = (targetPosition - startingPosition).magnitude;
+        float deltaTime = distanceToTarget / projectileSpeed;
+        for (int i = 0; i < maxIterations; i++)
+        {
+            if (distanceToTarget <= 0.05f) return targetPosition;
+            targetPosition = targetTrajectory.ExtrapolateFuturePosition(deltaTime);
+            distanceToTarget = (targetPosition - startingPosition).magnitude;
+            deltaTime = distanceToTarget / projectileSpeed;
+        }
+        return targetPosition;
+    }
 }
