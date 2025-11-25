@@ -274,10 +274,10 @@ MonoBehaviour:
   thrustDampingMultiplier: 3
   maxVelocity: 20
   perpendicularDamping: 0.1
-  steerTorque: 1000
+  steerTorque: 10000
   maxAngularDampingMultiplier: 2
   maxAngularVelocity: 100
-  angularDamping: 0.1
+  angularDamping: 0.2
   shipControlInput: {fileID: 4049380779284195394}
 --- !u!114 &6543003814999245564
 MonoBehaviour:
@@ -485,18 +485,19 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2369128004041744743}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6045741e038df4847ab70e98b65af53e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   chaseRange: 20
-  stopRange: 2
-  avoidRange: 3
-  maxAvoidanceFraction: 0.7
+  stopRange: 5
+  maxAvoidanceFraction: 0.6
+  dangerousObstacleSpeed: 5
+  chaseMode: 1
   chaseEntityTypes: 01000000
   avoidEntityTypes: 0000000004000000
-  debug: 0
+  debug: 1
 --- !u!114 &8076816269696358030
 MonoBehaviour:
   m_ObjectHideFlags: 0

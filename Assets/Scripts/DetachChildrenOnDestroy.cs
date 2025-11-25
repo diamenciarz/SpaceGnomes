@@ -45,10 +45,8 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
 
     private void Start()
     {
-        if (topRigidbody2D)
-        {
-            totalMass = topRigidbody2D.mass;
-        }
+        topRigidbody2D = GetComponentInParent<Rigidbody2D>();
+        if (topRigidbody2D) totalMass = topRigidbody2D.mass;
         SetMassToSplit(totalMass);
 
         // Subscribe to despawn and spawn events of each child
@@ -167,6 +165,8 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
             rb2d.mass = totalMass * (childInfo.relativeMass / totalRelativeMass);
             rb2d.gravityScale = 0;
             rb2d.interpolation = RigidbodyInterpolation2D.Interpolate;
+            rb2d.velocity = topRigidbody2D ? topRigidbody2D.velocity : Vector2.zero;
+            rb2d.angularVelocity = topRigidbody2D ? topRigidbody2D.angularVelocity : 0f;
 
             CompositeCollider2D compositeCollider2D = childInfo.child.GetComponent<CompositeCollider2D>();
             if (!compositeCollider2D) compositeCollider2D = childInfo.child.AddComponent<CompositeCollider2D>();

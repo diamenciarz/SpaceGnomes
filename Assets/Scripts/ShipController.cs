@@ -38,6 +38,15 @@ public class ShipController: MonoBehaviour
         ApplyAngularDamping();
     }
 
+    public float GetMaxVelocity()
+    {
+        return maxVelocity;
+    }
+    public float GetMaxAngularVelocity()
+    {
+        return maxAngularVelocity;
+    }
+
     private void UpdateInputs()
     {
         if (shipControlInput != null)

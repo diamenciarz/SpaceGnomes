@@ -225,19 +225,32 @@ public static class GeometryUtils
         // If an Euler angle is outside the range <-180,180> bring it into it
         return Mathf.Repeat(angle + 180f, 360f) - 180f;
     }
-    public static Vector2 CalculateVectorBetweenColliderEdges(GameObject to, GameObject from)
+    public struct CollidingPoints
+    {
+        public Vector2 toPos;
+        public Vector2 fromPos;
+    }
+
+    public static CollidingPoints CalculateColliderEdgePoints(GameObject to, GameObject from)
     {
         Collider2D colliderB = from.GetComponent<Collider2D>();
         Collider2D colliderA = to.GetComponent<Collider2D>();
+        CollidingPoints points = new CollidingPoints();
         if (colliderA == null || colliderB == null)
         {
-            return to.transform.position - from.transform.position;
+            points.toPos = to.transform.position;
+            points.fromPos = from.transform.position;
+            return points;
         }
-        Vector2 closestPointA = colliderA.ClosestPoint(colliderB.transform.position);
-        Vector2 closestPointB = colliderB.ClosestPoint(colliderA.transform.position);
-        //Debug.DrawLine(closestPointA, closestPointB, Color.cyan);
-
-        return closestPointB - closestPointA;
+        points.toPos = colliderA.ClosestPoint(colliderB.transform.position);
+        points.fromPos = colliderB.ClosestPoint(colliderA.transform.position);
+        //Debug.DrawLine(points.toPos, points.fromPos, Color.magenta);
+        return points;
+    }
+    public static Vector2 CalculateVectorBetweenColliderEdges(GameObject to, GameObject from)
+    {
+        CollidingPoints points = CalculateColliderEdgePoints(to, from);
+        return points.toPos - points.fromPos;
     }
     public static GameObject FindClosestEntityToPosition(IEnumerable<GameObject> entities, Vector2 position, float minRange = 0f, float maxRange = float.MaxValue)
     {
