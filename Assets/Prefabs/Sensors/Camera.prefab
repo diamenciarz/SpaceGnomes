@@ -48,7 +48,7 @@ MonoBehaviour:
   displayFOV: 1
   range: 10
   fov: 60
-  detectTypes: 000000000100000004000000
+  detectTypes: 0100000004000000
   fieldOfViewPrefab: {fileID: 1698827673125149811, guid: 09008ffff9d2b8a4191b2205993c2ab1, type: 3}
   sensorViewPoint: {fileID: 6121753063332892029}
 --- !u!1 &8063564290379923370

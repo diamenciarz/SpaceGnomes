@@ -10,6 +10,7 @@ public class DestroyAfterDelay : MonoBehaviour
     private float timer;
     private void OnEnable()
     {
+        //Debug.Log("Enabled: " + gameObject.name);
         timer = 0f;
     }
 
@@ -19,6 +20,7 @@ public class DestroyAfterDelay : MonoBehaviour
         timer += Time.deltaTime;
         if (timer >= lifetime)
         {
+            //Debug.Log("Despawning after delay: " + gameObject.name);
             ObjectPoolManager.Instance.Despawn(gameObject, poolId);
         }
     }

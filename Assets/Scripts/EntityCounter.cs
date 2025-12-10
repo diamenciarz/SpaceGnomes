@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.SearchService;
 using UnityEngine;
 using static HasEntityType;
 using static UnityEngine.EventSystems.EventTrigger;
@@ -246,6 +247,31 @@ public class EntityCounter : MonoBehaviour
         }
 
         return closest;
+    }
+
+    /// <summary>
+    /// Keeps only objects with HasEntityType script attached whose type is in the list
+    /// </summary>
+    public GameObject[] FilterEntityTypes(GameObject[] entities, EntityType[] entityTypes)
+    {
+        return FilterEntityTypes(new List<GameObject>(entities), new List<EntityType>(entityTypes));
+    }
+    /// <summary>
+    /// Keeps only objects with HasEntityType script attached whose type is in the list
+    /// </summary>
+    public GameObject[] FilterEntityTypes(List<GameObject> entities, List<EntityType> entityTypes)
+    {
+        List<GameObject> filteredObjects = new List<GameObject>();
+        foreach (GameObject obj in entities)
+        {
+            HasEntityType entityTypeComponent = obj.GetComponent<HasEntityType>();
+            if (entityTypeComponent == null) continue;
+            if (entityTypes.Contains(entityTypeComponent.Type)) 
+            {
+                filteredObjects.Add(obj);
+            }
+        }
+        return filteredObjects.ToArray();
     }
 
     // Debug visualization - draws bounding boxes for occupied cells

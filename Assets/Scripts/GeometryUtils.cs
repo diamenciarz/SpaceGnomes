@@ -43,6 +43,40 @@ public static class GeometryUtils
     public static GameObject[] GetVisibleEnemiesInCone(Cone cone, Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         GameObject[] objects = GetVisibleObjectsInCone(cone, myTeam, sensorType);
+        //foreach (var item in objects)
+        //{
+        //    Debug.Log("Seeing " + item.gameObject.name);
+        //}
+        List<GameObject> enemies = new List<GameObject>();
+        foreach (GameObject obj in objects)
+        {
+            if (TeamManager.Instance.IsEnemy(TeamManager.Instance.GetEntityTeam(obj), myTeam))
+            {
+                enemies.Add(obj);
+            }
+        }
+        return enemies.ToArray();
+    }
+    public static GameObject[] GetVisibleAlliesInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    {
+        GameObject[] objects = GetVisibleObjectsInCone(cone, myTeam, entityTypes, sensorType);
+        List<GameObject> enemies = new List<GameObject>();
+        foreach (GameObject obj in objects)
+        {
+            if (TeamManager.Instance.IsAlly(TeamManager.Instance.GetEntityTeam(obj), myTeam))
+            {
+                enemies.Add(obj);
+            }
+        }
+        return enemies.ToArray();
+    }
+    public static GameObject[] GetVisibleEnemiesInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    {
+        GameObject[] objects = GetVisibleObjectsInCone(cone, myTeam, entityTypes, sensorType);
+        //foreach (var item in objects)
+        //{
+        //    Debug.Log("Seeing " + item.gameObject.name);
+        //}
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject obj in objects)
         {
@@ -57,7 +91,7 @@ public static class GeometryUtils
     {
         List<GameObject> visibleObjects = new List<GameObject>();
         float RAYS_PER_DEGREE = 0.5f;
-        int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE); // One ray per degree
+        int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
         for (int i = 0; i <= rayCount; i++)
@@ -65,6 +99,25 @@ public static class GeometryUtils
             float currentAngle = startAngle + i * angleStep;
             Vector2 rayDirection = Quaternion.Euler(0, 0, currentAngle) * cone.direction;
             GameObject hitObject = GetFirstVisibleObject(cone.origin + rayDirection * cone.maxDistance, cone.origin, myTeam, cone.maxDistance, sensorType);
+            if (hitObject != null && !visibleObjects.Contains(hitObject))
+            {
+                visibleObjects.Add(hitObject);
+            }
+        }
+        return visibleObjects.ToArray();
+    }
+    public static GameObject[] GetVisibleObjectsInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    {
+        List<GameObject> visibleObjects = new List<GameObject>();
+        float RAYS_PER_DEGREE = 0.5f;
+        int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
+        float angleStep = cone.angle / rayCount;
+        float startAngle = -cone.angle / 2;
+        for (int i = 0; i <= rayCount; i++)
+        {
+            float currentAngle = startAngle + i * angleStep;
+            Vector2 rayDirection = Quaternion.Euler(0, 0, currentAngle) * cone.direction;
+            GameObject hitObject = GetFirstVisibleEntity(cone.origin + rayDirection * cone.maxDistance, cone.origin, myTeam, entityTypes, cone.maxDistance, sensorType);
             if (hitObject != null && !visibleObjects.Contains(hitObject))
             {
                 visibleObjects.Add(hitObject);
@@ -136,6 +189,13 @@ public static class GeometryUtils
     public static GameObject GetFirstVisibleObject(Vector2 to, Vector2 from, EntityTeam.Team myTeam, float maxDistance=float.MaxValue, SensorType sensorType = SensorType.Camera)
     {
         RaycastHit2D[] hits = GetVisibleObjects(to, from, maxDistance, sensorType);
+        if (hits.Length == 0) return null;
+
+        //foreach (RaycastHit2D hit in hits)
+        //{
+        //    Debug.Log("Hit object: " + hit.collider.gameObject.name);
+        //    Debug.DrawLine(from, hit.point, Color.blue);
+        //}
         RaycastHit2D[] enemyHits = RemoveAllies(hits, myTeam);
         // Select the closest enemy hit
         float minDistance = float.MaxValue;
@@ -146,8 +206,27 @@ public static class GeometryUtils
             {
                 minDistance = hit.distance;
                 closestObject = hit.transform.gameObject;
-                //Debug.DrawLine(from, hit.point, Color.yellow);
             }
+        }
+        return closestObject;
+    }
+    public static GameObject GetFirstVisibleEntity(Vector2 to, Vector2 from, EntityTeam.Team myTeam, HasEntityType.EntityType[] entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera)
+    {
+        RaycastHit2D[] hits = GetVisibleObjects(to, from, maxDistance, sensorType);
+        if (hits.Length == 0) return null;
+
+        RaycastHit2D[] enemyHits = RemoveAllies(hits, myTeam);
+        // Select the closest enemy hit
+        float minDistance = float.MaxValue;
+        GameObject closestObject = null;
+        foreach (RaycastHit2D hit in enemyHits)
+        {
+            if (hit.distance >= minDistance) continue;
+            HasEntityType entityTypeComponent = hit.collider.GetComponent<HasEntityType>();
+            if (entityTypeComponent == null) continue;
+            if (!entityTypes.Contains(entityTypeComponent.Type)) continue;
+            minDistance = hit.distance;
+            closestObject = hit.collider.gameObject;
         }
         return closestObject;
     }

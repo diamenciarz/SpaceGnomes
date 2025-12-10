@@ -28,6 +28,7 @@ public class DestroyOnCollision : MonoBehaviour
         }
         if (targetEntityTypes.Contains(entityType.Type))
         {
+            Debug.Log(gameObject.name + " collided with " + other.gameObject.name);
             ObjectPoolManager.Instance.Despawn(gameObject, poolId);
         }
     }
