@@ -201,14 +201,14 @@ public class EntityCounter : MonoBehaviour
         return new List<GameObject>(trackers[typeof(EntityType)][(int)type].AllEntities);
     }
 
-    public GameObject[] GetNearbyEntities(EntityType[] types, Vector2 center, float radius)
+    public List<GameObject> GetNearbyEntities(Vector2 center, List<EntityType> types, float radius)
     {
         List<GameObject> entities = new List<GameObject>();
         foreach (EntityType type in types)
         {
             entities.AddRange(GetNearby(typeof(EntityType), (int)type, center, radius));
         }
-        return entities.ToArray();
+        return entities;
     }
     // New: Get entities of type within radius of center (2D circle query)
     public List<GameObject> GetNearbyEntities(EntityType type, Vector2 center, float radius)
@@ -252,14 +252,7 @@ public class EntityCounter : MonoBehaviour
     /// <summary>
     /// Keeps only objects with HasEntityType script attached whose type is in the list
     /// </summary>
-    public GameObject[] FilterEntityTypes(GameObject[] entities, EntityType[] entityTypes)
-    {
-        return FilterEntityTypes(new List<GameObject>(entities), new List<EntityType>(entityTypes));
-    }
-    /// <summary>
-    /// Keeps only objects with HasEntityType script attached whose type is in the list
-    /// </summary>
-    public GameObject[] FilterEntityTypes(List<GameObject> entities, List<EntityType> entityTypes)
+    public List<GameObject> FilterEntityTypes(List<GameObject> entities, List<EntityType> entityTypes)
     {
         List<GameObject> filteredObjects = new List<GameObject>();
         foreach (GameObject obj in entities)
@@ -271,7 +264,7 @@ public class EntityCounter : MonoBehaviour
                 filteredObjects.Add(obj);
             }
         }
-        return filteredObjects.ToArray();
+        return filteredObjects;
     }
 
     // Debug visualization - draws bounding boxes for occupied cells

@@ -37,11 +37,11 @@ public class CameraSensor : MonoBehaviour, ISensor
         follower.Follow(sensorViewPoint.gameObject, true, 0);
         follower.SetDeltaAngle(fov/2); // Rotate to face forward
     }
-    public GameObject[] GetVisibleEnemies()
+    public List<GameObject> GetVisibleEnemies()
     {
         Vector2 dir = GeometryUtils.AngleToDirectionVector(sensorViewPoint.transform.rotation.eulerAngles.z);
         GeometryUtils.Cone cone = new GeometryUtils.Cone(sensorViewPoint.transform.position, dir, fov, range);
-        GameObject[] visibleObjects = GeometryUtils.GetVisibleEnemiesInCone(cone, team, detectTypes, GeometryUtils.SensorType.Camera);
+        List<GameObject> visibleObjects = GeometryUtils.GetVisibleEnemiesInCone(cone, team, detectTypes, GeometryUtils.SensorType.Camera);
         if (debug)
         {
             foreach (GameObject enemy in visibleObjects)
@@ -51,18 +51,18 @@ public class CameraSensor : MonoBehaviour, ISensor
         }
         return visibleObjects;
     }
-    public GameObject[] GetVisibleAllies()
+    public List<GameObject> GetVisibleAllies()
     {
         Vector2 dir = GeometryUtils.AngleToDirectionVector(sensorViewPoint.transform.rotation.eulerAngles.z);
         GeometryUtils.Cone cone = new GeometryUtils.Cone(sensorViewPoint.transform.position, dir, fov, range);
-        GameObject[] visibleObjects = GeometryUtils.GetVisibleAlliesInCone(cone, team, GeometryUtils.SensorType.Camera);
-        return EntityCounter.Instance.FilterEntityTypes(visibleObjects, detectTypes);
+        List<GameObject> visibleObjects = GeometryUtils.GetVisibleAlliesInCone(cone, team, GeometryUtils.SensorType.Camera);
+        return EntityCounter.Instance.FilterEntityTypes(visibleObjects, new List<HasEntityType.EntityType>(detectTypes));
     }
-    public GameObject[] GetVisibleObjects()
+    public List<GameObject> GetVisibleObjects()
     {
         Vector2 dir = GeometryUtils.AngleToDirectionVector(sensorViewPoint.transform.rotation.eulerAngles.z);
         GeometryUtils.Cone cone = new GeometryUtils.Cone(sensorViewPoint.transform.position, dir, fov, range);
-        GameObject[] visibleObjects = GeometryUtils.GetVisibleObjectsInCone(cone, team, GeometryUtils.SensorType.Camera);
-        return EntityCounter.Instance.FilterEntityTypes(visibleObjects, detectTypes);
+        List<GameObject> visibleObjects = GeometryUtils.GetVisibleObjectsInCone(cone, team, GeometryUtils.SensorType.Camera);
+        return EntityCounter.Instance.FilterEntityTypes(visibleObjects, new List<HasEntityType.EntityType>(detectTypes));
     }
 }

@@ -29,9 +29,9 @@ public class AIWeaponController : MonoBehaviour
     {
         foreach (WeaponConfig config in weaponConfigs)
         {
-            GameObject[] enemies = config.cameraSensor.GetVisibleEnemies();
+            List<GameObject> enemies = config.cameraSensor.GetVisibleEnemies();
             
-            if (enemies.Length == 0)
+            if (enemies.Count == 0)
             {
                 config.weaponController.SetShooting(false);
                 config.rotator.StopTargeting();

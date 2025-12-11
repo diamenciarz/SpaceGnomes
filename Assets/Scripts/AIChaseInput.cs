@@ -24,8 +24,7 @@ public class AIChaseInput : ShipControlInput
     [SerializeField] [Range(0, 50f)] [Tooltip("Obstacles moving relatively towards us faster than this will be avoided")]
     private float dangerousObstacleSpeed = 5f;
     [SerializeField] private ChaseMode chaseMode = ChaseMode.DirectlyToTarget;
-
-    private EntityTeam myTeam; // Get the team
+    [SerializeField] [Range(1f,5f)] private float avoidCollisionLookaheadTime = 2f;
 
     [Header("Instances")]
     [SerializeField] private List<EntityType> chaseEntityTypes;
@@ -37,6 +36,7 @@ public class AIChaseInput : ShipControlInput
     private Vector2 controlVector = Vector2.zero;
     private Rigidbody2D myRigidbody2D;
     private ShipController shipController;
+    private EntityTeam myTeam; // Get the team
     private void Awake()
     {
         myTeam = GetComponent<EntityTeam>();
@@ -69,7 +69,7 @@ public class AIChaseInput : ShipControlInput
     }
     private Vector2 CalculateChaseVector()
     {
-        List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(chaseEntityTypes, gameObject.transform.position, chaseRange, myTeam.team);
+        List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(gameObject.transform.position, myTeam.team, chaseEntityTypes, chaseRange);
         GameObject chaseEntity = GeometryUtils.FindClosestEntityToPosition(entities, gameObject.transform.position, stopRange);
         if (!chaseEntity) return Vector2.zero; // Noone to chase
 
@@ -107,12 +107,18 @@ public class AIChaseInput : ShipControlInput
             CollidingPoints collidingPoints = GeometryUtils.CalculateColliderEdgePoints(obstacle, gameObject);
             Trajectory.TrajectoryInstance obstacleTrajectory = obstacle.GetComponent<Trajectory>().GetShifted(collidingPoints.toPos - (Vector2)obstacle.transform.position);
             Trajectory.TrajectoryInstance myTrajectory = GetComponent<Trajectory>().GetShifted(collidingPoints.fromPos - (Vector2) transform.position);
-            Trajectory.CrossingInfo? crossingInfo = obstacleTrajectory.TrajectoryCrossing(myTrajectory, 2f);
+            Trajectory.CrossingInfo? crossingInfo = myTrajectory.TrajectoryCrossing(obstacleTrajectory, avoidCollisionLookaheadTime);
             if (crossingInfo == null) continue; // No collision predicted
             
             float timeToCollision = crossingInfo.Value.time;
             Vector2 relativeVelocity = obstacleTrajectory.ExtrapolateFutureVelocity(timeToCollision) - myTrajectory.ExtrapolateFutureVelocity(timeToCollision);
-            if (relativeVelocity.magnitude < dangerousObstacleSpeed) continue; // Not moving fast enough relative to us
+
+            if (relativeVelocity.magnitude < dangerousObstacleSpeed) 
+            {
+                Debug.DrawRay(collidingPoints.fromPos, relativeVelocity, Color.gray);
+                continue; // Not moving fast enough relative to us
+            }
+            Debug.DrawRay(collidingPoints.fromPos, relativeVelocity, Color.red);
             avoidanceVector += (collidingPoints.fromPos - crossingInfo.Value.position).normalized / timeToCollision; // The closer the collision, the stronger the avoidance
         }
         if (avoidanceVector.magnitude > 1) avoidanceVector.Normalize();
@@ -129,6 +135,7 @@ public class AIChaseInput : ShipControlInput
         };
         // The avoid range is counted from the middle of the entity, so we need to check in a larger range than avoidRange
         List<GameObject> avoidEntities = TeamManager.Instance.GetNearbyEntitiesInTeams(avoidEntityTypes, gameObject.transform.position, chaseRange, teams);
+        avoidEntities = GeometryUtils.KeepVisibleObjects(gameObject.transform.position, avoidEntities, myTeam.team, chaseRange);
         return avoidEntities;
     }
 

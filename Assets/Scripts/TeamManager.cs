@@ -143,17 +143,17 @@ public class TeamManager : MonoBehaviour
         return entitiesInTeam;
     }
 
-    public List<GameObject> GetNearbyAllies(List<EntityType> types, Vector2 center, float radius, Team myTeam)
+    public List<GameObject> GetNearbyAllies(Vector2 center, Team myTeam, List<EntityType> types,  float radius)
     {
         List<GameObject> allies = new List<GameObject>();
         foreach (EntityType type in types)
         {
-            allies.AddRange(GetNearbyAllies(type, center, radius, myTeam));
+            allies.AddRange(GetNearbyAllies(center, myTeam, type, radius));
         }
         return allies;
     }
 
-    public List<GameObject> GetNearbyAllies(EntityType type, Vector2 center, float radius, Team myTeam)
+    public List<GameObject> GetNearbyAllies(Vector2 center, Team myTeam, EntityType type,  float radius)
     {
         List<GameObject> allies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
@@ -166,17 +166,17 @@ public class TeamManager : MonoBehaviour
         return allies;
     }
 
-    public List<GameObject> GetNearbyEnemies(List<EntityType> types, Vector2 center, float radius, Team myTeam)
+    public List<GameObject> GetNearbyEnemies(Vector2 center, Team myTeam, List<EntityType> types, float radius)
     {
         List<GameObject> enemies = new List<GameObject>();
         foreach (EntityType type in types)
         {
-            enemies.AddRange(GetNearbyEnemies(type, center, radius, myTeam));
+            enemies.AddRange(GetNearbyEnemies(center, myTeam, type, radius));
         }
         return enemies;
     }
 
-    public List<GameObject> GetNearbyEnemies(EntityType type, Vector2 center, float radius, Team myTeam)
+    public List<GameObject> GetNearbyEnemies(Vector2 center, Team myTeam, EntityType type, float radius)
     {
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
@@ -189,7 +189,7 @@ public class TeamManager : MonoBehaviour
         return enemies;
     }
 
-    public List<GameObject> GetAllies(List<EntityType> types, Team myTeam)
+    public List<GameObject> GetAllies(EntityType[] types, Team myTeam)
     {
         List<GameObject> allies = new List<GameObject>();
         foreach (EntityType type in types)
@@ -212,7 +212,7 @@ public class TeamManager : MonoBehaviour
         return allies;
     }
 
-    public List<GameObject> GetEnemies(List<EntityType> types, Team myTeam)
+    public List<GameObject> GetEnemies(EntityType[] types, Team myTeam)
     {
         List<GameObject> enemies = new List<GameObject>();
         foreach (EntityType type in types)
@@ -226,6 +226,30 @@ public class TeamManager : MonoBehaviour
     {
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))
+        {
+            if (IsEnemy(myTeam, GetEntityTeam(entity)))
+            {
+                enemies.Add(entity);
+            }
+        }
+        return enemies;
+    }
+    public List<GameObject> KeepAllies(List<GameObject> entities, Team myTeam)
+    {
+        List<GameObject> allies = new List<GameObject>();
+        foreach (GameObject entity in entities)
+        {
+            if (IsAlly(myTeam, GetEntityTeam(entity)))
+            {
+                allies.Add(entity);
+            }
+        }
+        return allies;
+    }
+    public List<GameObject> KeepEnemies(List<GameObject> entities, Team myTeam)
+    {
+        List<GameObject> enemies = new List<GameObject>();
+        foreach (GameObject entity in entities)
         {
             if (IsEnemy(myTeam, GetEntityTeam(entity)))
             {

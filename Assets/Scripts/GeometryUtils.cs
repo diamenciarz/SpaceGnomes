@@ -27,9 +27,9 @@ public static class GeometryUtils
             this.maxDistance = maxDistance;
         }
     }
-    public static GameObject[] GetVisibleAlliesInCone(Cone cone, Team myTeam, SensorType sensorType = SensorType.Camera)
+    public static List<GameObject> GetVisibleAlliesInCone(Cone cone, Team myTeam, SensorType sensorType = SensorType.Camera)
     {
-        GameObject[] objects = GetVisibleObjectsInCone(cone, myTeam, sensorType);
+        List<GameObject> objects = GetVisibleObjectsInCone(cone, myTeam, sensorType);
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject obj in objects)
         {
@@ -38,11 +38,11 @@ public static class GeometryUtils
                 enemies.Add(obj);
             }
         }
-        return enemies.ToArray();
+        return enemies;
     }
-    public static GameObject[] GetVisibleEnemiesInCone(Cone cone, Team myTeam, SensorType sensorType = SensorType.Camera)
+    public static List<GameObject> GetVisibleEnemiesInCone(Cone cone, Team myTeam, SensorType sensorType = SensorType.Camera)
     {
-        GameObject[] objects = GetVisibleObjectsInCone(cone, myTeam, sensorType);
+        List<GameObject> objects = GetVisibleObjectsInCone(cone, myTeam, sensorType);
         //foreach (var item in objects)
         //{
         //    Debug.Log("Seeing " + item.gameObject.name);
@@ -55,11 +55,11 @@ public static class GeometryUtils
                 enemies.Add(obj);
             }
         }
-        return enemies.ToArray();
+        return enemies;
     }
-    public static GameObject[] GetVisibleAlliesInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public static List<GameObject> GetVisibleAlliesInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
-        GameObject[] objects = GetVisibleObjectsInCone(cone, myTeam, entityTypes, sensorType);
+        List<GameObject> objects = GetVisibleObjectsInCone(cone, myTeam, entityTypes, sensorType);
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject obj in objects)
         {
@@ -68,11 +68,11 @@ public static class GeometryUtils
                 enemies.Add(obj);
             }
         }
-        return enemies.ToArray();
+        return enemies;
     }
-    public static GameObject[] GetVisibleEnemiesInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public static List<GameObject> GetVisibleEnemiesInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
-        GameObject[] objects = GetVisibleObjectsInCone(cone, myTeam, entityTypes, sensorType);
+        List<GameObject> objects = GetVisibleObjectsInCone(cone, myTeam, entityTypes, sensorType);
         //foreach (var item in objects)
         //{
         //    Debug.Log("Seeing " + item.gameObject.name);
@@ -85,9 +85,9 @@ public static class GeometryUtils
                 enemies.Add(obj);
             }
         }
-        return enemies.ToArray();
+        return enemies;
     }
-    public static GameObject[] GetVisibleObjectsInCone(Cone cone, Team myTeam, SensorType sensorType=SensorType.Camera)
+    public static List<GameObject> GetVisibleObjectsInCone(Cone cone, Team myTeam, SensorType sensorType=SensorType.Camera)
     {
         List<GameObject> visibleObjects = new List<GameObject>();
         float RAYS_PER_DEGREE = 0.5f;
@@ -104,9 +104,9 @@ public static class GeometryUtils
                 visibleObjects.Add(hitObject);
             }
         }
-        return visibleObjects.ToArray();
+        return visibleObjects;
     }
-    public static GameObject[] GetVisibleObjectsInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public static List<GameObject> GetVisibleObjectsInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<GameObject> visibleObjects = new List<GameObject>();
         float RAYS_PER_DEGREE = 0.5f;
@@ -123,9 +123,24 @@ public static class GeometryUtils
                 visibleObjects.Add(hitObject);
             }
         }
-        return visibleObjects.ToArray();
+        return visibleObjects;
     }
-    public static GameObject[] KeepObjectsInCone(Cone cone, GameObject[] gameObjects)
+    public static List<GameObject> GetVisibleAllies(Vector2 from, Team myTeam, List<HasEntityType.EntityType> entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera)
+    {
+        List<GameObject> allies = TeamManager.Instance.GetNearbyAllies(from, myTeam, entityTypes, maxDistance);
+        return KeepVisibleObjects(from, allies, myTeam, maxDistance, sensorType);
+    }
+    public static List<GameObject> GetVisibleEnemies(Vector2 from, Team myTeam, List<HasEntityType.EntityType> entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera)
+    {
+        List<GameObject> enemies = TeamManager.Instance.GetNearbyEnemies(from, myTeam, entityTypes, maxDistance);
+        return KeepVisibleObjects(from, enemies, myTeam, maxDistance, sensorType);
+    }
+    public static List<GameObject> GetVisibleObjects(Vector2 from, Team myTeam, List<HasEntityType.EntityType> entityTypes, float maxDistance=float.MaxValue, SensorType sensorType = SensorType.Camera)
+    {
+        List<GameObject> entities = EntityCounter.Instance.GetNearbyEntities(from, entityTypes, maxDistance);
+        return KeepVisibleObjects(from, entities, myTeam, maxDistance, sensorType);
+    }
+    public static List<GameObject> KeepObjectsInCone(Cone cone, List<GameObject> gameObjects)
     {
         List<GameObject> objectsInCone = new List<GameObject>();
         foreach (GameObject obj in gameObjects)
@@ -135,7 +150,19 @@ public static class GeometryUtils
                 objectsInCone.Add(obj);
             }
         }
-        return objectsInCone.ToArray();
+        return objectsInCone;
+    }
+    public static List<GameObject> KeepVisibleObjects(Vector2 from, List<GameObject> gameObjects, Team myTeam, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera)
+    {
+        List<GameObject> visibleObjects = new List<GameObject>();
+        foreach (GameObject obj in gameObjects)
+        {
+            if (IsObjectVisible(obj, from, myTeam, maxDistance, sensorType))
+            {
+                visibleObjects.Add(obj);
+            }
+        }
+        return visibleObjects;
     }
     public static Vector2 AngleToDirectionVector(float zAngle)
     {
@@ -188,7 +215,7 @@ public static class GeometryUtils
     }
     public static GameObject GetFirstVisibleObject(Vector2 to, Vector2 from, EntityTeam.Team myTeam, float maxDistance=float.MaxValue, SensorType sensorType = SensorType.Camera)
     {
-        RaycastHit2D[] hits = GetVisibleObjects(to, from, maxDistance, sensorType);
+        RaycastHit2D[] hits = RaycastInLine(to, from, maxDistance, sensorType);
         if (hits.Length == 0) return null;
 
         //foreach (RaycastHit2D hit in hits)
@@ -212,7 +239,7 @@ public static class GeometryUtils
     }
     public static GameObject GetFirstVisibleEntity(Vector2 to, Vector2 from, EntityTeam.Team myTeam, HasEntityType.EntityType[] entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera)
     {
-        RaycastHit2D[] hits = GetVisibleObjects(to, from, maxDistance, sensorType);
+        RaycastHit2D[] hits = RaycastInLine(to, from, maxDistance, sensorType);
         if (hits.Length == 0) return null;
 
         RaycastHit2D[] enemyHits = RemoveAllies(hits, myTeam);
@@ -233,7 +260,7 @@ public static class GeometryUtils
     public static bool IsObjectVisible(GameObject target, Vector2 from, EntityTeam.Team myTeam, float maxDistance=float.MaxValue, SensorType sensorType = SensorType.Camera)
     {
         // There is no need to check for allies using Raycast, as they can be checked using distance alone
-        RaycastHit2D[] hits = GetVisibleObjects(target.transform.position, from, maxDistance, sensorType);
+        RaycastHit2D[] hits = RaycastInLine(target.transform.position, from, maxDistance, sensorType);
         float distanceToTarget = -1;
         // Find distance to target, so it can be compared with other objects in the ray's path
         foreach (RaycastHit2D hit in hits)
@@ -270,7 +297,7 @@ public static class GeometryUtils
         }
         return nonAllies.ToArray();
     }
-    public static RaycastHit2D[] GetVisibleObjects(Vector2 to, Vector2 from, float maxDistance=float.MaxValue, SensorType sensorType=SensorType.Camera)
+    private static RaycastHit2D[] RaycastInLine(Vector2 to, Vector2 from, float maxDistance=float.MaxValue, SensorType sensorType=SensorType.Camera)
     {
         return Physics2D.RaycastAll(from, to-from, maxDistance, GetSensorMask(sensorType));
     }
@@ -325,6 +352,19 @@ public static class GeometryUtils
         points.fromPos = colliderB.ClosestPoint(colliderA.transform.position);
         //Debug.DrawLine(points.toPos, points.fromPos, Color.magenta);
         return points;
+    }
+    public static Trajectory.CrossingInfo? WillObjectsCollide(GameObject objA, GameObject objB, float maxTime)
+    {
+        // Check if the objects have Trajectory components
+        if (objA.GetComponent<Trajectory>() == null || objB.GetComponent<Trajectory>() == null)
+        {
+            return null;
+        }
+
+        CollidingPoints collidingPoints = CalculateColliderEdgePoints(objA, objB);
+        Trajectory.TrajectoryInstance trajectoryA = objA.GetComponent<Trajectory>().GetShifted(collidingPoints.toPos - (Vector2)objA.transform.position);
+        Trajectory.TrajectoryInstance trajectoryB = objB.GetComponent<Trajectory>().GetShifted(collidingPoints.fromPos - (Vector2)objB.transform.position);
+        return trajectoryA.TrajectoryCrossing(trajectoryB, maxTime);
     }
     public static Vector2 CalculateVectorBetweenColliderEdges(GameObject to, GameObject from)
     {

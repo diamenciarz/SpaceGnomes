@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface ISensor
 {
-    public GameObject[] GetVisibleEnemies();
-    public GameObject[] GetVisibleAllies();
-    public GameObject[] GetVisibleObjects();
+    public List<GameObject> GetVisibleEnemies();
+    public List<GameObject> GetVisibleAllies();
+    public List<GameObject> GetVisibleObjects();
 }
