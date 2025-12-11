@@ -2,16 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DestroyAfterDelay : MonoBehaviour
+public class DestroyAfterDelay : ActivateOnSpawn
 {
     [SerializeField] private float lifetime = 3f;
     [SerializeField] private string poolId = ""; // Pool ID for this bullet
 
     private float timer;
-    private void OnEnable()
+
+    public override void Activate()
     {
-        //Debug.Log("Enabled: " + gameObject.name);
         timer = 0f;
+        //Debug.Log("Enabled: " + gameObject.name);
     }
 
     private void Update()
@@ -20,7 +21,7 @@ public class DestroyAfterDelay : MonoBehaviour
         timer += Time.deltaTime;
         if (timer >= lifetime)
         {
-            //Debug.Log("Despawning after delay: " + gameObject.name);
+            Debug.Log("Despawning after delay: " + gameObject.name);
             ObjectPoolManager.Instance.Despawn(gameObject, poolId);
         }
     }

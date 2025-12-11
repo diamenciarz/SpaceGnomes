@@ -130,7 +130,6 @@ public class ObjectPoolManager : MonoBehaviour
         }
         obj.SetActive(true);
 
-
         ActivateOnSpawned(obj);
         return obj;
     }
@@ -167,26 +166,25 @@ public class ObjectPoolManager : MonoBehaviour
     {
         if (!pools.ContainsKey(poolId))
         {
-             //Debug.LogWarning($"No pool found for ID: {poolId}. Destroying object.");
+            Debug.LogWarning($"No pool found for ID: {poolId}. Destroying object.");
             Despawn(obj);
             return;
         }
 
         // Deactivate and return to pool
         ActivateOnDespawned(obj);
-        ReturnObjToPool(obj);
-        pools[poolId].Enqueue(obj);
+        ReturnObjToPool(obj, poolId);
     }
 
-    private void ReturnObjToPool(GameObject obj)
+    private void ReturnObjToPool(GameObject obj, string poolId)
     {
         obj.SetActive(false);
         obj.transform.SetParent(poolParent);
-        HasEntityType hasEntityType = gameObject.GetComponent<HasEntityType>();
+        HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
         if (hasEntityType)
         {
             EntityCounter.Instance.UnregisterEntity(obj);
         }
-
+        pools[poolId].Enqueue(obj);
     }
 }

@@ -11,13 +11,20 @@ public class DestroyOnCollision : MonoBehaviour
     [SerializeField] private string poolId = "PlasmaBullet"; // Pool ID for this object
 
     private EntityTeam.Team myTeam;
+    private bool isDestroyed = false;
+
     private void Start()
     {
         EntityTeam entityTeam = GetComponent<EntityTeam>();
         myTeam = entityTeam ? entityTeam.team : EntityTeam.Team.Neutral;
     }
+    private void OnEnable()
+    {
+        isDestroyed = false;
+    }
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (isDestroyed) return;
         HasEntityType entityType = other.GetComponent<HasEntityType>();
         if (!entityType) return;
 
@@ -28,7 +35,8 @@ public class DestroyOnCollision : MonoBehaviour
         }
         if (targetEntityTypes.Contains(entityType.Type))
         {
-            Debug.Log(gameObject.name + " collided with " + other.gameObject.name);
+            //Debug.Log(gameObject.name + " collided with " + other.gameObject.name);
+            isDestroyed = true;
             ObjectPoolManager.Instance.Despawn(gameObject, poolId);
         }
     }
