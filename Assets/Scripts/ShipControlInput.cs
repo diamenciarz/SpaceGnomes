@@ -2,6 +2,8 @@ using UnityEngine;
 
 public abstract class ShipControlInput : MonoBehaviour
 {
-    public abstract float GetThrustInput();
-    public abstract float GetSteerInput();
+    public abstract float GetVerticalInput();
+    public abstract float GetHorizontalInput();
+    public abstract float GetRotationInput();
+    
 }

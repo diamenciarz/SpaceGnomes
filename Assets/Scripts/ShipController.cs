@@ -4,16 +4,16 @@ using UnityEngine;
 public class ShipController: MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float thrustForce = 10f;
-    [SerializeField] private float thrustDampingMultiplier = 1.5f;
-    [SerializeField][Range(0f, 20)] float maxVelocity;
+    [SerializeField] private float thrustForce = 1000f;
+    [SerializeField] private float thrustDampingMultiplier = 3f;
+    [SerializeField][Range(0f, 20)] float maxVelocity = 10f;
 
-    [SerializeField, Range(0f, 1f)] private float perpendicularDamping = 0.9f;
+    [SerializeField, Range(0f, 1f)] private float perpendicularDamping = 0.1f;
     [Header("Rotation")]
-    [SerializeField] private float steerTorque = 5f;
-    [SerializeField] private float maxAngularDampingMultiplier = 1.3f;
-    [SerializeField] [Range(0f, 360)] float maxAngularVelocity;
-    [SerializeField, Range(0f, 1f)] private float angularDamping = 0.8f;
+    [SerializeField] private float steerTorque = 10000f;
+    [SerializeField] private float maxAngularDampingMultiplier = 2f;
+    [SerializeField] [Range(0f, 360)] float maxAngularVelocity = 100f;
+    [SerializeField, Range(0f, 1f)] private float angularDamping = 0.2f;
     [Header("Instances")]
     [SerializeField] private ShipControlInput shipControlInput = null;
 
@@ -51,8 +51,8 @@ public class ShipController: MonoBehaviour
     {
         if (shipControlInput != null)
         {
-            thrustInput = shipControlInput.GetThrustInput();
-            steerInput = shipControlInput.GetSteerInput();
+            thrustInput = shipControlInput.GetVerticalInput();
+            steerInput = shipControlInput.GetHorizontalInput();
         }
     }
 

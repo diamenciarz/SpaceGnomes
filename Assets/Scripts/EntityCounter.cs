@@ -266,6 +266,31 @@ public class EntityCounter : MonoBehaviour
         }
         return filteredObjects;
     }
+    public List<GameObject> ExcludeMyChildren(GameObject parent, List<GameObject> entities)
+    {
+        List<GameObject> filteredObjects = new List<GameObject>();
+        foreach (GameObject obj in entities)
+        {
+            if (!IsParent(parent, obj))
+            {
+                filteredObjects.Add(obj);
+            }
+        }
+        return filteredObjects;
+    }
+    public bool IsParent(GameObject potentialParent, GameObject child)
+    {
+        Transform current = child.transform.parent;
+        while (current != null)
+        {
+            if (current.gameObject == potentialParent)
+            {
+                return true;
+            }
+            current = current.parent;
+        }
+        return false;
+    }
 
     // Debug visualization - draws bounding boxes for occupied cells
     private void OnDrawGizmos()

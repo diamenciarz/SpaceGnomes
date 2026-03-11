@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static GeometryUtils;
 using static HasEntityType;
-using static Trajectory;
 
 [RequireComponent(typeof(EntityTeam))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(Trajectory))]
-[RequireComponent(typeof(ShipController))]
+//[RequireComponent(typeof(ShipController))]
 public class AIChaseInput : ShipControlInput
 {
     public enum ChaseMode
@@ -44,23 +45,30 @@ public class AIChaseInput : ShipControlInput
         shipController = GetComponent<ShipController>();
     }
 
-    public override float GetSteerInput()
+    public override float GetHorizontalInput()
     {
         return controlVector.x;
     }
 
-    public override float GetThrustInput()
+    public override float GetVerticalInput()
     {
         return controlVector.y;
+    }
+
+    public override float GetRotationInput()
+    {
+        return 0f;
     }
 
     void Update()
     {
         Vector2 chaseVector = CalculateChaseVector();
+        //chaseVector = Vector2.zero; // Disable chasing for now to test avoidance
         Vector2 avoidanceVector = CalculateAvoidanceVector();
         if (debug) Debug.DrawRay(transform.position, avoidanceVector, Color.blue);
 
-        Vector2 scaledAvoidance = avoidanceVector.normalized * avoidanceVector.magnitude * maxAvoidanceFraction; // 0 -> 0.7
+        if (avoidanceVector.magnitude > 1) avoidanceVector.Normalize();
+        Vector2 scaledAvoidance = avoidanceVector * maxAvoidanceFraction; // 0 -> 0.7
         Vector2 scaledChase = chaseVector * (1 - scaledAvoidance.magnitude); // 1 -> 0.3
         Vector2 output = scaledAvoidance + scaledChase;
         if (output.magnitude > 1) output.Normalize();
@@ -94,7 +102,7 @@ public class AIChaseInput : ShipControlInput
         }
         else
         {
-            return - GeometryUtils.CalculateVectorBetweenColliderEdges(chaseEntity, gameObject);
+            return GeometryUtils.CalculateVectorBetweenColliderEdges(chaseEntity, gameObject);
         }
     }
 
@@ -104,26 +112,70 @@ public class AIChaseInput : ShipControlInput
         Vector2 avoidanceVector = Vector2.zero;
         foreach (GameObject obstacle in avoidEntities)
         {
-            CollidingPoints collidingPoints = GeometryUtils.CalculateColliderEdgePoints(obstacle, gameObject);
-            Trajectory.TrajectoryInstance obstacleTrajectory = obstacle.GetComponent<Trajectory>().GetShifted(collidingPoints.toPos - (Vector2)obstacle.transform.position);
-            Trajectory.TrajectoryInstance myTrajectory = GetComponent<Trajectory>().GetShifted(collidingPoints.fromPos - (Vector2) transform.position);
-            Trajectory.CrossingInfo? crossingInfo = myTrajectory.TrajectoryCrossing(obstacleTrajectory, avoidCollisionLookaheadTime);
-            if (crossingInfo == null) continue; // No collision predicted
+            GeometryUtils.CollidingPoints collidingPoints = GeometryUtils.CalculateClosestDistanceBetweenColliders(obstacle, gameObject);
+            //Debug.DrawLine(collidingPoints.toPos, collidingPoints.fromPos, Color.cyan);
+            Trajectory obstacleTrajectory = obstacle.GetComponent<Trajectory>();
+            Trajectory myTrajectory = GetComponent<Trajectory>();
+            Trajectory.CollisionInfo? crossingInfo = myTrajectory.WillObjectsCollide(obstacleTrajectory, avoidCollisionLookaheadTime);
+            if (!crossingInfo.HasValue) continue; // No collision predicted
             
             float timeToCollision = crossingInfo.Value.time;
-            Vector2 relativeVelocity = obstacleTrajectory.ExtrapolateFutureVelocity(timeToCollision) - myTrajectory.ExtrapolateFutureVelocity(timeToCollision);
+            if (timeToCollision <= 0f) continue; // Already colliding, can't avoid
 
-            if (relativeVelocity.magnitude < dangerousObstacleSpeed) 
+            // The closer the collision, the stronger the avoidance
+            Vector2 threatVector = CalculateThreatVector(crossingInfo.Value);
+
+            Vector2 relativeVelocity = obstacleTrajectory.ExtrapolateFutureVelocity(timeToCollision) - myTrajectory.ExtrapolateFutureVelocity(timeToCollision);
+            if (relativeVelocity.magnitude < dangerousObstacleSpeed)
             {
-                Debug.DrawRay(collidingPoints.fromPos, relativeVelocity, Color.gray);
+                Debug.DrawRay(crossingInfo.Value.collisionPosition, threatVector, Color.gray);
                 continue; // Not moving fast enough relative to us
             }
-            Debug.DrawRay(collidingPoints.fromPos, relativeVelocity, Color.red);
-            avoidanceVector += (collidingPoints.fromPos - crossingInfo.Value.position).normalized / timeToCollision; // The closer the collision, the stronger the avoidance
+
+            Vector2 myCenter = myTrajectory.transform.gameObject.transform.position;
+            Vector2 obstacleCenter = obstacleTrajectory.transform.gameObject.transform.position;
+            Debug.DrawRay(myCenter, crossingInfo.Value.myVelocity, Color.magenta);
+            //Debug.DrawRay(obstacleCenter, crossingInfo.Value.otherVelocity, Color.green);
+            bool movingTowardsThreat = GeometryUtils.MovingTowardsThreat(crossingInfo.Value.myPoint, crossingInfo.Value.myVelocity, obstacleCenter, crossingInfo.Value.otherVelocity, myCenter, crossingInfo.Value.collisionPosition);
+            if (movingTowardsThreat)
+            {
+                // If has not passed the threat yet, increase the threat
+                avoidanceVector += threatVector;
+                Debug.DrawRay(crossingInfo.Value.collisionPosition, threatVector, Color.red);
+            }
+            else
+            {
+                // If the obstacle is moving in the other direction as the threat vector, flip the threat vector
+                Debug.DrawRay(crossingInfo.Value.collisionPosition, -threatVector, Color.red);
+                avoidanceVector -= threatVector;
+            }
         }
         if (avoidanceVector.magnitude > 1) avoidanceVector.Normalize();
 
         return avoidanceVector; // We invert the vector to move away from obstacles
+    }
+
+    private Vector2 CalculateThreatVector(Trajectory.CollisionInfo crossingInfo)
+{
+        //if (crossingInfo.otherIsWall)
+        //{
+        //    float timeToCollision = crossingInfo.time;
+        //    return (crossingInfo.myPoint - crossingInfo.collisionPosition).normalized / timeToCollision;
+        //}
+        //else
+        //{
+        Line2D myLine = new Line2D(crossingInfo.myPoint, crossingInfo.myVelocity);
+        Line2D otherLine = new Line2D(crossingInfo.otherPoint, crossingInfo.otherVelocity);
+
+        // Maybe possible to simplify the function by using Vector2 in the calculation
+        Line2D threatVector = myLine.CalculateThreatVector(otherLine);
+        if (float.IsNaN(threatVector.direction.x) || float.IsNaN(threatVector.direction.y))
+        {
+            Debug.Log("NaN threat vector. My velocity: " + crossingInfo.myVelocity + " Other velocity: " + crossingInfo.otherVelocity + " My point: " + crossingInfo.myPoint + " Other point: " + crossingInfo.otherPoint);
+        }
+
+        return threatVector.direction;
+        //}
     }
 
     private List<GameObject> GetEntitiesToAvoid()
@@ -134,9 +186,10 @@ public class AIChaseInput : ShipControlInput
             myTeam.team
         };
         // The avoid range is counted from the middle of the entity, so we need to check in a larger range than avoidRange
-        List<GameObject> avoidEntities = TeamManager.Instance.GetNearbyEntitiesInTeams(avoidEntityTypes, gameObject.transform.position, chaseRange, teams);
-        avoidEntities = GeometryUtils.KeepVisibleObjects(gameObject.transform.position, avoidEntities, myTeam.team, chaseRange);
-        return avoidEntities;
+        const float MAX_ENTITY_SIZE = 5f;
+        List<GameObject> entities = GeometryUtils.GetVisibleObjects(gameObject.transform.position, myTeam.team, avoidEntityTypes, chaseRange + MAX_ENTITY_SIZE, ignoreObject:gameObject);
+        // Remove my own ship parts
+        return EntityCounter.Instance.ExcludeMyChildren(gameObject, entities);
     }
 
     private Vector2 WorldCoordsToLocal(Vector2 worldCoords)

@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\ObjectPoolManager.cs" />
     <Compile Include="Assets\Scripts\GunController.cs" />
     <Compile Include="Assets\Scripts\ProgressBar.cs" />
+    <Compile Include="Assets\Scripts\SidewaysController.cs" />
     <Compile Include="Assets\Scripts\ObjectFollower.cs" />
     <Compile Include="Assets\Scripts\AIWeaponController.cs" />
     <Compile Include="Assets\Scripts\ISensor.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Assets\Scripts\ForceManager.cs" />
     <Compile Include="Assets\Scripts\KeyListener.cs" />
     <Compile Include="Assets\Scripts\DetachChildrenOnDestroy.cs" />
+    <Compile Include="Assets\Scripts\MathUtils.cs" />
     <Compile Include="Assets\Scripts\AbstractWeaponController.cs" />
     <Compile Include="Assets\Scripts\DestroyOnCollision.cs" />
     <Compile Include="Assets\Scripts\Rotator.cs" />
@@ -95,6 +97,7 @@
     <Compile Include="Assets\Scripts\EntityCounter.cs" />
     <Compile Include="Assets\Scripts\GPUCellularAutomata.cs" />
     <Compile Include="Assets\Scripts\EntityPositionTracker.cs" />
+    <Compile Include="Assets\Scripts\Line2D.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

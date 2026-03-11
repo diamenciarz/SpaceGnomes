@@ -29,18 +29,19 @@ public class AIWeaponController : MonoBehaviour
     {
         foreach (WeaponConfig config in weaponConfigs)
         {
-            List<GameObject> enemies = config.cameraSensor.GetVisibleEnemies();
+            GameObject target = config.cameraSensor.GetClosestVisibleEnemy();
             
-            if (enemies.Count == 0)
+            if (!target)
             {
                 config.weaponController.SetShooting(false);
                 config.rotator.StopTargeting();
                 continue;
             }
-
-            GameObject target = GeometryUtils.FindClosestEntityToPosition(enemies, config.cameraSensor.transform.position);
-            config.weaponController.SetShooting(true);
-            RotateToTarget(config, target);
+            else
+            {
+                config.weaponController.SetShooting(true);
+                RotateToTarget(config, target);
+            }
         }
     }
     private void RotateToTarget(WeaponConfig config, GameObject target)

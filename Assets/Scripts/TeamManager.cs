@@ -45,7 +45,7 @@ public class TeamManager : MonoBehaviour
         return GetParentEntityTeamRecursive(obj, obj.GetComponent<EntityTeam>());
     }
 
-    public EntityTeam GetParentEntityTeamRecursive(GameObject obj, EntityTeam currentHighest)
+    private EntityTeam GetParentEntityTeamRecursive(GameObject obj, EntityTeam currentHighest)
     {
         GameObject parent = obj.transform.parent?.gameObject;
         if (parent == null)
