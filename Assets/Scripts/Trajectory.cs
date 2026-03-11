@@ -69,13 +69,13 @@ public class Trajectory : MonoBehaviour
             return previousPosition + previousVelocity * deltaTime;// + (currentAcceleration * deltaTime * deltaTime / 2);
         }
 
-        public CollisionInfo? WillObjectsCollide(Trajectory other, float maxTime)
+        public CollisionInfo? WillObjectsCollide(Trajectory other, float maxTime, int collisionCheckPointCount)
         {
-            return Trajectory.WillObjectsCollide(this, other.Copy(), maxTime);
+            return Trajectory.WillObjectsCollide(this, other.Copy(), maxTime, collisionCheckPointCount);
         }
-        public CollisionInfo? WillObjectsCollide(TrajectoryInstance other, float maxTime)
+        public CollisionInfo? WillObjectsCollide(TrajectoryInstance other, float maxTime, int collisionCheckPointCount)
         {
-            return Trajectory.WillObjectsCollide(this, other, maxTime);
+            return Trajectory.WillObjectsCollide(this, other, maxTime, collisionCheckPointCount);
         }
     }
 
@@ -167,20 +167,20 @@ public class Trajectory : MonoBehaviour
     {
         return previousPosition + previousVelocity * deltaTime;// + (currentAcceleration * deltaTime * deltaTime / 2);
     }
-    public CollisionInfo? WillObjectsCollide(Trajectory other, float maxTime)
+    public CollisionInfo? WillObjectsCollide(Trajectory other, float maxTime, int collisionCheckPointCount)
     {
-        return WillObjectsCollide(Copy(), other.Copy(), maxTime);
+        return WillObjectsCollide(Copy(), other.Copy(), maxTime, collisionCheckPointCount);
     }
-    public CollisionInfo? WillObjectsCollide(TrajectoryInstance other, float maxTime)
+    public CollisionInfo? WillObjectsCollide(TrajectoryInstance other, float maxTime, int collisionCheckPointCount)
     {
-        return WillObjectsCollide(Copy(), other, maxTime);
+        return WillObjectsCollide(Copy(), other, maxTime, collisionCheckPointCount);
     }
     /// <summary>
     /// Predicts if and when the trajectory of this object will cross with another Trajectory object's trajectory within a given maximum time.
     /// Uses an approximation based on the time of closest approach for constant relative velocity, then checks if positions coincide.
     /// </summary>
     /// <returns>A CrossingInfo struct with the time and position of crossing if they cross within maxTime, otherwise null.</returns>
-    public static CollisionInfo? WillObjectsCollide(TrajectoryInstance trajectory, TrajectoryInstance other, float maxTime)
+    public static CollisionInfo? WillObjectsCollide(TrajectoryInstance trajectory, TrajectoryInstance other, float maxTime, int collisionCheckPointCount)
     {
         // Get current state of both trajectories
         Vector2 pA = trajectory.currentPosition;
@@ -192,37 +192,47 @@ public class Trajectory : MonoBehaviour
 
         if (vA.magnitude == 0 && vB.magnitude == 0) return null;
 
-        if (Mathf.Approximately(vB.magnitude, 0)) return WillCollideWithWall(trajectory, vA, other, maxTime, true);
-        if (Mathf.Approximately(vA.magnitude, 0)) return WillCollideWithWall(other, vB, trajectory, maxTime, false);
+        CollisionInfo? myDirectCollision = WillObjectsCollideDirectly(trajectory, vA, vB, other, maxTime, collisionCheckPointCount);
+        if (myDirectCollision.HasValue) return myDirectCollision;
+        CollisionInfo? otherDirectCollision = WillObjectsCollideDirectly(other, vB, vA, trajectory, maxTime, collisionCheckPointCount);
+        if (myDirectCollision.HasValue) return otherDirectCollision;
 
         // Calculate moving collider collision
         return WillMovingObjectsCollide(pA, vA, trajectory.MyCollider, pB, vB, other.MyCollider, maxTime);
     }
-    private static CollisionInfo? WillCollideWithWall(TrajectoryInstance movingTrajectory, Vector2 velocity, TrajectoryInstance staticTrajectory, float maxTime, bool isMyColliderMoving)
+    private static CollisionInfo? WillObjectsCollideDirectly(TrajectoryInstance myTrajectory, Vector2 myVelocity, Vector2 otherVelocity, TrajectoryInstance otherTrajectory, float maxTime, int collisionCheckPointCount)
     {
-        Collider2D movingCollider2D = movingTrajectory.MyCollider;
-        Collider2D staticCollider2D = staticTrajectory.MyCollider;
-        GeometryUtils.ColliderPoints? colliderPoints = GeometryUtils.CalculateColliderCrossection(movingCollider2D, velocity, true);
+        Vector2 deltaVelocity = myVelocity - otherVelocity;
+        Collider2D movingCollider2D = myTrajectory.MyCollider;
+        Collider2D staticCollider2D = otherTrajectory.MyCollider;
+        GeometryUtils.ColliderPoints? colliderPoints = GeometryUtils.CalculateColliderCrossection(movingCollider2D, myVelocity, true);
         if (!colliderPoints.HasValue) return null;
-        Vector2 frontMovingPoint = GeometryUtils.GetForwardmostPoint(colliderPoints.Value.points, velocity);
-        RaycastHit2D[] hits = GeometryUtils.RaycastInDir(frontMovingPoint, velocity);
-
-        RaycastHit2D? wallHit = null;
-        foreach (RaycastHit2D hit in hits)
+        List<Vector2> frontMovingPoints = GeometryUtils.GetForwardmostPoints(colliderPoints.Value.points, myVelocity, collisionCheckPointCount);
+        foreach (var movingPoint in frontMovingPoints)
         {
-            if (hit.collider == staticCollider2D) wallHit = hit;
+            Debug.DrawRay(movingPoint, myVelocity.normalized, Color.white);
         }
-        if (!wallHit.HasValue) return null;
+        foreach (var movingPoint in frontMovingPoints)
+        {
+            RaycastHit2D[] hits = GeometryUtils.RaycastInDir(movingPoint, deltaVelocity);
 
-        Line2D wallLine = GeometryUtils.GetHitWallDirection(wallHit.Value, staticCollider2D, velocity);
+            RaycastHit2D? wallHit = null;
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider == staticCollider2D) wallHit = hit;
+            }
+            if (!wallHit.HasValue) continue;
 
-        float distanceToHit = Vector2.Distance(frontMovingPoint, wallHit.Value.point);
-        float timeToHit = distanceToHit / velocity.magnitude;
-        if (timeToHit < 0 || timeToHit > maxTime) return null;
+            Line2D wallLine = GeometryUtils.GetHitWallDirection(wallHit.Value, staticCollider2D, myVelocity);
+            Debug.DrawLine(wallLine.start, wallLine.end, Color.yellow);
 
-        Vector2 vA = isMyColliderMoving ? movingTrajectory.previousVelocity : staticTrajectory.previousVelocity;
-        Vector2 vB = isMyColliderMoving ? staticTrajectory.previousVelocity : movingTrajectory.previousVelocity;
-        return new CollisionInfo { time = timeToHit, collisionPosition = wallHit.Value.point, collisionSpeed = velocity.magnitude, myPoint = frontMovingPoint, otherPoint = wallHit.Value.point, myVelocity=vA, otherVelocity= wallLine.direction, otherIsWall=isMyColliderMoving};
+            float distanceToHit = Vector2.Distance(movingPoint, wallHit.Value.point);
+            float timeToHit = distanceToHit / deltaVelocity.magnitude;
+            if (timeToHit < 0 || timeToHit > maxTime) continue;
+
+            return new CollisionInfo { time = timeToHit, collisionPosition = wallHit.Value.point, collisionSpeed = myVelocity.magnitude, myPoint = movingPoint, otherPoint = wallHit.Value.point, myVelocity= myTrajectory.previousVelocity, otherVelocity= wallLine.direction};
+        }
+        return null;
     }
     private static CollisionInfo? WillMovingObjectsCollide(Vector2 pA, Vector2 vA, Collider2D myCollider2D, Vector2 pB, Vector2 vB, Collider2D otherCollider2D, float maxTime)
     {

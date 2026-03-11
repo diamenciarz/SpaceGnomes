@@ -1,10 +1,11 @@
 using UnityEngine;
+using static AIChaseInput;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class ShipController: MonoBehaviour
+public class VehicularController: AbstractController
 {
     [Header("Movement")]
-    [SerializeField] private float thrustForce = 1000f;
+    [SerializeField] private float thrustForce = 2400f;
     [SerializeField] private float thrustDampingMultiplier = 3f;
     [SerializeField][Range(0f, 20)] float maxVelocity = 10f;
 
@@ -14,18 +15,14 @@ public class ShipController: MonoBehaviour
     [SerializeField] private float maxAngularDampingMultiplier = 2f;
     [SerializeField] [Range(0f, 360)] float maxAngularVelocity = 100f;
     [SerializeField, Range(0f, 1f)] private float angularDamping = 0.2f;
-    [Header("Instances")]
-    [SerializeField] private ShipControlInput shipControlInput = null;
+    
 
-    private Rigidbody2D rb2d;
     private float thrustInput;
     private float steerInput;
 
-    private void Awake()
+    protected override void Awake()
     {
-        rb2d = GetComponent<Rigidbody2D>();
-        //rb2d.inertia *= 3f;
-
+        base.Awake();
         thrustInput = 0f;
         steerInput = 0f;
     }
@@ -37,6 +34,15 @@ public class ShipController: MonoBehaviour
         ApplyPerpendicularDamping();
         ApplyAngularDamping();
     }
+    private void UpdateInputs()
+    {
+        ShipControlInput controlInput = Input.GetKey(alternativeControlKey) ? alternativeShipControlInput : mainShipControlInput;
+        if (controlInput != null)
+        {
+            thrustInput = controlInput.GetVerticalInput(ControlVectorCoordinates.World);
+            steerInput = controlInput.GetHorizontalInput(ControlVectorCoordinates.World);
+        }
+    }
 
     public float GetMaxVelocity()
     {
@@ -45,15 +51,6 @@ public class ShipController: MonoBehaviour
     public float GetMaxAngularVelocity()
     {
         return maxAngularVelocity;
-    }
-
-    private void UpdateInputs()
-    {
-        if (shipControlInput != null)
-        {
-            thrustInput = shipControlInput.GetVerticalInput();
-            steerInput = shipControlInput.GetHorizontalInput();
-        }
     }
 
     private void HandleMovement()

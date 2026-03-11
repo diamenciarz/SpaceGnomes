@@ -571,20 +571,58 @@ public static class GeometryUtils
         }
         return null;
     }
-    public static Vector2 GetForwardmostPoint(Vector2[] points, Vector2 direction)
+    public static List<Vector2> GetForwardmostPoints(Vector2[] points, Vector2 direction, int collisionCheckPointCount)
     {
-        Vector2 forwardmostPoint = points[0];
-        float maxDot = Vector2.Dot(points[0], direction.normalized);
+        if (collisionCheckPointCount >= points.Length) return points.ToList();
+
+        List<Vector2> centeredPoints = GetCenteredPoints(points);
+        // Use centered points for the dot product
+
+        List<Vector2> forwardmostPoints = new List<Vector2> { points[0] };
+        List<float> angles = new List<float> { Vector2.Angle(centeredPoints[0], direction.normalized) };
         for (int i = 1; i < points.Length; i++)
         {
-            float dot = Vector2.Dot(points[i], direction.normalized);
-            if (dot > maxDot)
+            bool wasAdded = false;
+            float angle = Vector2.Angle(centeredPoints[i], direction.normalized);
+            for (int j = 0; j < forwardmostPoints.Count; j++)
             {
-                maxDot = dot;
-                forwardmostPoint = points[i];
+                if (angle < angles[j])
+                {
+                    wasAdded = true;
+
+                    float putAngle = angle;
+                    Vector2 putPoint = points[i];
+
+                    float heldAngle = 0;
+                    Vector2 heldPoint = Vector2.zero;
+
+                    for (int k = j; k < forwardmostPoints.Count; k++)
+                    {
+                        heldAngle = angles[k];
+                        heldPoint = forwardmostPoints[k];
+                        angles[k] = putAngle;
+                        forwardmostPoints[k] = putPoint;
+
+                        putAngle = heldAngle;
+                        putPoint = heldPoint;
+
+                    }
+                    if (forwardmostPoints.Count < collisionCheckPointCount)
+                    {
+                        angles.Insert(angles.Count, putAngle);
+                        forwardmostPoints.Insert(forwardmostPoints.Count, putPoint);
+                    }
+                    break;
+                }
+            }
+            if (!wasAdded && forwardmostPoints.Count < collisionCheckPointCount)
+            // If we have reached the end of the list without adding the point, add the new point to the list if there is still space
+            {
+                angles.Add(angle);
+                forwardmostPoints.Add(points[i]);
             }
         }
-        return forwardmostPoint;
+        return forwardmostPoints;
     }
     public struct LineCrossingInfo
     {
@@ -642,6 +680,7 @@ public static class GeometryUtils
         {
             return null;
         }
+        // Center the points at zero
         if (getAllPoints)
         {
             return new ColliderPoints { points = points.ToArray() };
@@ -651,6 +690,23 @@ public static class GeometryUtils
         Vector2[] leftRightPoints = CalculateCrossectionPoints(points, Vector2.Perpendicular(direction));
 
         return new ColliderPoints { points = new Vector2[4] { frontBackPoints[0], frontBackPoints[1], leftRightPoints[0], leftRightPoints[1] } };
+    }
+    private static List<Vector2> GetCenteredPoints(Vector2[] points)
+    {
+        Vector2 middlePoint = Vector2.zero;
+
+        foreach (Vector2 point in points)
+        {
+            middlePoint += point;
+        }
+        middlePoint /= points.Length;
+
+        List<Vector2> centeredPoints = new List<Vector2>();
+        for (int i = 0; i < points.Length; i++)
+        {
+            centeredPoints.Add(points[i] - middlePoint);
+        }
+        return centeredPoints;
     }
     private static Vector2[] CalculateCrossectionPoints(List<Vector2> points, Vector2 direction)
     {
@@ -804,5 +860,17 @@ public static class GeometryUtils
     public static Vector2 Project(Vector2 vector, Vector2 onto)
     {
         return Vector2.Dot(vector, onto) / Vector2.Dot(onto, onto) * onto;
+    }
+    public static Vector2 WorldCoordsToLocal(Vector2 worldCoords, UnityEngine.Transform coordsTransform)
+    {
+        Vector3 worldDir3 = new Vector3(worldCoords.x, worldCoords.y, 0f);
+        Vector3 localDir3 = coordsTransform.InverseTransformDirection(worldDir3);
+        return new Vector2(localDir3.x, localDir3.y);
+    }
+    public static Vector2 LocalCoordsToWorld(Vector2 localCoords, UnityEngine.Transform coordsTransform)
+    {
+        Vector3 localDir3 = new Vector3(localCoords.x, localCoords.y, 0f);
+        Vector3 worldDir3 = coordsTransform.TransformDirection(localDir3);
+        return new Vector2(worldDir3.x, worldDir3.y);
     }
 }

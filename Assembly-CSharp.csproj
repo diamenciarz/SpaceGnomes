@@ -63,7 +63,7 @@
     <Compile Include="Assets\Scripts\ObjectPoolManager.cs" />
     <Compile Include="Assets\Scripts\GunController.cs" />
     <Compile Include="Assets\Scripts\ProgressBar.cs" />
-    <Compile Include="Assets\Scripts\SidewaysController.cs" />
+    <Compile Include="Assets\Scripts\OmnidirectionalController.cs" />
     <Compile Include="Assets\Scripts\ObjectFollower.cs" />
     <Compile Include="Assets\Scripts\AIWeaponController.cs" />
     <Compile Include="Assets\Scripts\ISensor.cs" />
@@ -76,7 +76,6 @@
     <Compile Include="Assets\Scripts\GeometryUtils.cs" />
     <Compile Include="Assets\Scripts\AIChaseInput.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />
-    <Compile Include="Assets\Scripts\ShipController.cs" />
     <Compile Include="Assets\Scripts\IDamage.cs" />
     <Compile Include="Assets\Scripts\DamageCounter.cs" />
     <Compile Include="Assets\Scripts\CPUCellularAutomata.cs" />
@@ -84,6 +83,7 @@
     <Compile Include="Assets\Scripts\EntityTeam.cs" />
     <Compile Include="Assets\Scripts\KeyboardControlInput.cs" />
     <Compile Include="Assets\Scripts\ActivateOnSpawn.cs" />
+    <Compile Include="Assets\Scripts\VehicularController.cs" />
     <Compile Include="Assets\Scripts\ForceManager.cs" />
     <Compile Include="Assets\Scripts\KeyListener.cs" />
     <Compile Include="Assets\Scripts\DetachChildrenOnDestroy.cs" />
@@ -91,13 +91,14 @@
     <Compile Include="Assets\Scripts\AbstractWeaponController.cs" />
     <Compile Include="Assets\Scripts\DestroyOnCollision.cs" />
     <Compile Include="Assets\Scripts\Rotator.cs" />
+    <Compile Include="Assets\Scripts\Line2D.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\CameraSensor.cs" />
     <Compile Include="Assets\Scripts\DestroyWithObjects.cs" />
     <Compile Include="Assets\Scripts\EntityCounter.cs" />
     <Compile Include="Assets\Scripts\GPUCellularAutomata.cs" />
+    <Compile Include="Assets\Scripts\AbstractController.cs" />
     <Compile Include="Assets\Scripts\EntityPositionTracker.cs" />
-    <Compile Include="Assets\Scripts\Line2D.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

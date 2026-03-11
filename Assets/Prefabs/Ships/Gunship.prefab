@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPositions: 100
+  saveStates: 10
 --- !u!1 &2369128004041744743
 GameObject:
   m_ObjectHideFlags: 0
@@ -205,6 +205,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3888461407280299183}
   - component: {fileID: 4275953901346360542}
+  - component: {fileID: 1741509105870174778}
   - component: {fileID: 827234146337642812}
   - component: {fileID: 6543003814999245564}
   - component: {fileID: 4049380779284195394}
@@ -258,6 +259,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!114 &1741509105870174778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2369128004041744743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5332cb33abb9cc947b06de6833b5731b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainShipControlInput: {fileID: 4049380779284195394}
+  alternativeShipControlInput: {fileID: 5747292331280976720}
+  alternativeControlKey: 32
+  thrustForce: 2000
+  thrustDampingMultiplier: 3
+  maxVelocity: 10
+  steerTorque: 10000
+  maxAngularDampingMultiplier: 2
+  maxAngularVelocity: 100
+  angularDamping: 0.2
 --- !u!114 &827234146337642812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,18 +290,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2369128004041744743}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f7d36a2f9a3dd649af1cfcda4c1769a, type: 3}
+  m_Script: {fileID: 11500000, guid: 49a03b21b89ae5048a66ec01433a71f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainShipControlInput: {fileID: 4049380779284195394}
+  alternativeShipControlInput: {fileID: 5747292331280976720}
+  alternativeControlKey: 32
   thrustForce: 2400
   thrustDampingMultiplier: 3
-  maxVelocity: 20
+  maxVelocity: 10
   perpendicularDamping: 0.1
   steerTorque: 10000
   maxAngularDampingMultiplier: 2
   maxAngularVelocity: 100
   angularDamping: 0.2
-  shipControlInput: {fileID: 4049380779284195394}
 --- !u!114 &6543003814999245564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,6 +337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7791e2d4bf06d4da81964f6ce1debd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controlScheme: 0
 --- !u!66 &6514658271571309198
 CompositeCollider2D:
   m_ObjectHideFlags: 0
@@ -332,123 +358,123 @@ CompositeCollider2D:
   m_ColliderPaths:
   - m_Collider: {fileID: 8196803837620988013}
     m_ColliderPaths:
-    - - X: 4365001
-        Y: 4511666
-      - X: 1581498
-        Y: 6537033
-      - X: -1525792
-        Y: 6542925
-      - X: -4331518
+    - - X: 4365000
+        Y: 4511668
+      - X: 1581497
+        Y: 6537034
+      - X: -1525794
+        Y: 6542926
+      - X: -4331519
         Y: 4588595
-      - X: -1851502
-        Y: -6459163
-      - X: 1883325
+      - X: -1851501
+        Y: -6459164
+      - X: 1883327
         Y: -6466204
   - m_Collider: {fileID: 5133975644343501789}
     m_ColliderPaths:
     - - X: -7750001
-        Y: -5500003
+        Y: -5500002
       - X: -5455778
-        Y: -5199398
-      - X: -5996809
-        Y: -3264745
+        Y: -5199396
+      - X: -5996810
+        Y: -3264743
       - X: -2691035
-        Y: -2041038
-      - X: -1949999
-        Y: 8499995
-      - X: -5498441
-        Y: 8441242
-      - X: -10120517
-        Y: 2471119
+        Y: -2041035
+      - X: -1950000
+        Y: 8499999
+      - X: -5498444
+        Y: 8441245
+      - X: -10120519
+        Y: 2471121
   - m_Collider: {fileID: 7063446210809736147}
     m_ColliderPaths:
-    - - X: -5889418
-        Y: 3143977
-      - X: -6874633
-        Y: 2030891
-      - X: -6900003
-        Y: -4261394
+    - - X: -5889419
+        Y: 3143975
+      - X: -6874634
+        Y: 2030888
+      - X: -6900002
+        Y: -4261397
       - X: -5061798
-        Y: -6336623
-      - X: -2931195
-        Y: -6336623
-      - X: -1112600
-        Y: -4284733
-      - X: -1131188
-        Y: 2018600
-      - X: -2198715
-        Y: 3136625
+        Y: -6336626
+      - X: -2931194
+        Y: -6336626
+      - X: -1112599
+        Y: -4284735
+      - X: -1131189
+        Y: 2018599
+      - X: -2198716
+        Y: 3136623
   - m_Collider: {fileID: 6577324679013694679}
     m_ColliderPaths:
     - - X: 2110582
-        Y: 3143977
+        Y: 3143978
       - X: 1125367
         Y: 2030891
-      - X: 1099998
-        Y: -4261394
-      - X: 2938201
+      - X: 1099999
+        Y: -4261395
+      - X: 2938203
         Y: -6336623
-      - X: 5068806
+      - X: 5068807
         Y: -6336623
-      - X: 6887400
-        Y: -4284733
+      - X: 6887402
+        Y: -4284732
       - X: 6868812
-        Y: 2018600
+        Y: 2018601
       - X: 5801285
-        Y: 3136625
+        Y: 3136626
   - m_Collider: {fileID: 5033700563489854107}
     m_ColliderPaths:
-    - - X: 995563
+    - - X: 995562
         Y: 4164782
       - X: 2961942
         Y: 5468334
-      - X: 2248311
-        Y: 8362533
-      - X: 20617
+      - X: 2248309
+        Y: 8362534
+      - X: 20615
         Y: 10873075
-      - X: -2195684
+      - X: -2195686
         Y: 8465248
-      - X: -3055855
+      - X: -3055856
         Y: 5468487
-      - X: -1022032
+      - X: -1022034
         Y: 4156009
   - m_Collider: {fileID: 5671065295789464785}
     m_ColliderPaths:
     - - X: 1949997
-        Y: 8549627
+        Y: 8549628
       - X: 2870623
-        Y: -2181132
-      - X: 5950325
+        Y: -2181131
+      - X: 5950326
         Y: -3114972
       - X: 5537001
-        Y: -5112903
-      - X: 7610509
+        Y: -5112902
+      - X: 7610510
         Y: -5506229
-      - X: 10129660
-        Y: 2595538
+      - X: 10129662
+        Y: 2595539
       - X: 5471983
-        Y: 8441246
+        Y: 8441247
   m_CompositePaths:
     m_Paths:
-    - - {x: 0.1883101, y: -0.64662033}
-      - {x: 0.2121585, y: -0.5414709}
-      - {x: 0.2938319, y: -0.6336623}
-      - {x: 0.5068885, y: -0.6336535}
-      - {x: 0.6064827, y: -0.5213026}
-      - {x: 0.7610585, y: -0.5505985}
-      - {x: 1.0129571, y: 0.2595647}
-      - {x: 0.5471862, y: 0.8441248}
-      - {x: 0.2085935, y: 0.8545526}
-      - {x: 0.0020394, y: 1.0872831}
-      - {x: -0.21671191, y: 0.84964}
-      - {x: -0.5498519, y: 0.8441142}
-      - {x: -1.0120479, y: 0.24709891}
-      - {x: -0.77497613, y: -0.5499972}
-      - {x: -0.60052574, y: -0.5271512}
-      - {x: -0.506168, y: -0.6336623}
-      - {x: -0.2931116, y: -0.6336535}
-      - {x: -0.2091502, y: -0.5390032}
-      - {x: -0.1851277, y: -0.6459164}
+    - - {x: 0.1883103, y: -0.64662033}
+      - {x: 0.21215871, y: -0.5414709}
+      - {x: 0.2938321, y: -0.6336623}
+      - {x: 0.5068886, y: -0.6336535}
+      - {x: 0.6064828, y: -0.5213026}
+      - {x: 0.7610586, y: -0.5505985}
+      - {x: 1.0129573, y: 0.25956482}
+      - {x: 0.5471862, y: 0.8441249}
+      - {x: 0.20859331, y: 0.8545527}
+      - {x: 0.0020392, y: 1.0872831}
+      - {x: -0.2167118, y: 0.8496404}
+      - {x: -0.5498522, y: 0.8441145}
+      - {x: -1.0120481, y: 0.2470991}
+      - {x: -0.77497613, y: -0.5499971}
+      - {x: -0.60052603, y: -0.527151}
+      - {x: -0.506168, y: -0.6336626}
+      - {x: -0.2931115, y: -0.6336538}
+      - {x: -0.2091501, y: -0.5390035}
+      - {x: -0.1851276, y: -0.6459165}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
 --- !u!114 &6968070201716844009
@@ -496,6 +522,7 @@ MonoBehaviour:
   dangerousObstacleSpeed: 5
   chaseMode: 1
   avoidCollisionLookaheadTime: 2
+  collisionCheckPointCount: 20
   chaseEntityTypes: 01000000
   avoidEntityTypes: 0000000004000000
   debug: 1
@@ -528,7 +555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPositions: 100
+  saveStates: 10
 --- !u!1 &2405233771952785761
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,7 +748,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPositions: 100
+  saveStates: 10
 --- !u!1 &5409615770571366803
 GameObject:
   m_ObjectHideFlags: 0
@@ -916,7 +943,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPositions: 100
+  saveStates: 10
 --- !u!1 &5641312366177501074
 GameObject:
   m_ObjectHideFlags: 0
@@ -1111,7 +1138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPositions: 100
+  saveStates: 10
 --- !u!1 &5905030987734287010
 GameObject:
   m_ObjectHideFlags: 0
@@ -1304,7 +1331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPositions: 100
+  saveStates: 10
 --- !u!1 &7228385878822119569
 GameObject:
   m_ObjectHideFlags: 0
@@ -1527,7 +1554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bcdb865188c5ad4ebeb8d4442f9125a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPositions: 100
+  saveStates: 10
 --- !u!1 &8662590800914166733
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,10 +1,11 @@
 using UnityEngine;
+using static AIChaseInput;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class SidewaysController: MonoBehaviour
+public class OmnidirectionalController: AbstractController
 {
     [Header("Movement")]
-    [SerializeField] private float thrustForce = 1000f;
+    [SerializeField] private float thrustForce = 2000f;
     [SerializeField] private float thrustDampingMultiplier = 3f;
     [SerializeField][Range(0f, 20)] float maxVelocity = 10f;
 
@@ -14,18 +15,13 @@ public class SidewaysController: MonoBehaviour
     [SerializeField] [Range(0f, 360)] float maxAngularVelocity = 100f;
     [SerializeField, Range(0f, 1f)] private float angularDamping = 0.2f;
 
-    [Header("Instances")]
-    [SerializeField] private ShipControlInput shipControlInput = null;
 
-    private Rigidbody2D rb2d;
     private Vector2 movementInput;
     private float rotationInput;
 
-    private void Awake()
+    protected override void Awake()
     {
-        rb2d = GetComponent<Rigidbody2D>();
-        //rb2d.inertia *= 3f;
-
+        base.Awake();
         movementInput = Vector2.zero;
         rotationInput = 0f;
     }
@@ -48,10 +44,11 @@ public class SidewaysController: MonoBehaviour
 
     private void UpdateInputs()
     {
-        if (shipControlInput != null)
+        ShipControlInput controlInput = Input.GetKey(alternativeControlKey) ? alternativeShipControlInput : mainShipControlInput;
+        if (controlInput != null)
         {
-            movementInput = new Vector2(shipControlInput.GetHorizontalInput(), shipControlInput.GetVerticalInput());
-            rotationInput = shipControlInput.GetRotationInput();
+            movementInput = new Vector2(controlInput.GetHorizontalInput(ControlVectorCoordinates.World), controlInput.GetVerticalInput(ControlVectorCoordinates.World));
+            rotationInput = controlInput.GetRotationInput();
         }
     }
 

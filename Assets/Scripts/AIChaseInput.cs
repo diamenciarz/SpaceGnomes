@@ -26,6 +26,8 @@ public class AIChaseInput : ShipControlInput
     private float dangerousObstacleSpeed = 5f;
     [SerializeField] private ChaseMode chaseMode = ChaseMode.DirectlyToTarget;
     [SerializeField] [Range(1f,5f)] private float avoidCollisionLookaheadTime = 2f;
+    [SerializeField][Range(1,30)][Tooltip("How many points along the trajectory to check for collisions. Higher values are more accurate but more expensive.")] 
+    int collisionCheckPointCount = 5;
 
     [Header("Instances")]
     [SerializeField] private List<EntityType> chaseEntityTypes;
@@ -34,33 +36,52 @@ public class AIChaseInput : ShipControlInput
     [Header("Debugging Settings")]
     [SerializeField] private bool debug = false;
 
+    public enum ControlVectorCoordinates
+    {
+        World,
+        Local
+    }
+
     private Vector2 controlVector = Vector2.zero;
+    private bool calculatedControlThisFrame = false;
     private Rigidbody2D myRigidbody2D;
-    private ShipController shipController;
+    private VehicularController shipController;
     private EntityTeam myTeam; // Get the team
     private void Awake()
     {
         myTeam = GetComponent<EntityTeam>();
         myRigidbody2D = GetComponentInParent<Rigidbody2D>();
-        shipController = GetComponent<ShipController>();
+        shipController = GetComponent<VehicularController>();
     }
 
-    public override float GetHorizontalInput()
+    public override float GetHorizontalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local)
     {
-        return controlVector.x;
+        if (!calculatedControlThisFrame) CalculateControlVector();
+        return mode == ControlVectorCoordinates.Local ? GeometryUtils.WorldCoordsToLocal(controlVector, transform).x : controlVector.x;
     }
 
-    public override float GetVerticalInput()
+    public override float GetVerticalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local)
     {
-        return controlVector.y;
+        if (!calculatedControlThisFrame) CalculateControlVector();
+        return mode == ControlVectorCoordinates.Local ? GeometryUtils.WorldCoordsToLocal(controlVector, transform).y : controlVector.y;
     }
 
-    public override float GetRotationInput()
+    public override float GetRotationInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local)
     {
         return 0f;
     }
 
     void Update()
+    {
+        calculatedControlThisFrame = false;
+    }
+    /**
+    <summary>
+    Calculated the control vector in world coordinates.
+    </summary>
+     **/
+    private void CalculateControlVector()
+        
     {
         Vector2 chaseVector = CalculateChaseVector();
         //chaseVector = Vector2.zero; // Disable chasing for now to test avoidance
@@ -73,7 +94,8 @@ public class AIChaseInput : ShipControlInput
         Vector2 output = scaledAvoidance + scaledChase;
         if (output.magnitude > 1) output.Normalize();
         if (debug) Debug.DrawRay(transform.position, output, Color.yellow);
-        controlVector = WorldCoordsToLocal(output);
+        controlVector = output;
+        calculatedControlThisFrame = true;
     }
     private Vector2 CalculateChaseVector()
     {
@@ -112,11 +134,11 @@ public class AIChaseInput : ShipControlInput
         Vector2 avoidanceVector = Vector2.zero;
         foreach (GameObject obstacle in avoidEntities)
         {
-            GeometryUtils.CollidingPoints collidingPoints = GeometryUtils.CalculateClosestDistanceBetweenColliders(obstacle, gameObject);
+            //GeometryUtils.CollidingPoints collidingPoints = GeometryUtils.CalculateClosestDistanceBetweenColliders(obstacle, gameObject);
             //Debug.DrawLine(collidingPoints.toPos, collidingPoints.fromPos, Color.cyan);
             Trajectory obstacleTrajectory = obstacle.GetComponent<Trajectory>();
             Trajectory myTrajectory = GetComponent<Trajectory>();
-            Trajectory.CollisionInfo? crossingInfo = myTrajectory.WillObjectsCollide(obstacleTrajectory, avoidCollisionLookaheadTime);
+            Trajectory.CollisionInfo? crossingInfo = myTrajectory.WillObjectsCollide(obstacleTrajectory, avoidCollisionLookaheadTime, collisionCheckPointCount);
             if (!crossingInfo.HasValue) continue; // No collision predicted
             
             float timeToCollision = crossingInfo.Value.time;
