@@ -19,8 +19,9 @@ public class AIChaseInput : ShipControlInput
         ExtrapolateTrajectory
     }
     [Header("Distance settings")]
-    [SerializeField] private float chaseRange = 20f;
-    [SerializeField] private float stopRange = 5;
+    [SerializeField][Range(1f,100f)] private float chaseRange = 20f;
+    [SerializeField][Range(0f, 100f)][Tooltip("Will stop chasing an entity once below that distance")] private float stopChaseRange = 6;
+    [SerializeField][Range(0f, 100f)][Tooltip("The minimum distance to keep from avoided entities")] private float retreatRange = 3;
     [SerializeField] [Range(0,1)] private float maxAvoidanceFraction = 0.7f;
     [SerializeField] [Range(0, 50f)] [Tooltip("Obstacles moving relatively towards us faster than this will be avoided")]
     private float dangerousObstacleSpeed = 5f;
@@ -32,6 +33,7 @@ public class AIChaseInput : ShipControlInput
     [Header("Instances")]
     [SerializeField] private List<EntityType> chaseEntityTypes;
     [SerializeField] private List<EntityType> avoidEntityTypes;
+    [SerializeField] private List<EntityType> retreatFromEntityTypes;
 
     [Header("Debugging Settings")]
     [SerializeField] private bool debug = false;
@@ -47,6 +49,8 @@ public class AIChaseInput : ShipControlInput
     private Rigidbody2D myRigidbody2D;
     private VehicularController shipController;
     private EntityTeam myTeam; // Get the team
+
+
     private void Awake()
     {
         myTeam = GetComponent<EntityTeam>();
@@ -73,6 +77,7 @@ public class AIChaseInput : ShipControlInput
 
     void Update()
     {
+        if (retreatRange > stopChaseRange) retreatRange = stopChaseRange;
         calculatedControlThisFrame = false;
     }
     /**
@@ -81,7 +86,6 @@ public class AIChaseInput : ShipControlInput
     </summary>
      **/
     private void CalculateControlVector()
-        
     {
         Vector2 chaseVector = CalculateChaseVector();
         //chaseVector = Vector2.zero; // Disable chasing for now to test avoidance
@@ -100,13 +104,22 @@ public class AIChaseInput : ShipControlInput
     private Vector2 CalculateChaseVector()
     {
         List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(gameObject.transform.position, myTeam.team, chaseEntityTypes, chaseRange);
-        GameObject chaseEntity = GeometryUtils.FindClosestEntityToPosition(entities, gameObject.transform.position, stopRange);
-        if (!chaseEntity) return Vector2.zero; // Noone to chase
+        GameObject chaseEntity = GeometryUtils.FindClosestEntityToPosition(entities, gameObject.transform.position, stopChaseRange);
+        if (chaseEntity)
+        {
+            Vector2 directionToTarget = CalculateDirectionToTarget(chaseEntity);
+            //if (debug) Debug.DrawRay(transform.position, directionToTarget, Color.red);
+            if (directionToTarget.magnitude > 1) directionToTarget.Normalize();
+            return directionToTarget;
+        }
+        // Try to retreat
+        GameObject retreatFromEntity = GeometryUtils.FindClosestEntityToPosition(entities, gameObject.transform.position, 0, retreatRange);
+        if (!retreatFromEntity) return Vector2.zero;
 
-        Vector2 directionToTarget = CalculateDirectionToTarget(chaseEntity);
-        //if (debug) Debug.DrawRay(transform.position, directionToTarget, Color.red);
-        if (directionToTarget.magnitude > 1) directionToTarget.Normalize();
-        return directionToTarget;
+        Vector2 directionToEntity = -CalculateDirectionToTarget(retreatFromEntity);
+        if (directionToEntity.magnitude > 1) directionToEntity.Normalize();
+        return directionToEntity.magnitude < retreatRange ? directionToEntity : Vector2.zero;
+
     }
     private Vector2 CalculateDirectionToTarget(GameObject chaseEntity)
     {
@@ -150,27 +163,11 @@ public class AIChaseInput : ShipControlInput
             Vector2 relativeVelocity = obstacleTrajectory.ExtrapolateFutureVelocity(timeToCollision) - myTrajectory.ExtrapolateFutureVelocity(timeToCollision);
             if (relativeVelocity.magnitude < dangerousObstacleSpeed)
             {
-                Debug.DrawRay(crossingInfo.Value.collisionPosition, threatVector, Color.gray);
+                if (debug)  Debug.DrawRay(crossingInfo.Value.collisionPosition, threatVector, Color.gray);
                 continue; // Not moving fast enough relative to us
             }
-
-            Vector2 myCenter = myTrajectory.transform.gameObject.transform.position;
-            Vector2 obstacleCenter = obstacleTrajectory.transform.gameObject.transform.position;
-            Debug.DrawRay(myCenter, crossingInfo.Value.myVelocity, Color.magenta);
-            //Debug.DrawRay(obstacleCenter, crossingInfo.Value.otherVelocity, Color.green);
-            bool movingTowardsThreat = GeometryUtils.MovingTowardsThreat(crossingInfo.Value.myPoint, crossingInfo.Value.myVelocity, obstacleCenter, crossingInfo.Value.otherVelocity, myCenter, crossingInfo.Value.collisionPosition);
-            if (movingTowardsThreat)
-            {
-                // If has not passed the threat yet, increase the threat
-                avoidanceVector += threatVector;
-                Debug.DrawRay(crossingInfo.Value.collisionPosition, threatVector, Color.red);
-            }
-            else
-            {
-                // If the obstacle is moving in the other direction as the threat vector, flip the threat vector
-                Debug.DrawRay(crossingInfo.Value.collisionPosition, -threatVector, Color.red);
-                avoidanceVector -= threatVector;
-            }
+            avoidanceVector += threatVector;
+            if (debug) Debug.DrawRay(crossingInfo.Value.collisionPosition, threatVector, Color.red);
         }
         if (avoidanceVector.magnitude > 1) avoidanceVector.Normalize();
 
@@ -179,13 +176,6 @@ public class AIChaseInput : ShipControlInput
 
     private Vector2 CalculateThreatVector(Trajectory.CollisionInfo crossingInfo)
 {
-        //if (crossingInfo.otherIsWall)
-        //{
-        //    float timeToCollision = crossingInfo.time;
-        //    return (crossingInfo.myPoint - crossingInfo.collisionPosition).normalized / timeToCollision;
-        //}
-        //else
-        //{
         Line2D myLine = new Line2D(crossingInfo.myPoint, crossingInfo.myVelocity);
         Line2D otherLine = new Line2D(crossingInfo.otherPoint, crossingInfo.otherVelocity);
 
@@ -197,7 +187,6 @@ public class AIChaseInput : ShipControlInput
         }
 
         return threatVector.direction;
-        //}
     }
 
     private List<GameObject> GetEntitiesToAvoid()
@@ -212,12 +201,5 @@ public class AIChaseInput : ShipControlInput
         List<GameObject> entities = GeometryUtils.GetVisibleObjects(gameObject.transform.position, myTeam.team, avoidEntityTypes, chaseRange + MAX_ENTITY_SIZE, ignoreObject:gameObject);
         // Remove my own ship parts
         return EntityCounter.Instance.ExcludeMyChildren(gameObject, entities);
-    }
-
-    private Vector2 WorldCoordsToLocal(Vector2 worldCoords)
-    {
-        Vector3 worldDir3 = new Vector3(worldCoords.x, worldCoords.y, 0f);
-        Vector3 localDir3 = transform.InverseTransformDirection(worldDir3);
-        return new Vector2(localDir3.x, localDir3.y);
     }
 }

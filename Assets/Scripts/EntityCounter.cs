@@ -31,6 +31,7 @@ public class EntityCounter : MonoBehaviour
         public Dictionary<Vector2Int, HashSet<GameObject>> Cells = new Dictionary<Vector2Int, HashSet<GameObject>>();
         public Dictionary<GameObject, Vector2Int> EntityToCell = new Dictionary<GameObject, Vector2Int>();
     }
+    private GameObject dummyPointObject = null;
     private void Awake()
     {
         // Singleton setup
@@ -58,7 +59,18 @@ public class EntityCounter : MonoBehaviour
             trackers[typeof(ForceManager.ForceType)][(int)type] = new EntityTracker();
         }
     }
-
+    public GameObject GetDummyPointObject()
+    {
+        if (!dummyPointObject) CreateDummyPointObject();
+        return dummyPointObject;
+    }
+    private void CreateDummyPointObject()
+    {
+        dummyPointObject = new GameObject();
+        CircleCollider2D positionCollider = dummyPointObject.AddComponent<CircleCollider2D>();
+        positionCollider.radius = 0.0001f; // A very small radius to approximate a point
+        positionCollider.isTrigger = true;
+    }
     private void Register(GameObject obj, System.Type enumType, int enumValue)
     {
         Vector2 pos = obj.transform.position;

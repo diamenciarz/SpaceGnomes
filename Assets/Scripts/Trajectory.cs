@@ -210,10 +210,6 @@ public class Trajectory : MonoBehaviour
         List<Vector2> frontMovingPoints = GeometryUtils.GetForwardmostPoints(colliderPoints.Value.points, myVelocity, collisionCheckPointCount);
         foreach (var movingPoint in frontMovingPoints)
         {
-            Debug.DrawRay(movingPoint, myVelocity.normalized, Color.white);
-        }
-        foreach (var movingPoint in frontMovingPoints)
-        {
             RaycastHit2D[] hits = GeometryUtils.RaycastInDir(movingPoint, deltaVelocity);
 
             RaycastHit2D? wallHit = null;
@@ -224,7 +220,6 @@ public class Trajectory : MonoBehaviour
             if (!wallHit.HasValue) continue;
 
             Line2D wallLine = GeometryUtils.GetHitWallDirection(wallHit.Value, staticCollider2D, myVelocity);
-            Debug.DrawLine(wallLine.start, wallLine.end, Color.yellow);
 
             float distanceToHit = Vector2.Distance(movingPoint, wallHit.Value.point);
             float timeToHit = distanceToHit / deltaVelocity.magnitude;
