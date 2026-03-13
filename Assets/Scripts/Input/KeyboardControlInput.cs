@@ -55,11 +55,11 @@ public class KeyboardControlInput : ShipControlInput
         }
         else
         {
-            if (Input.GetKey(KeyCode.Keypad7))
+            if (Input.GetKey(KeyCode.Home))
             {
                 return -1f;
             }
-            else if (Input.GetKey(KeyCode.Keypad9))
+            else if (Input.GetKey(KeyCode.PageUp))
             {
                 return 1f;
             }

@@ -105,6 +105,7 @@ public class AIChaseInput : ShipControlInput
     {
         List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(gameObject.transform.position, myTeam.team, chaseEntityTypes, chaseRange);
         GameObject chaseEntity = GeometryUtils.FindClosestEntityToPosition(entities, gameObject.transform.position, stopChaseRange);
+        // If chased entity is 
         if (chaseEntity)
         {
             Vector2 directionToTarget = CalculateDirectionToTarget(chaseEntity);

@@ -403,11 +403,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxVelocity
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
+      propertyPath: thrustForce
+      value: 3000
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: angularDamping
@@ -429,6 +433,14 @@ PrefabInstance:
       propertyPath: alternativeShipControlInput
       value: 
       objectReference: {fileID: 677351338}
+    - target: {fileID: 1741509105870174778, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1741509105870174778, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
+      propertyPath: thrustForce
+      value: 3000
+      objectReference: {fileID: 0}
     - target: {fileID: 1741509105870174778, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: angularDamping
       value: 1
@@ -538,6 +550,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
+      propertyPath: stopChaseRange
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxAvoidanceFraction
       value: 1
       objectReference: {fileID: 0}
@@ -551,7 +567,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: avoidEntityTypes.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: chaseEntityTypes.Array.size
@@ -4124,7 +4140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5849378418243473390, guid: 8466a39bb6d0ba54abef7981acfa37b5, type: 3}
       propertyPath: EnableGridDebug
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8466a39bb6d0ba54abef7981acfa37b5, type: 3}

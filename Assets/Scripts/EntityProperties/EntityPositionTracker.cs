@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class EntityPositionTracker : MonoBehaviour
 {
+    /**
+     * It's like Trajectory but lite, only for tracking position changes to update the EntityCounter's spatial grid.
+     */
     private Vector2 lastPosition;
 
     private void Start()
