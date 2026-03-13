@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class AbstractController : MonoBehaviour
+public class AbstractPhysicsController : MonoBehaviour
 {
     [Header("Instances")]
-    [SerializeField] protected ShipControlInput mainShipControlInput = null;
-    [SerializeField] protected ShipControlInput alternativeShipControlInput = null;
+    [SerializeField] protected ControlInput mainShipControlInput = null;
+    [SerializeField] protected ControlInput alternativeShipControlInput = null;
     [SerializeField] protected KeyCode alternativeControlKey = KeyCode.Space;
 
     protected Rigidbody2D rb2d;

@@ -403,7 +403,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxVelocity
@@ -435,7 +435,7 @@ PrefabInstance:
       objectReference: {fileID: 677351338}
     - target: {fileID: 1741509105870174778, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1741509105870174778, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: thrustForce
@@ -553,6 +553,10 @@ PrefabInstance:
       propertyPath: stopChaseRange
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
+      propertyPath: movementBehavior
+      value: 
+      objectReference: {fileID: 11400000, guid: d162cb2dc2d795c4595b686096f61022, type: 2}
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxAvoidanceFraction
       value: 1
@@ -1422,7 +1426,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6045741e038df4847ab70e98b65af53e, type: 3}
+  m_Script: {fileID: 11500000, guid: 91ba24750820afc48bf060e1e607809f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &703813225
@@ -2089,70 +2093,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6754316655583377866, guid: fa0664c57e475614a9651144fb391135, type: 3}
   m_PrefabInstance: {fileID: 1800150232}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1221645721 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2685383631660251024, guid: fa0664c57e475614a9651144fb391135, type: 3}
-  m_PrefabInstance: {fileID: 1800150232}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1221645731
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1221645721}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d7791e2d4bf06d4da81964f6ce1debd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  controlScheme: 1
---- !u!114 &1221645732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1221645721}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5332cb33abb9cc947b06de6833b5731b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainShipControlInput: {fileID: 0}
-  alternativeShipControlInput: {fileID: 0}
-  alternativeControlKey: 32
-  thrustForce: 2000
-  thrustDampingMultiplier: 3
-  maxVelocity: 20
-  steerTorque: 10000
-  maxAngularDampingMultiplier: 2
-  maxAngularVelocity: 100
-  angularDamping: 0.2
---- !u!114 &1221645742
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1221645721}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6045741e038df4847ab70e98b65af53e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chaseRange: 20
-  stopChaseRange: 5
-  retreatRange: 5
-  maxAvoidanceFraction: 0.7
-  dangerousObstacleSpeed: 0
-  chaseMode: 1
-  avoidCollisionLookaheadTime: 5
-  collisionCheckPointCount: 5
-  chaseEntityTypes: 
-  avoidEntityTypes: 040000000100000000000000
-  retreatFromEntityTypes: 
-  debug: 1
 --- !u!1001 &1261645737
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2559,6 +2499,10 @@ PrefabInstance:
       propertyPath: stopChaseRange
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
+      propertyPath: movementBehavior
+      value: 
+      objectReference: {fileID: 11400000, guid: d162cb2dc2d795c4595b686096f61022, type: 2}
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxAvoidanceFraction
       value: 1
@@ -3333,7 +3277,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6045741e038df4847ab70e98b65af53e, type: 3}
+  m_Script: {fileID: 11500000, guid: 91ba24750820afc48bf060e1e607809f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1662053119 stripped

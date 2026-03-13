@@ -153,7 +153,7 @@ public class Line2D
         return angle;
     }
 
-    public Line2D CalculateThreatVector(Line2D other)
+    public Line2D CalculateThreatLine(Line2D other)
     {
         Vector2 closestPoint = other.ClosestPointOnLine(start);
         Line2D perpendicularLine = ProjectOntoLine(other.Perpendicular1());
@@ -166,19 +166,17 @@ public class Line2D
 
         bool angleOver90 = AngleBetween(other) / Mathf.PI > 0.5f;
 
-        Line2D threatVector;
+        Line2D threatLine;
         if (angleOver90)
         {
-            //Debug.Log("Angle over 90");
-            //Debug.Log($"Angle from to {AngleFromTo(candidate1) / Mathf.PI}");
-            threatVector = AngleFromTo(candidate1) / Mathf.PI < 0 ? candidate1 : candidate2;
+            threatLine = AngleFromTo(candidate1) / Mathf.PI < 0 ? candidate1 : candidate2;
         }
         else
         {
-            threatVector = distanceToLine1 < distanceToLine2 ? candidate1 : candidate2;
+            threatLine = distanceToLine1 < distanceToLine2 ? candidate1 : candidate2;
         }
 
         float distanceClosestPointToStart = Vector2.Distance(start, closestPoint);
-        return threatVector.Normalized().Scale(distanceClosestPointToStart);
+        return threatLine.Normalized().Scale(distanceClosestPointToStart);
     }
 }

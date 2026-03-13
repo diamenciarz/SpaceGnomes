@@ -1,8 +1,8 @@
 using UnityEngine;
-using static AIChaseInput;
+using static AIControlInput;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class OmnidirectionalController: AbstractController
+public class OmnidirectionalController: AbstractPhysicsController
 {
     [Header("Movement")]
     [SerializeField] private float thrustForce = 2000f;
@@ -44,7 +44,7 @@ public class OmnidirectionalController: AbstractController
 
     private void UpdateInputs()
     {
-        ShipControlInput controlInput = Input.GetKey(alternativeControlKey) ? alternativeShipControlInput : mainShipControlInput;
+        ControlInput controlInput = Input.GetKey(alternativeControlKey) ? alternativeShipControlInput : mainShipControlInput;
         if (controlInput != null)
         {
             movementInput = new Vector2(controlInput.GetHorizontalInput(ControlVectorCoordinates.World), controlInput.GetVerticalInput(ControlVectorCoordinates.World));

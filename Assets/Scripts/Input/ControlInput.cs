@@ -1,7 +1,7 @@
 using UnityEngine;
-using static AIChaseInput;
+using static AIControlInput;
 
-public abstract class ShipControlInput : MonoBehaviour
+public abstract class ControlInput : MonoBehaviour
 {
     public abstract float GetVerticalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local);
     public abstract float GetHorizontalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local);

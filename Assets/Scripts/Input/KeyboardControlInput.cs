@@ -1,8 +1,8 @@
 using Unity.VisualScripting;
 using UnityEngine;
-using static AIChaseInput;
+using static AIControlInput;
 
-public class KeyboardControlInput : ShipControlInput
+public class KeyboardControlInput : ControlInput
 {
     public enum ControlScheme
     {
