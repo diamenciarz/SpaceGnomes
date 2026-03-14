@@ -16,8 +16,8 @@ MonoBehaviour:
   stopChaseRange: 3
   retreatRange: 2
   onlyRetreatFromEnemies: 1
-  maxAvoidanceFraction: 0.7
-  maxRetreatFraction: 0.3
+  maxAvoidanceFraction: 0.5
+  maxRetreatFraction: 1
   dangerousObstacleSpeed: 0
   chaseMode: 0
   avoidCollisionLookaheadTime: 2
@@ -25,11 +25,15 @@ MonoBehaviour:
   chaseEntityTypes: 01000000
   avoidEntityTypes: 0000000001000000
   retreatFromEntityTypes: 01000000
-  debugCollisions: 0
-  debugMovementVectors: 0
+  debugCollisions: 1
+  debugMovementVectors: 1
   debugConsideredDistances: 0
-  findNewPositionDelay: 4
-  randomPositionMinRadius: 3
+  findNewPositionDelay: 6
+  randomPositionMinRadius: 6
   randomPositionMaxRadius: 6
   startingAngle: 0
   arcWidth: 360
+  arcAngularStep: 20
+  advanceAngleThreshold: 20
+  regenerateArcOnReachingTarget: 1
+  regenerateArcIfStuckFor: 2
