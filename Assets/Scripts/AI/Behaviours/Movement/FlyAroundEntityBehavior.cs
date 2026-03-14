@@ -3,28 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName= "ScriptableObjects/FlyAroundEntityBehavior", fileName ="EnemyBehavior")]
-public class FlyAroundEntityBehavior : MovementBehavior
+public class FlyAroundEntityBehavior : ArcMovementBehavior
 {
     [Header("Fly Around Settings")]
     [SerializeField][Range(0.1f, 10f)][Tooltip("The delay in seconds between attempts to find a new position to fly around the target entity.")]
-    float findNewPositionDelay= 2;
-    [SerializeField][Range(0.1f, 10f)] float randomPositionMinRadius = 3;
-    [SerializeField][Range(0.1f, 10f)] float randomPositionMaxRadius = 6;
+    private float findNewPositionDelay= 2;
+    [SerializeField][Range(0.1f, 10f)] protected float randomPositionMinRadius = 3;
+    [SerializeField][Range(0.1f, 10f)] protected float randomPositionMaxRadius = 6;
 
     // Arc control for generating random positions around the target
     [SerializeField][Range(0f, 360f)][Tooltip("Starting angle (degrees). 0 is at the top.")]
-    float startingAngle = 0f;
-    [SerializeField][Range(0f, 360f)][Tooltip("Arc width in degrees for random angle selection.")]
-    float arcWidth = 360f;
+    protected float startingAngle = 0f;
+    [SerializeField][Range(0f, 360f)][Tooltip("Counterclockwise arc width in degrees for random angle selection.")]
+    protected float arcWidth = 360f;
 
     [Header("Arc Path Settings")]
     [SerializeField][Range(1f, 90f)][Tooltip("Angular step (degrees) between generated arc points.")]
-    float arcAngularStep = 10f;
+    protected float arcAngularStep = 10f;
     [SerializeField][Range(1f, 45f)][Tooltip("Angle threshold (degrees) to advance to the next arc point when close to it.")]
-    float advanceAngleThreshold = 10f;
-    [SerializeField] bool regenerateArcOnReachingTarget = true;
+    protected float advanceAngleThreshold = 10f;
+    [SerializeField] private bool regenerateArcOnReachingTarget = true;
     [SerializeField][Range(0.1f, 10f)][Tooltip("If the ship gets stuck and fails to reach the target point within this time after reaching it, regenerate the arc to try to get unstuck.")]
-    float regenerateArcIfStuckFor = 2;
+    protected float regenerateArcIfStuckFor = 2;
 
     // Per-entity state (keyed by chaseEntity parent GetInstanceID())
     private Dictionary<int, float> lastNewPositionTimes = new Dictionary<int, float>();
@@ -40,11 +40,6 @@ public class FlyAroundEntityBehavior : MovementBehavior
         Vector2 actualCenter = (Vector2)chaseEntity.transform.position;
         List<Vector2> offsets = GetOrCreateArcOffsets(entityId, chaseEntity, data, actualCenter);
 
-        if (offsets == null || offsets.Count == 0)
-        {
-            return HandleFallback(data, actualCenter, entityId, chaseEntity);
-        }
-
         Vector2 shipPos = (Vector2)data.transform.position;
         PruneArc(offsets, actualCenter, shipPos, entityId);
         AdvanceArc(offsets, actualCenter, shipPos, entityId);
@@ -58,16 +53,7 @@ public class FlyAroundEntityBehavior : MovementBehavior
         return worldTarget - shipPos;
     }
 
-    private Vector2 HandleFallback(MovementBehaviorData data, Vector2 actualCenter, int entityId, GameObject chaseEntity)
-    {
-        Debug.LogError($"Failed to generate arc offsets for entity {chaseEntity.name} (ID: {entityId}).");
-        Vector2 fallbackDelta = GenerateDeltaOffset();
-        Vector2 fallbackTarget = actualCenter + fallbackDelta;
-        if (debugMovementVectors) Debug.DrawLine(data.transform.position, fallbackTarget, Color.green);
-        return fallbackTarget - (Vector2)data.transform.position;
-    }
-
-    private void PruneArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, int entityId)
+    protected virtual void PruneArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, int entityId)
     {
         int closestIndex = FindClosestPointIndex(offsets, actualCenter, shipPos);
         if (closestIndex > 0)
@@ -77,7 +63,7 @@ public class FlyAroundEntityBehavior : MovementBehavior
         }
     }
 
-    private void AdvanceArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, int entityId)
+    protected virtual void AdvanceArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, int entityId)
     {
         if (offsets.Count >= 2)
         {
@@ -91,39 +77,7 @@ public class FlyAroundEntityBehavior : MovementBehavior
         }
     }
 
-    private Vector2 DetermineWorldTarget(List<Vector2> offsets, Vector2 actualCenter, MovementBehaviorData data, GameObject chaseEntity)
-    {
-        Vector2 targetOffset = offsets[0];
-        if (chaseMode == ChaseMode.ExtrapolateTrajectory && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
-        {
-            Vector2 myVelocity = data.myRigidbody2D.velocity;
-            const float MINIMUM_SPEED = 2f;
-            float simulatedVelocity = Mathf.Max(myVelocity.magnitude, MINIMUM_SPEED);
-            float reachTime = (targetTrajectory.GetCurrentPosition() - (Vector2)data.transform.position).magnitude / simulatedVelocity;
-            Vector2 predictedCenter = targetTrajectory.ExtrapolateFuturePosition(reachTime);
-            return predictedCenter + targetOffset;
-        }
-        else
-        {
-            return actualCenter + targetOffset;
-        }
-    }
-
-    private void DrawDebugLines(MovementBehaviorData data, Vector2 worldTarget, List<Vector2> offsets, Vector2 actualCenter)
-    {
-        if (debugMovementVectors)
-        {
-            Debug.DrawLine(data.transform.position, worldTarget, Color.green);
-            for (int i = 0; i < offsets.Count; i++)
-            {
-                Vector2 p = actualCenter + offsets[i];
-                Debug.DrawLine(actualCenter, p, Color.yellow);
-                Debug.DrawLine(p, p + Vector2.up * 0.01f, Color.cyan);
-            }
-        }
-    }
-
-    private List<Vector2> GetOrCreateArcOffsets(int entityId, GameObject chaseEntity, MovementBehaviorData data, Vector2 actualCenter)
+    protected virtual List<Vector2> GetOrCreateArcOffsets(int entityId, GameObject chaseEntity, MovementBehaviorData data, Vector2 actualCenter)
     {
         if (!lastNewOffsetTimes.TryGetValue(entityId, out var lastNewOffsetTime))
         {
@@ -156,7 +110,7 @@ public class FlyAroundEntityBehavior : MovementBehavior
         return newOffsets;
     }
 
-    private Vector2 GenerateDeltaOffset()
+    protected Vector2 GenerateDeltaOffset()
     {
         // Pick an angle within the configured arc. 0 degrees is treated as "up" (world +Y).
         float angleOffset = Random.Range(0f, arcWidth);
@@ -172,7 +126,7 @@ public class FlyAroundEntityBehavior : MovementBehavior
     }
 
     // Build arc offsets (relative to center) that move from the ship's current angular position to the desired delta offset.
-    private List<Vector2> BuildArcOffsets(Vector2 center, Vector2 myPos, Vector2 deltaOffset)
+    protected virtual List<Vector2> BuildArcOffsets(Vector2 center, Vector2 myPos, Vector2 deltaOffset)
     {
         float radius = deltaOffset.magnitude;
         if (radius <= Mathf.Epsilon)
@@ -184,7 +138,7 @@ public class FlyAroundEntityBehavior : MovementBehavior
         float endAngle = AngleDegFromVector(deltaOffset);
         float deltaAngle = Mathf.DeltaAngle(startAngle, endAngle);
 
-        int steps = Mathf.Max(1, Mathf.CeilToInt(Mathf.Abs(deltaAngle) / arcAngularStep));
+        int steps = Mathf.CeilToInt(Mathf.Abs(deltaAngle) / arcAngularStep);
         float angleStep = deltaAngle / steps;
 
         List<Vector2> offsets = new List<Vector2>(steps);
@@ -201,36 +155,4 @@ public class FlyAroundEntityBehavior : MovementBehavior
         return offsets;
     }
 
-    private int FindClosestPointIndex(List<Vector2> offsets, Vector2 center, Vector2 shipPos)
-    {
-        int closestIndex = -1;
-        float bestDist = float.MaxValue;
-        for (int i = 0; i < offsets.Count; i++)
-        {
-            Vector2 worldPoint = center + offsets[i];
-            float d = Vector2.SqrMagnitude(worldPoint - shipPos);
-            if (d < bestDist)
-            {
-                bestDist = d;
-                closestIndex = i;
-            }
-        }
-        return closestIndex;
-    }
-
-    // Map vector to angle degrees where 0 is world-up (+Y)
-    private float AngleDegFromVector(Vector2 v)
-    {
-        if (v.sqrMagnitude == 0) return 0f;
-        float ang = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
-        ang = ang - 90f; // convert so 0 = up
-        return Mathf.Repeat(ang, 360f);
-    }
-
-    // Convert angle (0 = up) and radius to vector
-    private Vector2 VectorFromAngleDeg(float angleDeg, float radius)
-    {
-        float rad = (angleDeg + 90f) * Mathf.Deg2Rad;
-        return new Vector2(radius * Mathf.Cos(rad), radius * Mathf.Sin(rad));
-    }
 }

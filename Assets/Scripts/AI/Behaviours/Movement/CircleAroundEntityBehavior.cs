@@ -3,105 +3,115 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/CircleAroundEntityBehavior", fileName = "EnemyBehavior")]
-public class CircleAroundEntityBehavior : MovementBehavior
+public class CircleAroundEntityBehavior : ArcMovementBehavior
 {
-    [Header("Orbit Settings")]
-    [SerializeField]
-    [Range(0.1f, 10f)]
-    [Tooltip("Minimum orbit radius (used to pick a deterministic radius between min and max).")]
-    float randomPositionMinRadius = 3f;
 
-    [SerializeField]
-    [Range(0.1f, 20f)]
-    [Tooltip("Maximum orbit radius (used to pick a deterministic radius between min and max).")]
-    float randomPositionMaxRadius = 6f;
+    [Header("Circle Around Settings")]
+    [SerializeField][Range(0.1f, 10f)] private float randomPositionMinRadius = 3;
+    [SerializeField][Range(0.1f, 10f)] private float randomPositionMaxRadius = 6;
 
-    [SerializeField]
-    [Range(0f, 360f)]
-    [Tooltip("Starting angle (degrees). 0 is at the top.")]
-    float startingAngle = 0f;
+    [Header("Arc Path Settings")]
+    [SerializeField][Range(1f, 90f)][Tooltip("Angular step (degrees) between generated arc points.")]
+    private float arcAngularStep = 10f;
+    [SerializeField][Range(1f, 180f)][Tooltip("Angle threshold (degrees) to advance to the next arc point when close to it.")]
+    private float advanceAngleThreshold = 10f;
+    [SerializeField][Range(0.1f, 10f)][Tooltip("If the ship gets stuck and fails to reach the target point within this time after reaching it, regenerate the arc to try to get unstuck.")]
+    private float regenerateArcIfStuckFor = 2;
 
-    [SerializeField]
-    [Range(0f, 360f)]
-    [Tooltip("Arc width in degrees for the orbit. 360 = full circle.")]
-    float arcWidth = 360f;
+    private Dictionary<int, List<Vector2>> arcOffsetsByEntity = new Dictionary<int, List<Vector2>>();
+    private Dictionary<int, float> lastNewOffsetTimes = new Dictionary<int, float>();
 
-    [SerializeField]
-    [Range(-360f, 360f)]
-    [Tooltip("Angular speed in degrees per second for the orbiting point.")]
-    float angularSpeed = 30f;
-
-    [SerializeField]
-    [Tooltip("If true, each target will get a deterministic phase offset so multiple chasers stagger their positions.")]
-    bool usePhaseOffset = true;
+    private bool addingArcPointsClockwise;
+    private float lastArcPointAngle;
 
     protected override Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity)
     {
-        if (chaseEntity == null) return Vector2.zero;
+        chaseEntity = EntityCounter.Instance.GetEntityParent(chaseEntity);
+        int entityId = chaseEntity.GetInstanceID();
 
-        // Determine center of orbit. If extrapolating, predict the target's future position and orbit around that.
-        Vector2 center;
-        if (chaseMode == ChaseMode.ExtrapolateTrajectory && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
+        Vector2 actualCenter = (Vector2)chaseEntity.transform.position;
+        List<Vector2> offsets = GetOrCreateArcOffsets(entityId, chaseEntity, data, actualCenter);
+
+        Vector2 shipPos = (Vector2)data.transform.position;
+        PruneArc(offsets, actualCenter, shipPos, entityId);
+        AdvanceArc(offsets, actualCenter, shipPos, entityId);
+
+        arcOffsetsByEntity[entityId] = offsets;
+
+        Vector2 worldTarget = DetermineWorldTarget(offsets, actualCenter, data, chaseEntity);
+
+        DrawDebugLines(data, worldTarget, offsets, actualCenter);
+
+        return worldTarget - shipPos;
+    }
+    private List<Vector2> GetOrCreateArcOffsets(int entityId, GameObject chaseEntity, MovementBehaviorData data, Vector2 actualCenter)
+    {
+        if (!lastNewOffsetTimes.TryGetValue(entityId, out var lastNewOffsetTime))
         {
-            Vector2 myVelocity = data.myRigidbody2D.velocity;
-            const float MINIMUM_SPEED = 2f;
-            float simulatedVelocity = Mathf.Max(myVelocity.magnitude, MINIMUM_SPEED);
-            float reachTime = (targetTrajectory.GetCurrentPosition() - (Vector2)data.transform.position).magnitude / simulatedVelocity;
-            center = targetTrajectory.ExtrapolateFuturePosition(reachTime);
+            lastNewOffsetTimes[entityId] = Time.time;
         }
-        else
+        bool isStuck = Time.time - lastNewOffsetTime > regenerateArcIfStuckFor;
+        if (isStuck)
         {
-            center = chaseEntity.transform.position;
+            // Reset the arc in an opposite direction to try to get unstuck
+            addingArcPointsClockwise = !addingArcPointsClockwise;
+            InitializeNewArc(entityId, chaseEntity, data, actualCenter);
+            return arcOffsetsByEntity[entityId];
         }
 
-        // Deterministic radius chosen between min and max so the orbit radius doesn't jitter every frame.
-        float radius = DetermineDeterministicRadius(chaseEntity);
-
-        // Compute angle using Time.time so the point moves along the arc at a consistent rate.
-        float baseAngle = startingAngle;
-        if (usePhaseOffset) baseAngle += GetDeterministicPhaseOffset(chaseEntity);
-
-        float sweepDegrees = angularSpeed * Time.time;
-        if (arcWidth < 360f)
+        bool arcExists = arcOffsetsByEntity.TryGetValue(entityId, out var existing);// && existing != null && existing.Count > 0;
+        if (!arcExists)
         {
-            // Keep the sweep constrained to the configured arc width
-            sweepDegrees = Mathf.Repeat(sweepDegrees, arcWidth);
+            InitializeNewArc(entityId, chaseEntity, data, actualCenter);
         }
 
-        float angle = baseAngle + sweepDegrees;
+        return arcOffsetsByEntity[entityId];
+    }
+    private void InitializeNewArc(int entityId, GameObject chaseEntity, MovementBehaviorData data, Vector2 actualCenter)
+    {
+        // Instantiate a new arc by adding current ship position
+        float startAngle = AngleDegFromVector((Vector2) data.transform.position - actualCenter);
+        float initialRadius = Random.Range(randomPositionMinRadius, randomPositionMaxRadius);
+        Vector2 p = VectorFromAngleDeg(startAngle, initialRadius);
+        arcOffsetsByEntity[entityId] = new List<Vector2> { p };
+        lastArcPointAngle = startAngle;
+
+        // Then one more point in the direction of the arc
+        AddArcPoint(arcOffsetsByEntity[entityId], actualCenter, entityId);
+    }
+    private void PruneArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, int entityId)
+    {
+        int closestIndex = FindClosestPointIndex(offsets, actualCenter, shipPos);
+        if (closestIndex > 0)
+        {
+            offsets.RemoveRange(0, closestIndex);
+            // Add one new point at the end of the arc
+            AddArcPoint(offsets, actualCenter, entityId);
+        }
+    }
+
+    private void AdvanceArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, int entityId)
+    {
+        if (offsets.Count >= 2)
+        {
+            float shipAngle = AngleDegFromVector(shipPos - actualCenter);
+            float secondAngle = AngleDegFromVector(offsets[1]);
+            if (Mathf.Abs(Mathf.DeltaAngle(shipAngle, secondAngle)) <= advanceAngleThreshold)
+            {
+                offsets.RemoveAt(0);
+                AddArcPoint(offsets, actualCenter, entityId);
+            }
+        }
+    }
+    private void AddArcPoint(List<Vector2> offsets, Vector2 actualCenter, int entityId)
+    {
+        float deltaAngle = addingArcPointsClockwise ? -arcAngularStep : arcAngularStep;
+        float angle = lastArcPointAngle + deltaAngle;
         angle = Mathf.Repeat(angle, 360f);
-
-        // Convert angle to world-space offset. 0 degrees corresponds to world-up (positive Y).
-        float rad = (angle + 90f) * Mathf.Deg2Rad;
-        Vector2 offset = new Vector2(radius * Mathf.Cos(rad), radius * Mathf.Sin(rad));
-
-        Vector2 orbitPoint = center + offset;
-
-        if (debugMovementVectors)
-        {
-            Debug.DrawLine(data.transform.position, orbitPoint, Color.green);
-            Debug.DrawLine(center, orbitPoint, Color.yellow);
-        }
-
-        return orbitPoint - (Vector2)data.transform.position;
-    }
-
-    // Pick a stable radius between min and max using the chaseEntity instance id so it doesn't change every frame.
-    private float DetermineDeterministicRadius(GameObject chaseEntity)
-    {
-        if (Mathf.Approximately(randomPositionMinRadius, randomPositionMaxRadius)) return randomPositionMinRadius;
-        int id = chaseEntity.GetInstanceID();
-        int absId = id == int.MinValue ? int.MaxValue : Mathf.Abs(id);
-        float frac = (absId % 1000) / 1000f; // stable fraction in [0,0.999]
-        return Mathf.Lerp(randomPositionMinRadius, randomPositionMaxRadius, frac);
-    }
-
-    // Provide a deterministic phase offset (in degrees) so different chasers don't all sit on the exact same point.
-    private float GetDeterministicPhaseOffset(GameObject chaseEntity)
-    {
-        int id = chaseEntity.GetInstanceID();
-        int absId = id == int.MinValue ? int.MaxValue : Mathf.Abs(id);
-        float frac = (absId % 360) / 360f; // 0..0.997
-        return frac * arcWidth;
+        float radius = offsets[0].magnitude;
+        Vector2 p = VectorFromAngleDeg(angle, radius);
+        offsets.Add(p);
+        lastArcPointAngle = angle;
+        lastNewOffsetTimes[entityId] = Time.time;
     }
 }

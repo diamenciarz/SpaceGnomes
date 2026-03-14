@@ -403,7 +403,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxVelocity
@@ -411,7 +411,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: thrustForce
-      value: 3000
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 827234146337642812, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: angularDamping
@@ -435,7 +435,7 @@ PrefabInstance:
       objectReference: {fileID: 677351338}
     - target: {fileID: 1741509105870174778, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1741509105870174778, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: thrustForce
@@ -560,7 +560,7 @@ PrefabInstance:
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: movementBehavior
       value: 
-      objectReference: {fileID: 11400000, guid: d561e613d305df14c8c6789e3cdd274f, type: 2}
+      objectReference: {fileID: 11400000, guid: 44b161de8aa1ba144ab9fe0a74885ffb, type: 2}
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxAvoidanceFraction
       value: 1

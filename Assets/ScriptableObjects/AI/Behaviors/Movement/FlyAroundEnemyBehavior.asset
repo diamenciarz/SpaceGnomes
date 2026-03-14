@@ -29,8 +29,8 @@ MonoBehaviour:
   debugMovementVectors: 1
   debugConsideredDistances: 0
   findNewPositionDelay: 6
-  randomPositionMinRadius: 6
-  randomPositionMaxRadius: 6
+  randomPositionMinRadius: 4
+  randomPositionMaxRadius: 8
   startingAngle: 0
   arcWidth: 360
   arcAngularStep: 20

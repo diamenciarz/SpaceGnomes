@@ -105,6 +105,7 @@
     <Compile Include="Assets\Scripts\Physics\EntityControllers\AbstractPhysicsController.cs" />
     <Compile Include="Assets\Scripts\AI\AIControlInput.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\FlyAroundEntityBehavior.cs" />
+    <Compile Include="Assets\Scripts\AI\Behaviours\Movement\ArcMovementBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />
