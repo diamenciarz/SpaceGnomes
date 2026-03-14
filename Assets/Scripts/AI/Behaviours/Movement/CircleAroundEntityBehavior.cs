@@ -5,74 +5,103 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "ScriptableObjects/CircleAroundEntityBehavior", fileName = "EnemyBehavior")]
 public class CircleAroundEntityBehavior : MovementBehavior
 {
-    [Header("Fly Around Settings")]
+    [Header("Orbit Settings")]
     [SerializeField]
     [Range(0.1f, 10f)]
-    [Tooltip("The delay in seconds between attempts to find a new position to fly around the target entity.")]
-    float findNewPositionDelay = 2;
-    [SerializeField][Range(0.1f, 10f)] float randomPositionMinRadius = 3;
-    [SerializeField][Range(0.1f, 10f)] float randomPositionMaxRadius = 6;
+    [Tooltip("Minimum orbit radius (used to pick a deterministic radius between min and max).")]
+    float randomPositionMinRadius = 3f;
 
-    // Arc control for generating random positions around the target
+    [SerializeField]
+    [Range(0.1f, 20f)]
+    [Tooltip("Maximum orbit radius (used to pick a deterministic radius between min and max).")]
+    float randomPositionMaxRadius = 6f;
+
     [SerializeField]
     [Range(0f, 360f)]
     [Tooltip("Starting angle (degrees). 0 is at the top.")]
     float startingAngle = 0f;
+
     [SerializeField]
     [Range(0f, 360f)]
-    [Tooltip("Arc width in degrees for random angle selection.")]
+    [Tooltip("Arc width in degrees for the orbit. 360 = full circle.")]
     float arcWidth = 360f;
 
-    private float lastNewPositionTime;
-    private Vector2 deltaPosToTarget;
+    [SerializeField]
+    [Range(-360f, 360f)]
+    [Tooltip("Angular speed in degrees per second for the orbiting point.")]
+    float angularSpeed = 30f;
+
+    [SerializeField]
+    [Tooltip("If true, each target will get a deterministic phase offset so multiple chasers stagger their positions.")]
+    bool usePhaseOffset = true;
 
     protected override Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity)
     {
-        if (Time.time - lastNewPositionTime > findNewPositionDelay) GenerateDeltaPositionToTarget();
+        if (chaseEntity == null) return Vector2.zero;
+
+        // Determine center of orbit. If extrapolating, predict the target's future position and orbit around that.
+        Vector2 center;
         if (chaseMode == ChaseMode.ExtrapolateTrajectory && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
         {
             Vector2 myVelocity = data.myRigidbody2D.velocity;
-            float mySpeed = myVelocity.magnitude;
             const float MINIMUM_SPEED = 2f;
             float simulatedVelocity = Mathf.Max(myVelocity.magnitude, MINIMUM_SPEED);
-            Vector2 relativeVelocity = targetTrajectory.GetVelocity() - myVelocity;
             float reachTime = (targetTrajectory.GetCurrentPosition() - (Vector2)data.transform.position).magnitude / simulatedVelocity;
-            Vector2 predictedHitCoords = targetTrajectory.ExtrapolateFuturePosition(reachTime);
-
-            // Apply the offset around the target
-            Vector2 offsetTarget = predictedHitCoords + deltaPosToTarget;
-
-            if (debugMovementVectors)
-            {
-                Debug.DrawLine(chaseEntity.transform.position, offsetTarget, Color.green);
-            }
-            return offsetTarget - (Vector2)data.transform.position;
-
+            center = targetTrajectory.ExtrapolateFuturePosition(reachTime);
         }
         else
         {
-            // Aim for the point offset from the chase entity's position
-            Vector2 targetPos = (Vector2)chaseEntity.transform.position + deltaPosToTarget;
-            if (debugMovementVectors)
-            {
-                Debug.DrawLine(data.transform.position, targetPos, Color.green);
-            }
-            return targetPos - (Vector2)data.transform.position;
+            center = chaseEntity.transform.position;
         }
-    }
-    private Vector2 GenerateDeltaPositionToTarget()
-    {
-        // Pick an angle within the configured arc. 0 degrees is treated as "up" (world +Y).
-        float angleOffset = Random.Range(0f, arcWidth);
-        float angle = startingAngle + angleOffset;
+
+        // Deterministic radius chosen between min and max so the orbit radius doesn't jitter every frame.
+        float radius = DetermineDeterministicRadius(chaseEntity);
+
+        // Compute angle using Time.time so the point moves along the arc at a consistent rate.
+        float baseAngle = startingAngle;
+        if (usePhaseOffset) baseAngle += GetDeterministicPhaseOffset(chaseEntity);
+
+        float sweepDegrees = angularSpeed * Time.time;
+        if (arcWidth < 360f)
+        {
+            // Keep the sweep constrained to the configured arc width
+            sweepDegrees = Mathf.Repeat(sweepDegrees, arcWidth);
+        }
+
+        float angle = baseAngle + sweepDegrees;
         angle = Mathf.Repeat(angle, 360f);
 
-        float distance = Random.Range(randomPositionMinRadius, randomPositionMaxRadius);
-
-        // Convert to radians and rotate so that 0 degrees maps to world up (0,1).
+        // Convert angle to world-space offset. 0 degrees corresponds to world-up (positive Y).
         float rad = (angle + 90f) * Mathf.Deg2Rad;
-        deltaPosToTarget = new Vector2(distance * Mathf.Cos(rad), distance * Mathf.Sin(rad));
-        lastNewPositionTime = Time.time;
-        return deltaPosToTarget;
+        Vector2 offset = new Vector2(radius * Mathf.Cos(rad), radius * Mathf.Sin(rad));
+
+        Vector2 orbitPoint = center + offset;
+
+        if (debugMovementVectors)
+        {
+            Debug.DrawLine(data.transform.position, orbitPoint, Color.green);
+            Debug.DrawLine(center, orbitPoint, Color.yellow);
+        }
+
+        return orbitPoint - (Vector2)data.transform.position;
+    }
+
+    // Pick a stable radius between min and max using the chaseEntity instance id so it doesn't change every frame.
+    private float DetermineDeterministicRadius(GameObject chaseEntity)
+    {
+        if (Mathf.Approximately(randomPositionMinRadius, randomPositionMaxRadius)) return randomPositionMinRadius;
+        int id = chaseEntity.GetInstanceID();
+        int absId = id == int.MinValue ? int.MaxValue : Mathf.Abs(id);
+        float frac = (absId % 1000) / 1000f; // stable fraction in [0,0.999]
+        return Mathf.Lerp(randomPositionMinRadius, randomPositionMaxRadius, frac);
+    }
+
+    // Provide a deterministic phase offset (in degrees) so different chasers don't all sit on the exact same point.
+    private float GetDeterministicPhaseOffset(GameObject chaseEntity)
+    {
+        int id = chaseEntity.GetInstanceID();
+        int absId = id == int.MinValue ? int.MaxValue : Mathf.Abs(id);
+        float frac = (absId % 360) / 360f; // 0..0.997
+        return frac * arcWidth;
     }
 }

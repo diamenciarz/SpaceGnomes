@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8bf5b92244221742a59496ef5e28a1d, type: 3}
+  m_Name: CircleAroundEntityBehavior
+  m_EditorClassIdentifier: 
+  chaseRange: 20
+  stopChaseRange: 0
+  retreatRange: 0
+  onlyRetreatFromEnemies: 1
+  maxAvoidanceFraction: 0.7
+  maxRetreatFraction: 0.7
+  dangerousObstacleSpeed: 0
+  chaseMode: 0
+  avoidCollisionLookaheadTime: 2
+  collisionCheckPointCount: 5
+  chaseEntityTypes: 01000000
+  avoidEntityTypes: 0000000001000000
+  retreatFromEntityTypes: 01000000
+  debugCollisions: 0
+  debugMovementVectors: 1
+  debugConsideredDistances: 0
+  randomPositionMinRadius: 6
+  randomPositionMaxRadius: 6
+  startingAngle: 0
+  arcWidth: 360
+  angularSpeed: 30
+  usePhaseOffset: 1

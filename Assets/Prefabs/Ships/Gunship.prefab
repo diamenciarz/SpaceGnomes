@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5332cb33abb9cc947b06de6833b5731b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainShipControlInput: {fileID: 4049380779284195394}
+  mainShipControlInput: {fileID: 5747292331280976720}
   alternativeShipControlInput: {fileID: 5747292331280976720}
   alternativeControlKey: 32
   thrustForce: 2000
@@ -516,7 +516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91ba24750820afc48bf060e1e607809f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementBehavior: {fileID: 0}
+  movementBehavior: {fileID: 11400000, guid: d561e613d305df14c8c6789e3cdd274f, type: 2}
 --- !u!114 &8076816269696358030
 MonoBehaviour:
   m_ObjectHideFlags: 0

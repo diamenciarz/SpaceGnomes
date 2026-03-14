@@ -59,6 +59,25 @@ public class EntityCounter : MonoBehaviour
             trackers[typeof(ForceManager.ForceType)][(int)type] = new EntityTracker();
         }
     }
+    public GameObject GetEntityParent(GameObject obj)
+    {
+        return GetEntityParentRecursive(obj);
+    }
+
+    private GameObject GetEntityParentRecursive(GameObject currentHighestObj)
+    {
+        GameObject parent = currentHighestObj.transform.parent?.gameObject;
+        if (parent == null)
+        {
+            return currentHighestObj;
+        }
+        EntityTeam parentTeamScript = parent.GetComponent<EntityTeam>();
+        if (parentTeamScript != null)
+        {
+            return parent;
+        }
+        return GetEntityParentRecursive(parent);
+    }
     public GameObject GetDummyPointObject()
     {
         if (!dummyPointObject) CreateDummyPointObject();
