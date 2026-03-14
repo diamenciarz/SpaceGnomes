@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static HasEntityType;
 
-[CreateAssetMenu(menuName="ScriptableObjects/MovementBehavior", fileName ="EnemyBehavior")]
-public class MovementBehavior : ScriptableObject
+public abstract class MovementBehavior : ScriptableObject
 {
     public class MovementBehaviorData
     {
@@ -22,30 +20,32 @@ public class MovementBehavior : ScriptableObject
         ExtrapolateTrajectory
     }
     [Header("Distance settings")]
-    [SerializeField][Range(1f, 100f)] private float chaseRange = 20f;
-    [SerializeField][Range(0f, 100f)][Tooltip("Will stop chasing an entity once below that distance")] private float stopChaseRange = 6;
-    [SerializeField][Range(0f, 100f)][Tooltip("The minimum distance to keep from avoided entities")] private float retreatRange = 3;
-    [SerializeField][Range(0, 1)] private float maxAvoidanceFraction = 0.7f;
+    [SerializeField][Range(1f, 100f)][Tooltip("Only chase entities within this distance")] protected float chaseRange = 20f;
+    [SerializeField][Range(0f, 100f)][Tooltip("Will stop chasing an entity once below that distance")] protected float stopChaseRange = 6;
+    [SerializeField][Range(0f, 100f)][Tooltip("The minimum distance to keep from avoided entities")] protected float retreatRange = 3;
+    [SerializeField][Tooltip("Whether to only retreat from entities that are also enemies, or to retreat from any entity regardless of team")]
+    protected bool onlyRetreatFromEnemies = true;
+    [SerializeField][Range(0, 1)] protected float maxAvoidanceFraction = 0.7f;
+    [SerializeField][Range(0, 1)] protected float maxRetreatFraction = 0.7f;
     [SerializeField]
     [Range(0, 50f)]
     [Tooltip("Obstacles moving relatively towards us faster than this will be avoided")]
-    private float dangerousObstacleSpeed = 0f;
-    [SerializeField] private ChaseMode chaseMode = ChaseMode.DirectlyToTarget;
-    [SerializeField][Range(1f, 5f)] private float avoidCollisionLookaheadTime = 2f;
-    [SerializeField]
-    [Range(1, 30)]
+    protected float dangerousObstacleSpeed = 0f;
+    [SerializeField] protected ChaseMode chaseMode = ChaseMode.DirectlyToTarget;
+    [SerializeField][Range(1f, 5f)] protected float avoidCollisionLookaheadTime = 2f;
+    [SerializeField][Range(1, 30)]
     [Tooltip("How many points along the trajectory to check for collisions. Higher values are more accurate but more expensive.")]
-    int collisionCheckPointCount = 5;
+    protected int collisionCheckPointCount = 5;
 
     [Header("Instances")]
-    [SerializeField] private List<EntityType> chaseEntityTypes;
-    [SerializeField] private List<EntityType> avoidEntityTypes;
-    [SerializeField] private List<EntityType> retreatFromEntityTypes;
+    [SerializeField] protected List<EntityType> chaseEntityTypes;
+    [SerializeField] protected List<EntityType> avoidEntityTypes;
+    [SerializeField] protected List<EntityType> retreatFromEntityTypes;
 
     [Header("Debugging Settings")]
-    [SerializeField] private bool debugCollisions = false;
-    [SerializeField] private bool debugMovementVectors = false;
-    [SerializeField] private bool debugConsideredDistances = false;
+    [SerializeField] protected bool debugCollisions = false;
+    [SerializeField] protected bool debugMovementVectors = false;
+    [SerializeField] protected bool debugConsideredDistances = false;
 
     private void OnValidate()
     {
@@ -60,41 +60,59 @@ public class MovementBehavior : ScriptableObject
     public virtual Vector2 CalculateControlVector(MovementBehaviorData data)
     {
         Vector2 chaseVector = CalculateChaseVector(data);
+        Vector2 retreatVector = CalculateRetreatVector(data);
         Vector2 avoidanceVector = CalculateAvoidanceVector(data);
+        // All are normalized if longer than 1
         if (debugMovementVectors) Debug.DrawRay(data.transform.position, avoidanceVector, Color.blue);
 
-        if (avoidanceVector.magnitude > 1) avoidanceVector.Normalize();
         Vector2 scaledAvoidance = avoidanceVector * maxAvoidanceFraction; // 0 -> 0.7
-        Vector2 scaledChase = chaseVector * (1 - scaledAvoidance.magnitude); // 1 -> 0.3
-        Vector2 output = scaledAvoidance + scaledChase;
+        Vector2 scaledRetreat = retreatVector * (1 - scaledAvoidance.magnitude) * maxRetreatFraction; // 0 -> ((1 -> 0.3) * 0.7) => 0 -> (0.7 -> 0.21)
+        Vector2 scaledChase = chaseVector * (1 - scaledRetreat.magnitude - scaledAvoidance.magnitude); // 1 -> 0.09
+        Vector2 output = scaledAvoidance + scaledRetreat + scaledChase;
         if (output.magnitude > 1) output.Normalize();
         if (debugCollisions) Debug.DrawRay(data.transform.position, output, Color.yellow);
         return output;
     }
     protected virtual Vector2 CalculateChaseVector(MovementBehaviorData data)
     {
-        List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(data.transform.position, data.myTeam.team, chaseEntityTypes, chaseRange);
-        GameObject chaseEntity = GeometryUtils.FindClosestEntityToPosition(entities, data.transform.position, stopChaseRange);
-        // If chased entity is 
-        if (chaseEntity)
-        {
-            Vector2 directionToTarget = CalculateDirectionToTarget(data, chaseEntity);
+        GameObject chaseEntity = GetClosestChaseEntity(data);
+        if (!chaseEntity) return Vector2.zero;
+        Vector2 directionToTarget = CalculateDirectionToTarget(data, chaseEntity);
 
-            if(debugMovementVectors) Debug.DrawRay(data.transform.position, directionToTarget, Color.red);
+        if(debugMovementVectors) Debug.DrawRay(data.transform.position, directionToTarget, Color.white);
 
-            if (directionToTarget.magnitude > 1) directionToTarget.Normalize();
-            return directionToTarget;
-        }
-        // Try to retreat
-        GameObject retreatFromEntity = GeometryUtils.FindClosestEntityToPosition(entities, data.transform.position, 0, retreatRange);
-        if (!retreatFromEntity) return Vector2.zero;
-
-        Vector2 directionToEntity = -CalculateDirectionToTarget(data, retreatFromEntity);
-        if (directionToEntity.magnitude > 1) directionToEntity.Normalize();
-        return directionToEntity.magnitude < retreatRange ? directionToEntity : Vector2.zero;
+        if (directionToTarget.magnitude > 1) directionToTarget.Normalize();
+        return directionToTarget;
 
     }
-    private Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity)
+    protected GameObject GetClosestChaseEntity(MovementBehaviorData data)
+    {
+        List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(data.transform.position, data.myTeam.team, chaseEntityTypes, chaseRange);
+        // If chased entity is farther than stopChaseRange, we want to chase it, otherwise we want to stop chasing and potentially start retreating
+        return GeometryUtils.FindClosestEntityToPosition(entities, data.transform.position, stopChaseRange);
+    }
+    protected virtual Vector2 CalculateRetreatVector(MovementBehaviorData data)
+    {
+        List<GameObject> entities = GetRetreatEntities(data);
+
+        GameObject entityToRetreatFrom = GeometryUtils.FindClosestEntityToPosition(entities, data.transform.position, 0, retreatRange);
+        if (!entityToRetreatFrom) return Vector2.zero;
+        Vector2 directionFromEntity = -CalculateDirectionToTarget(data, entityToRetreatFrom);
+        if (directionFromEntity.magnitude > 1) directionFromEntity.Normalize();
+        return directionFromEntity;
+    }
+    private List<GameObject> GetRetreatEntities(MovementBehaviorData data)
+    {
+        if (onlyRetreatFromEnemies)
+        {
+            return TeamManager.Instance.GetNearbyEnemies(data.transform.position, data.myTeam.team, retreatFromEntityTypes, retreatRange);
+        }
+        else
+        {
+            return EntityCounter.Instance.GetNearbyEntities(data.transform.position, retreatFromEntityTypes, retreatRange);
+        }
+    }
+    protected virtual Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity)
     {
         if (chaseMode == ChaseMode.ExtrapolateTrajectory && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
         {
@@ -141,13 +159,15 @@ public class MovementBehavior : ScriptableObject
             Vector2 threatVector = CalculateThreatVector(crossingInfo.Value);
 
             Vector2 relativeVelocity = obstacleTrajectory.ExtrapolateFutureVelocity(timeToCollision) - data.myTrajectory.ExtrapolateFutureVelocity(timeToCollision);
+            float weight = 1 - (timeToCollision / avoidCollisionLookaheadTime); // Closer collisions have higher weight
+            Vector2 scaledThreatVector = threatVector.normalized * weight;
             if (relativeVelocity.magnitude < dangerousObstacleSpeed)
             {
-                if (debugCollisions) Debug.DrawRay(crossingInfo.Value.collisionPosition, threatVector, Color.gray);
+                if (debugCollisions) Debug.DrawRay(crossingInfo.Value.collisionPosition, scaledThreatVector, Color.gray);
                 continue; // Not moving fast enough relative to us
             }
-            avoidanceVector += threatVector;
-            if (debugCollisions) Debug.DrawRay(crossingInfo.Value.collisionPosition, threatVector, Color.red);
+            if (debugCollisions) Debug.DrawRay(crossingInfo.Value.collisionPosition, scaledThreatVector, Color.red);
+            avoidanceVector += scaledThreatVector;
         }
         if (avoidanceVector.magnitude > 1) avoidanceVector.Normalize();
 
@@ -161,7 +181,7 @@ public class MovementBehavior : ScriptableObject
 
         // Maybe possible to simplify the function by using Vector2 in the calculation
         Line2D threatVector = mVelocity.CalculateThreatLine(otherVelocity);
-
+        float distanceToThreat = threatVector.direction.magnitude;
         return threatVector.direction;
     }
 

@@ -502,14 +502,12 @@ public static class GeometryUtils
     }
     public static GameObject FindClosestEntityToPosition(IEnumerable<GameObject> entities, Vector2 position, float minRange = 0f, float maxRange = float.MaxValue)
     {
-        // TODO: Should calculate the closest entity colider inside GeometryUtils
         GameObject tempObject = EntityCounter.Instance.GetDummyPointObject();
         tempObject.transform.position = position;
         return FindClosestEntityToObject(entities, tempObject, minRange, maxRange);
     }
     public static GameObject FindClosestEntityToObject(IEnumerable<GameObject> entities, GameObject obj, float minRange = 0f, float maxRange = float.MaxValue)
     {
-        // TODO: Should calculate the closest entity colider inside GeometryUtils
         GameObject closest = null;
         float minDistance = float.MaxValue;
 

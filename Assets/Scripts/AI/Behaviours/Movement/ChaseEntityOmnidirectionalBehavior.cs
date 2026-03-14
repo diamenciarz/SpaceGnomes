@@ -2,17 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChaseEntityOmnidirectionalBehavior : MonoBehaviour
+[CreateAssetMenu(menuName= "ScriptableObjects/ChaseEntityOmnidirectionalBehavior", fileName ="EnemyBehavior")]
+public class ChaseEntityOmnidirectionalBehavior : MovementBehavior
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

@@ -99,11 +99,12 @@
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\MovementBehavior.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\ChaseEntityOmnidirectionalBehavior.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\MoveToPositionBehavior.cs" />
-    <Compile Include="Assets\Scripts\AI\Behaviours\Movement\KeepDistanceBehavior.cs" />
+    <Compile Include="Assets\Scripts\AI\Behaviours\Movement\CircleAroundEntityBehavior.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\AttackAndRetreatBehavior.cs" />
     <Compile Include="Assets\Scripts\Input\ControlInput.cs" />
     <Compile Include="Assets\Scripts\Physics\EntityControllers\AbstractPhysicsController.cs" />
     <Compile Include="Assets\Scripts\AI\AIControlInput.cs" />
+    <Compile Include="Assets\Scripts\AI\Behaviours\Movement\FlyAroundEntityBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

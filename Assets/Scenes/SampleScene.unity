@@ -556,7 +556,7 @@ PrefabInstance:
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: movementBehavior
       value: 
-      objectReference: {fileID: 11400000, guid: d162cb2dc2d795c4595b686096f61022, type: 2}
+      objectReference: {fileID: 11400000, guid: d561e613d305df14c8c6789e3cdd274f, type: 2}
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxAvoidanceFraction
       value: 1
@@ -2397,19 +2397,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3888461407280299183, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7102026
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 3888461407280299183, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3888461407280299183, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3888461407280299183, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.70399743
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 3888461407280299183, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2421,7 +2421,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3888461407280299183, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -89.497
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 5033700563489854107, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: m_Enabled
@@ -2502,7 +2502,7 @@ PrefabInstance:
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: movementBehavior
       value: 
-      objectReference: {fileID: 11400000, guid: d162cb2dc2d795c4595b686096f61022, type: 2}
+      objectReference: {fileID: 11400000, guid: eb80449c995c44d4aac720d30c3e1b96, type: 2}
     - target: {fileID: 5747292331280976720, guid: be9f9d42a63e42d48be9b6711dd5eee2, type: 3}
       propertyPath: maxAvoidanceFraction
       value: 1

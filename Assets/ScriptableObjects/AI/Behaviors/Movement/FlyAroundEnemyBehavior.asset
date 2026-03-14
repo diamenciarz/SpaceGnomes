@@ -9,18 +9,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4a5d7f0f53050f4fa0a5b9074667f58, type: 3}
-  m_Name: NormalBehavior
+  m_Script: {fileID: 11500000, guid: 47ba2c6eaa53b904fafcd6e7bfe9ca03, type: 3}
+  m_Name: FlyAroundEnemyBehavior
   m_EditorClassIdentifier: 
-  chaseRange: 20
-  stopChaseRange: 6
-  retreatRange: 3
+  chaseRange: 100
+  stopChaseRange: 3
+  retreatRange: 2
+  onlyRetreatFromEnemies: 1
   maxAvoidanceFraction: 0.7
-  dangerousObstacleSpeed: 5
+  maxRetreatFraction: 0.3
+  dangerousObstacleSpeed: 0
   chaseMode: 0
   avoidCollisionLookaheadTime: 2
   collisionCheckPointCount: 5
   chaseEntityTypes: 01000000
   avoidEntityTypes: 0000000001000000
   retreatFromEntityTypes: 01000000
-  debug: 1
+  debugCollisions: 0
+  debugMovementVectors: 0
+  debugConsideredDistances: 0
+  findNewPositionDelay: 4
+  randomPositionMinRadius: 3
+  randomPositionMaxRadius: 6
+  startingAngle: 0
+  arcWidth: 360
