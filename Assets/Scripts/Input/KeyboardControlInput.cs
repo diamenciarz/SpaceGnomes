@@ -29,14 +29,12 @@ public class KeyboardControlInput : ControlInput
     {
         if (!calculatedControlThisFrame) UpdateControlVector(controlScheme);
         bool shouldUseLocal = mode == ControlVectorCoordinates.Local && !iAmVehicularController;
-        if(!shouldUseLocal) Debug.Log("Using world");
         return shouldUseLocal ? GeometryUtils.WorldCoordsToLocal(controlVector, transform).y : controlVector.y;
     }
     public override float GetHorizontalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local, bool iAmVehicularController = false)
     {
         if (!calculatedControlThisFrame) UpdateControlVector(controlScheme);
         bool shouldUseLocal = mode == ControlVectorCoordinates.Local && !iAmVehicularController;
-        if(!shouldUseLocal) Debug.Log("Using world");
         return shouldUseLocal ? GeometryUtils.WorldCoordsToLocal(controlVector, transform).x : controlVector.x;
     }
     private void UpdateControlVector(ControlScheme controlScheme)
@@ -44,7 +42,6 @@ public class KeyboardControlInput : ControlInput
         if (controlScheme == ControlScheme.WASD)
         {
             controlVector = new Vector2(Input.GetAxisRaw("HorizontalKeys"), Input.GetAxisRaw("VerticalKeys"));
-            Debug.Log($"Control Vector: {controlVector}, local control vector: {GeometryUtils.WorldCoordsToLocal(controlVector, transform)}");
         }
         else
         {
