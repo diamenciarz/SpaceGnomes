@@ -6,6 +6,10 @@ public class Trajectory : MonoBehaviour
     [SerializeField][Tooltip("Save a path of n positions and velocities. -1 for unlimited")]
     private int saveStates = 10;
 
+    [SerializeField][Range(5, 30)]
+    [Tooltip("How many points along the trajectory to check for collisions. Higher values are more accurate but more expensive.")]
+    public int collisionCheckPointCount = 20;
+
 
     private List<Vector2> positions = new List<Vector2>();
     private List<Vector2> velocities = new List<Vector2>();

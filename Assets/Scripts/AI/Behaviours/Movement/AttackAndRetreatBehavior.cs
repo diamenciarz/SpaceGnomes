@@ -61,7 +61,7 @@ public class AttackAndRetreatBehavior : ChaseEntityOmnidirectionalBehavior
     {
         Vector2 chaseVector = CalculateChaseVector(data);
         Vector2 retreatVector = CalculateRetreatVector(data);
-        Vector2 avoidanceVector = CalculateAvoidanceVector(data);
+        Vector2 avoidanceVector = CalculateCollisionAvoidanceVector(data);
         // All are normalized if longer than 1
         if (debugMovementVectors) Debug.DrawRay(data.transform.position, avoidanceVector, Color.blue);
 
