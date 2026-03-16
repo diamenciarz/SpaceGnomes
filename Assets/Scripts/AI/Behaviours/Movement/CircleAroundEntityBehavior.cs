@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "ScriptableObjects/CircleAroundEntityBehavior", fileName = "EnemyBehavior")]
+[CreateAssetMenu(menuName = "ScriptableObjects/CircleAroundEntityBehavior", fileName = "CircleAroundEntityBehavior")]
 public class CircleAroundEntityBehavior : ArcMovementBehavior
 {
 

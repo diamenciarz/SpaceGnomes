@@ -129,8 +129,8 @@
     <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SkinningModule\Selection\SkeletonSelection.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SpriteLib\SpriteLibrarySourceAsset\SpriteLibrarySourceAssetImporter.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SkinningModule\SpriteMeshData\EditableBoneWeightUtility.cs" />
-    <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SkinningModule\Undo\ICacheUndo.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SkinningModule\Undo\UnityEngineUndo.cs" />
+    <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SkinningModule\Undo\ICacheUndo.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SkinningModule\SpriteMeshData\SpriteMeshDataController.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SkinningModule\Cache\BaseObject.cs" />
     <Compile Include="Library\PackageCache\com.unity.2d.animation@7.0.8\Editor\SkinningModule\Triangulation\TriangulationUtility.cs" />

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8bf5b92244221742a59496ef5e28a1d, type: 3}
   m_Name: CircleAroundEntityBehavior
   m_EditorClassIdentifier: 
-  chaseRange: 20
+  chaseRange: 100
   stopChaseRange: 0
   retreatRange: 0
   onlyRetreatFromEnemies: 1
@@ -29,8 +29,7 @@ MonoBehaviour:
   debugMovementVectors: 1
   debugConsideredDistances: 0
   randomPositionMinRadius: 6
-  randomPositionMaxRadius: 6
-  startingAngle: 0
-  arcWidth: 360
-  angularSpeed: 30
-  usePhaseOffset: 1
+  randomPositionMaxRadius: 3
+  arcAngularStep: 30
+  advanceAngleThreshold: 60
+  regenerateArcIfStuckFor: 2

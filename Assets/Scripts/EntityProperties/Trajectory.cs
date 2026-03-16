@@ -126,7 +126,7 @@ public class Trajectory : MonoBehaviour
         return new TrajectoryInstance(this);
     }
 
-    public TrajectoryInstance GetShifted(Vector2 deltaPos)
+    public TrajectoryInstance Translated(Vector2 deltaPos)
     {
         TrajectoryInstance shifted = new TrajectoryInstance(this);
         shifted.currentPosition += deltaPos;

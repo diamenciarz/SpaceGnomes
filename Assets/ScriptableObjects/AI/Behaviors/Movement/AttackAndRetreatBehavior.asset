@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0be98c7b6c43df40b0a605db32ea5b1, type: 3}
-  m_Name: ChaseBehavior
+  m_Script: {fileID: 11500000, guid: 4a6a74f985b937144a57e355e5069086, type: 3}
+  m_Name: AttackAndRetreatBehavior
   m_EditorClassIdentifier: 
   chaseRange: 100
-  stopChaseRange: 0
-  retreatRange: 0
+  stopChaseRange: 6
+  retreatRange: 3
   onlyRetreatFromEnemies: 1
-  maxCollisionAvoidanceWeight: 0.7
+  maxCollisionAvoidanceWeight: 0
   maxEntityRetreatWeight: 0.7
   dangerousObstacleSpeed: 0
   chaseMode: 1
@@ -24,8 +24,12 @@ MonoBehaviour:
   collisionCheckPointCount: 5
   chaseEntityTypes: 01000000
   avoidEntityTypes: 00000000
-  retreatFromEntityTypes: 01000000
-  debugCollisions: 0
+  retreatFromEntityTypes: 00000000
+  debugCollisions: 1
   debugMovementVectors: 1
   debugConsideredDistances: 0
   moreMovementPrediction: 0
+  retreatDelay: 1
+  retreatDuration: 5
+  minDistanceToStartRetreating: 2
+  retreatFromTargetDistance: 12

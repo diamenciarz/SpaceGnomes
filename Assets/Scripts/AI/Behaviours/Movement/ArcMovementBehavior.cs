@@ -7,7 +7,7 @@ public class ArcMovementBehavior : MovementBehavior
     protected Vector2 DetermineWorldTarget(List<Vector2> offsets, Vector2 actualCenter, MovementBehaviorData data, GameObject chaseEntity)
     {
         Vector2 targetOffset = offsets[0];
-        if (chaseMode == ChaseMode.ExtrapolateTrajectory && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
+        if (chaseMode == ChaseMode.ExtrapolateAndCollideWithTarget && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
         {
             Vector2 myVelocity = data.myRigidbody2D.velocity;
             const float MINIMUM_SPEED = 2f;

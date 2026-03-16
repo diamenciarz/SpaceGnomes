@@ -476,29 +476,29 @@ public static class GeometryUtils
     }
     public struct CollidingPoints
     {
-        public Vector2 toPos;
-        public Vector2 fromPos;
+        public Vector2 toPoint;
+        public Vector2 fromPoint;
     }
 
     public static CollidingPoints CalculateClosestDistanceBetweenColliders(GameObject to, GameObject from)
     {
-        Collider2D colliderB = GeometryUtils.GetNonCompositeCollider(from);
-        Collider2D colliderA = GeometryUtils.GetNonCompositeCollider(to);
+        Collider2D colliderFrom = GeometryUtils.GetNonCompositeCollider(from);
+        Collider2D colliderTo = GeometryUtils.GetNonCompositeCollider(to);
         CollidingPoints points = new CollidingPoints();
-        if (colliderA == null || colliderB == null)
+        if (colliderTo == null || colliderFrom == null)
         {
-            points.toPos = to.gameObject.transform.position;
-            points.fromPos = from.gameObject.transform.position;
+            points.toPoint = to.gameObject.transform.position;
+            points.fromPoint = from.gameObject.transform.position;
             return points;
         }
-        points.toPos = colliderA.ClosestPoint(colliderB.gameObject.transform.position);
-        points.fromPos = colliderB.ClosestPoint(colliderA.gameObject.transform.position);
+        points.toPoint = colliderTo.ClosestPoint(colliderFrom.gameObject.transform.position);
+        points.fromPoint = colliderFrom.ClosestPoint(colliderTo.gameObject.transform.position);
         return points;
     }
     public static Vector2 CalculateVectorBetweenColliderEdges(GameObject to, GameObject from)
     {
         CollidingPoints points = CalculateClosestDistanceBetweenColliders(to, from);
-        return points.toPos - points.fromPos;
+        return points.toPoint - points.fromPoint;
     }
     public static GameObject FindClosestEntityToPosition(IEnumerable<GameObject> entities, Vector2 position, float minRange = 0f, float maxRange = float.MaxValue)
     {
@@ -515,7 +515,7 @@ public static class GeometryUtils
         {
             Vector2 entityPos = entity.transform.position;
             CollidingPoints collidingPoints = CalculateClosestDistanceBetweenColliders(obj, entity);
-            float distance = Vector2.Distance(collidingPoints.fromPos, collidingPoints.toPos);
+            float distance = Vector2.Distance(collidingPoints.fromPoint, collidingPoints.toPoint);
             if (distance >= minRange && distance <= maxRange && distance < minDistance)
             {
                 minDistance = distance;
@@ -549,11 +549,10 @@ public static class GeometryUtils
         }
         return closest;
     }
-    public static Vector2 CalculateTrajectoryHitCoordinates(Trajectory targetTrajectory, Vector2 startingPosition, float projectileSpeed)
+    public static Vector2 CalculateTrajectoryHitCoordinates(Trajectory targetTrajectory, Vector2 startingPosition, float projectileSpeed, int maxIterations=5)
     {
         if (projectileSpeed <= 0f) return targetTrajectory.GetCurrentPosition();
 
-        const int maxIterations = 5;
         Vector2 targetPosition = targetTrajectory.GetCurrentPosition();
         float distanceToTarget = (targetPosition - startingPosition).magnitude;
         float deltaTime = distanceToTarget / projectileSpeed;

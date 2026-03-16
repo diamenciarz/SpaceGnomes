@@ -17,16 +17,17 @@ public abstract class MovementBehavior : ScriptableObject
     public enum ChaseMode
     {
         DirectlyToTarget,
-        ExtrapolateTrajectory
+        ExtrapolateAndCollideWithTarget,
+        ExtrapolateAndFollowTarget,
     }
     [Header("Distance settings")]
-    [SerializeField][Range(1f, 100f)][Tooltip("Only chase entities within this distance")] protected float chaseRange = 20f;
+    [SerializeField][Range(1f, 100f)][Tooltip("Only chase entities within this distance")] protected float chaseRange = 100f;
     [SerializeField][Range(0f, 100f)][Tooltip("Will stop chasing an entity once below that distance")] protected float stopChaseRange = 6;
     [SerializeField][Range(0f, 100f)][Tooltip("The minimum distance to keep from avoided entities")] protected float retreatRange = 3;
     [SerializeField][Tooltip("Whether to only retreat from entities that are also enemies, or to retreat from any entity regardless of team")]
     protected bool onlyRetreatFromEnemies = true;
-    [SerializeField][Range(0, 1)] protected float maxAvoidanceFraction = 0.7f;
-    [SerializeField][Range(0, 1)] protected float maxRetreatFraction = 0.7f;
+    [SerializeField][Range(0, 1)] protected float maxCollisionAvoidanceWeight = 0.7f;
+    [SerializeField][Range(0, 1)] protected float maxEntityRetreatWeight = 0.7f;
     [SerializeField]
     [Range(0, 50f)]
     [Tooltip("Obstacles moving relatively towards us faster than this will be avoided")]
@@ -47,9 +48,13 @@ public abstract class MovementBehavior : ScriptableObject
     [SerializeField] protected bool debugMovementVectors = false;
     [SerializeField] protected bool debugConsideredDistances = false;
 
+    [Header("Test")]
+    [SerializeField] bool moreMovementPrediction = false;
+
     private void OnValidate()
     {
         if (retreatRange > stopChaseRange) retreatRange = stopChaseRange;
+        if (stopChaseRange > chaseRange) stopChaseRange = chaseRange;
     }
 
     /**
@@ -65,8 +70,8 @@ public abstract class MovementBehavior : ScriptableObject
         // All are normalized if longer than 1
         if (debugMovementVectors) Debug.DrawRay(data.transform.position, avoidanceVector, Color.blue);
 
-        Vector2 scaledAvoidance = avoidanceVector * maxAvoidanceFraction; // 0 -> 0.7
-        Vector2 scaledRetreat = retreatVector * (1 - scaledAvoidance.magnitude) * maxRetreatFraction; // 0 -> ((1 -> 0.3) * 0.7) => 0 -> (0.7 -> 0.21)
+        Vector2 scaledAvoidance = avoidanceVector * maxCollisionAvoidanceWeight; // 0 -> 0.7
+        Vector2 scaledRetreat = retreatVector * (1 - scaledAvoidance.magnitude) * maxEntityRetreatWeight; // 0 -> ((1 -> 0.3) * 0.7) => 0 -> (0.7 -> 0.21)
         Vector2 scaledChase = chaseVector * (1 - scaledRetreat.magnitude - scaledAvoidance.magnitude); // 1 -> 0.09
         Vector2 output = scaledAvoidance + scaledRetreat + scaledChase;
         if (output.magnitude > 1) output.Normalize();
@@ -75,7 +80,7 @@ public abstract class MovementBehavior : ScriptableObject
     }
     protected virtual Vector2 CalculateChaseVector(MovementBehaviorData data)
     {
-        GameObject chaseEntity = GetClosestChaseEntity(data);
+        GameObject chaseEntity = UpdateCurrentTarget(data);
         if (!chaseEntity) return Vector2.zero;
         Vector2 directionToTarget = CalculateDirectionToTarget(data, chaseEntity);
 
@@ -85,7 +90,7 @@ public abstract class MovementBehavior : ScriptableObject
         return directionToTarget;
 
     }
-    protected GameObject GetClosestChaseEntity(MovementBehaviorData data)
+    private GameObject UpdateCurrentTarget(MovementBehaviorData data)
     {
         List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(data.transform.position, data.myTeam.team, chaseEntityTypes, chaseRange);
         // If chased entity is farther than stopChaseRange, we want to chase it, otherwise we want to stop chasing and potentially start retreating
@@ -93,6 +98,7 @@ public abstract class MovementBehavior : ScriptableObject
     }
     protected virtual Vector2 CalculateRetreatVector(MovementBehaviorData data)
     {
+        if (maxEntityRetreatWeight == 0) return Vector2.zero; // No avoidance if maxAvoidanceFraction is 0 or negative
         List<GameObject> entities = GetRetreatEntities(data);
 
         GameObject entityToRetreatFrom = GeometryUtils.FindClosestEntityToPosition(entities, data.transform.position, 0, retreatRange);
@@ -101,43 +107,53 @@ public abstract class MovementBehavior : ScriptableObject
         if (directionFromEntity.magnitude > 1) directionFromEntity.Normalize();
         return directionFromEntity;
     }
-    private List<GameObject> GetRetreatEntities(MovementBehaviorData data)
+    protected virtual List<GameObject> GetRetreatEntities(MovementBehaviorData data)
     {
         if (onlyRetreatFromEnemies)
         {
             return TeamManager.Instance.GetNearbyEnemies(data.transform.position, data.myTeam.team, retreatFromEntityTypes, retreatRange);
         }
-        else
-        {
-            return EntityCounter.Instance.GetNearbyEntities(data.transform.position, retreatFromEntityTypes, retreatRange);
-        }
+        List<GameObject> entities = EntityCounter.Instance.GetNearbyEntities(data.transform.position, retreatFromEntityTypes, retreatRange);
+        // Retrieves all ship parts. We want to avoid retreating from our own ship parts, so we remove any entities that are part of our own ship (children in the entity hierarchy)
+        return entities.FindAll(entity => EntityCounter.Instance.GetEntityParent(entity) != data.gameObject);
     }
     protected virtual Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity)
     {
-        if (chaseMode == ChaseMode.ExtrapolateTrajectory && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
+        if (chaseMode != ChaseMode.DirectlyToTarget && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
         {
-            Vector2 myVelocity = data.myRigidbody2D.velocity;
-            float mySpeed = myVelocity.magnitude;
-            const float MINIMUM_SPEED = 2f;
-            float simulatedVelocity = Mathf.Max(myVelocity.magnitude, MINIMUM_SPEED);
-            Vector2 relativeVelocity = targetTrajectory.GetVelocity() - myVelocity;
-            float reachTime = (targetTrajectory.GetCurrentPosition() - (Vector2)data.transform.position).magnitude / simulatedVelocity;
-            Vector2 predictedHitCoords = targetTrajectory.ExtrapolateFuturePosition(reachTime);
-            if (debugMovementVectors)
-            {
-                Debug.DrawLine(chaseEntity.transform.position, predictedHitCoords, Color.green);
-            }
+            Vector2 predictedHitCoords = PredictHitCoords(targetTrajectory, data.myTrajectory, data.transform.position);
             return predictedHitCoords - (Vector2)data.transform.position;
-            
         }
         else
         {
             return GeometryUtils.CalculateVectorBetweenColliderEdges(chaseEntity, data.gameObject);
         }
     }
+    protected Vector2 PredictHitCoords(Trajectory targetTrajectory, Trajectory myTrajectory, Vector2 myPosition)
+    {
+        const float MINIMUM_SPEED = 2f;
+        Vector2 relativeVelocity = targetTrajectory.GetVelocity() - myTrajectory.GetVelocity();
+        float simulatedVelocity = Mathf.Max(relativeVelocity.magnitude, MINIMUM_SPEED);
+        float reachTime = (targetTrajectory.GetCurrentPosition() - myTrajectory.GetCurrentPosition()).magnitude / simulatedVelocity;
+
+        if(chaseMode == ChaseMode.ExtrapolateAndCollideWithTarget)
+        {
+            return targetTrajectory.ExtrapolateFuturePosition(reachTime);
+        }
+        else
+        //if(chaseMode == ChaseMode.ExtrapolateAndFollowTarget)
+        {
+            Vector2 myFuturePosition = myTrajectory.ExtrapolateFuturePosition(reachTime);
+            Vector2 targetFuturePosition = targetTrajectory.ExtrapolateFuturePosition(reachTime);
+            float updatedReachTime = (targetFuturePosition - myFuturePosition).magnitude / simulatedVelocity;
+            Debug.Log($"Original time {reachTime}, updated time {updatedReachTime}");
+            return targetTrajectory.ExtrapolateFuturePosition(updatedReachTime);
+        }
+    }
 
     protected virtual Vector2 CalculateAvoidanceVector(MovementBehaviorData data)
     {
+        if (maxCollisionAvoidanceWeight == 0) return Vector2.zero; // No avoidance if maxAvoidanceFraction is 0 or negative
         List<GameObject> avoidEntities = GetEntitiesToAvoid(data);
         Vector2 avoidanceVector = Vector2.zero;
         foreach (GameObject obstacle in avoidEntities)
@@ -145,7 +161,7 @@ public abstract class MovementBehavior : ScriptableObject
             if (debugConsideredDistances)
             {
                 GeometryUtils.CollidingPoints collidingPoints = GeometryUtils.CalculateClosestDistanceBetweenColliders(obstacle, data.gameObject);
-                Debug.DrawLine(collidingPoints.toPos, collidingPoints.fromPos, Color.cyan);
+                Debug.DrawLine(collidingPoints.toPoint, collidingPoints.fromPoint, Color.cyan);
             }
          
             Trajectory obstacleTrajectory = obstacle.GetComponent<Trajectory>();
