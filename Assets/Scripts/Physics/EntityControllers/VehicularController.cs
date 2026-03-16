@@ -39,8 +39,8 @@ public class VehicularController: AbstractPhysicsController
         ControlInput controlInput = Input.GetKey(alternativeControlKey) ? alternativeShipControlInput : mainShipControlInput;
         if (controlInput != null)
         {
-            thrustInput = controlInput.GetVerticalInput(ControlVectorCoordinates.Local);
-            steerInput = controlInput.GetHorizontalInput(ControlVectorCoordinates.Local);
+            thrustInput = controlInput.GetVerticalInput(ControlVectorCoordinates.Local, true);
+            steerInput = controlInput.GetHorizontalInput(ControlVectorCoordinates.Local, true);
         }
     }
 

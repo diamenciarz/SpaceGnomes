@@ -12,6 +12,7 @@ public abstract class MovementBehavior : ScriptableObject
         public EntityTeam myTeam;
         public Rigidbody2D myRigidbody2D;
         public Trajectory myTrajectory;
+        public bool makeKeyboardInputLocal;
     }
 
     public enum ChaseMode
@@ -47,9 +48,6 @@ public abstract class MovementBehavior : ScriptableObject
     [SerializeField] protected bool debugCollisions = false;
     [SerializeField] protected bool debugMovementVectors = false;
     [SerializeField] protected bool debugConsideredDistances = false;
-
-    [Header("Test")]
-    [SerializeField] bool moreMovementPrediction = false;
 
     private void OnValidate()
     {
@@ -90,7 +88,7 @@ public abstract class MovementBehavior : ScriptableObject
         return directionToTarget;
 
     }
-    private GameObject UpdateCurrentTarget(MovementBehaviorData data)
+    protected GameObject UpdateCurrentTarget(MovementBehaviorData data)
     {
         List<GameObject> entities = TeamManager.Instance.GetNearbyEnemies(data.transform.position, data.myTeam.team, chaseEntityTypes, chaseRange);
         // If chased entity is farther than stopChaseRange, we want to chase it, otherwise we want to stop chasing and potentially start retreating
@@ -150,7 +148,6 @@ public abstract class MovementBehavior : ScriptableObject
             return targetTrajectory.ExtrapolateFuturePosition(updatedReachTime);
         }
     }
-
     protected virtual Vector2 CalculateAvoidanceVector(MovementBehaviorData data)
     {
         if (maxCollisionAvoidanceWeight == 0) return Vector2.zero; // No avoidance if maxAvoidanceFraction is 0 or negative
@@ -189,7 +186,6 @@ public abstract class MovementBehavior : ScriptableObject
 
         return avoidanceVector; // We invert the vector to move away from obstacles
     }
-
     private Vector2 CalculateThreatVector(Trajectory.CollisionInfo crossingInfo)
     {
         Line2D mVelocity = new Line2D(crossingInfo.myPoint, crossingInfo.myVelocity);
@@ -200,7 +196,6 @@ public abstract class MovementBehavior : ScriptableObject
         float distanceToThreat = threatVector.direction.magnitude;
         return threatVector.direction;
     }
-
     private List<GameObject> GetEntitiesToAvoid(MovementBehaviorData data)
     {
         List<EntityTeam.Team> teams = new List<EntityTeam.Team>() {

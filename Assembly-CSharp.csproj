@@ -106,6 +106,7 @@
     <Compile Include="Assets\Scripts\Singletons\EntityCounter.cs" />
     <Compile Include="Assets\Scripts\Unused\CellularAutomata\GPUCellularAutomata.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\EntityPositionTracker.cs" />
+    <Compile Include="Assets\Scripts\AI\Behaviours\Movement\TailEntityBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />
