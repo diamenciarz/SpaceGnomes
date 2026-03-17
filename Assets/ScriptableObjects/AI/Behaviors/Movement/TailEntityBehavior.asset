@@ -13,19 +13,18 @@ MonoBehaviour:
   m_Name: TailEntityBehavior
   m_EditorClassIdentifier: 
   chaseRange: 100
-  stopChaseRange: 2
-  retreatRange: 0
+  stopChaseRange: 6
+  retreatRange: 3
   onlyRetreatFromEnemies: 1
   maxCollisionAvoidanceWeight: 0.7
   maxEntityRetreatWeight: 0.7
   dangerousObstacleSpeed: 0
   chaseMode: 0
   avoidCollisionLookaheadTime: 2
-  collisionCheckPointCount: 5
   chaseEntityTypes: 01000000
   avoidEntityTypes: 00000000
   retreatFromEntityTypes: 0000000001000000
   debugCollisions: 0
   debugMovementVectors: 1
   debugConsideredDistances: 0
-  slowdownDistance: 8
+  slowdownDistance: 6

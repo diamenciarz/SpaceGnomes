@@ -16,12 +16,11 @@ MonoBehaviour:
   stopChaseRange: 0
   retreatRange: 0
   onlyRetreatFromEnemies: 1
-  maxAvoidanceFraction: 0.7
-  maxRetreatFraction: 0.7
+  maxCollisionAvoidanceWeight: 0.7
+  maxEntityRetreatWeight: 0.7
   dangerousObstacleSpeed: 0
   chaseMode: 0
   avoidCollisionLookaheadTime: 2
-  collisionCheckPointCount: 5
   chaseEntityTypes: 01000000
   avoidEntityTypes: 0000000001000000
   retreatFromEntityTypes: 01000000

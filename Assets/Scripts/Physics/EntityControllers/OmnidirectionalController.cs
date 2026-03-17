@@ -6,7 +6,7 @@ public class OmnidirectionalController: AbstractPhysicsController
 {
     [Header("Movement")]
     [SerializeField] private float thrustForce = 2000f;
-    [SerializeField] private float thrustDampingMultiplier = 3f;
+    [SerializeField][Range(1f, 10f)] private float thrustDampingMultiplier = 3f;
     [SerializeField][Range(0f, 20)] float maxVelocity = 10f;
 
     [Header("Rotation")]

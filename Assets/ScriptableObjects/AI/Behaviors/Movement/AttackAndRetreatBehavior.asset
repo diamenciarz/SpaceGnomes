@@ -21,14 +21,12 @@ MonoBehaviour:
   dangerousObstacleSpeed: 0
   chaseMode: 1
   avoidCollisionLookaheadTime: 2
-  collisionCheckPointCount: 5
   chaseEntityTypes: 01000000
   avoidEntityTypes: 00000000
   retreatFromEntityTypes: 00000000
   debugCollisions: 1
   debugMovementVectors: 1
   debugConsideredDistances: 0
-  moreMovementPrediction: 0
   retreatDelay: 1
   retreatDuration: 5
   minDistanceToStartRetreating: 2

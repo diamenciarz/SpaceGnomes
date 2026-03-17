@@ -6,7 +6,7 @@ public class VehicularController: AbstractPhysicsController
 {
     [Header("Movement")]
     [SerializeField] private float thrustForce = 2400f;
-    [SerializeField] private float thrustDampingMultiplier = 3f;
+    [SerializeField][Range(1f, 10f)] private float thrustDampingMultiplier = 3f;
     [SerializeField][Range(0f, 20)] float maxVelocity = 10f;
 
     [SerializeField, Range(0f, 1f)] private float perpendicularDamping = 0.1f;

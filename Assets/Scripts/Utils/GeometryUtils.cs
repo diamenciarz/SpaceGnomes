@@ -91,10 +91,10 @@ public static class GeometryUtils
         }
         return enemies;
     }
+    static float RAYS_PER_DEGREE = 0.5f;
     public static List<GameObject> GetVisibleObjectsInCone(Cone cone, Team myTeam, SensorType sensorType=SensorType.Camera)
     {
         List<GameObject> visibleObjects = new List<GameObject>();
-        float RAYS_PER_DEGREE = 0.5f;
         int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
@@ -114,7 +114,6 @@ public static class GeometryUtils
     public static List<GameObject> GetVisibleObjectsInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<GameObject> visibleObjects = new List<GameObject>();
-        float RAYS_PER_DEGREE = 0.5f;
         int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
@@ -135,7 +134,6 @@ public static class GeometryUtils
     {
         RaycastHit2D? closestHit = null;
 
-        float RAYS_PER_DEGREE = 0.5f;
         int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
@@ -153,13 +151,13 @@ public static class GeometryUtils
                 }
             }
         }
+        if (!closestHit.HasValue) return null;
         return closestHit.Value.collider.gameObject;
     }
     public static GameObject GetClosestVisibleAllyInCone(Cone cone, Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         RaycastHit2D? closestHit = null;
 
-        float RAYS_PER_DEGREE = 0.5f;
         int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
@@ -177,13 +175,13 @@ public static class GeometryUtils
                 }
             }
         }
+        if (!closestHit.HasValue) return null;
         return closestHit.Value.collider.gameObject;
     }
     public static GameObject GetClosestVisibleEnemyInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         RaycastHit2D? closestHit = null;
 
-        float RAYS_PER_DEGREE = 0.5f;
         int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
@@ -201,13 +199,13 @@ public static class GeometryUtils
                 }
             }
         }
+        if (!closestHit.HasValue) return null;
         return closestHit.Value.collider.gameObject;
     }
     public static GameObject GetClosestVisibleEnemyInCone(Cone cone, Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         RaycastHit2D? closestHit = null;
 
-        float RAYS_PER_DEGREE = 0.5f;
         int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
@@ -225,13 +223,13 @@ public static class GeometryUtils
                 }
             }
         }
+        if (!closestHit.HasValue) return null;
         return closestHit.Value.collider.gameObject;
     }
     public static GameObject GetClosestVisibleObjectInCone(Cone cone, Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         RaycastHit2D? closestHit = null;
 
-        float RAYS_PER_DEGREE = 0.5f;
         int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
@@ -243,13 +241,13 @@ public static class GeometryUtils
             if (!hit.HasValue) continue;
             if (!closestHit.HasValue || hit.Value.distance < closestHit.Value.distance) closestHit = hit;
         }
+        if (!closestHit.HasValue) return null;
         return closestHit.Value.collider.gameObject;
     }
     public static GameObject GetClosestVisibleObjectInCone(Cone cone, Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         RaycastHit2D? closestHit = null;
 
-        float RAYS_PER_DEGREE = 0.5f;
         int rayCount = Mathf.CeilToInt(cone.angle * RAYS_PER_DEGREE);
         float angleStep = cone.angle / rayCount;
         float startAngle = -cone.angle / 2;
@@ -261,6 +259,7 @@ public static class GeometryUtils
             if (!hit.HasValue) continue;
             if (!closestHit.HasValue || hit.Value.distance < closestHit.Value.distance) closestHit = hit;
         }
+        if (!closestHit.HasValue) return null;
         return closestHit.Value.collider.gameObject;
     }
     public static List<GameObject> GetVisibleAllies(Vector2 from, Team myTeam, List<HasEntityType.EntityType> entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera, GameObject ignoreObject = null)
