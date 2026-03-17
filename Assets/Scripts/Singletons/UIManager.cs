@@ -2,23 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIManager : MonoBehaviour
+public class UIManager : AbstractSingleton<UIManager>
 {
     [SerializeField] GameObject fieldOfViewPrefab;
 
-    public static UIManager Instance { get; private set; }
-    private void Awake()
+    protected override void Awake()
     {
-        // Singleton setup
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake(); // Call base singleton setup
     }
 
     public ProgressBar InstantiateFieldOfView(GameObject followObj)

@@ -14,13 +14,6 @@ public class AIWeaponController : MonoBehaviour
     [SerializeField][Tooltip("Targets a position the target will be when the bullet reaches it")] 
     bool predictTrajectories;
     [SerializeField] List<WeaponConfig> weaponConfigs = new List<WeaponConfig>();
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
         ControlWeapons();

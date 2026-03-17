@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting.FullSerializer;
 using System;
 
-public class ObjectPoolManager : MonoBehaviour
+public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
 {
-    // Singleton instance
-    public static ObjectPoolManager Instance { get; private set; }
-
     [System.Serializable]
     public class PoolConfig
     {
@@ -22,18 +19,9 @@ public class ObjectPoolManager : MonoBehaviour
     private Dictionary<string, PoolConfig> configMap = new Dictionary<string, PoolConfig>();
     private Transform poolParent; // Parent transform for inactive objects
 
-    private void Awake()
+    protected override void Awake()
     {
-        // Singleton setup
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake(); // Call base singleton setup
 
         // Initialize pools
         poolParent = new GameObject("PooledObjects").transform;

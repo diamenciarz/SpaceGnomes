@@ -5,23 +5,14 @@ using static EntityTeam;
 using static HasEntityType;
 using static UnityEngine.EventSystems.EventTrigger;
 
-public class TeamManager : MonoBehaviour
+public class TeamManager : AbstractSingleton<TeamManager>
 {
     // This class will keep track of which entity belongs to which team and will control team switching
-    // Singleton instance
-    public static TeamManager Instance { get; private set; }
-    private void Awake()
+    // Singleton instance - now inherited from AbstractSingleton
+    // public static TeamManager Instance { get; private set; }
+    protected override void Awake()
     {
-        // Singleton setup
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake(); // Call base singleton setup
     }
 
     public Team GetEntityTeam(GameObject entity)

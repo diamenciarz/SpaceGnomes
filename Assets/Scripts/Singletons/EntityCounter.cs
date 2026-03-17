@@ -6,10 +6,10 @@ using UnityEngine;
 using static HasEntityType;
 using static UnityEngine.EventSystems.EventTrigger;
 
-public class EntityCounter : MonoBehaviour
+public class EntityCounter : AbstractSingleton<EntityCounter>
 {
-    // Singleton instance
-    public static EntityCounter Instance { get; private set; }
+    // Singleton instance - now inherited from AbstractSingleton
+    // public static EntityCounter Instance { get; private set; } // Removed, inherited
     [SerializeField] public Canvas canvas;
 
 
@@ -32,18 +32,9 @@ public class EntityCounter : MonoBehaviour
         public Dictionary<GameObject, Vector2Int> EntityToCell = new Dictionary<GameObject, Vector2Int>();
     }
     private GameObject dummyPointObject = null;
-    private void Awake()
+    protected override void Awake()
     {
-        // Singleton setup
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake(); // Call base singleton setup
 
         // Initialize trackers for all entity types
         trackers[typeof(EntityType)] = new Dictionary<int, EntityTracker>();

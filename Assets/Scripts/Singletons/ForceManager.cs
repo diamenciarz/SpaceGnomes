@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.PlayerLoop;
 
-public class ForceManager : MonoBehaviour
+public class ForceManager : AbstractSingleton<ForceManager>
 {
     public enum ForceType
     {
@@ -18,26 +18,17 @@ public class ForceManager : MonoBehaviour
         Quadratic,
         CustomCurve,
     }
-    // Singleton instance
-    public static ForceManager Instance { get; private set; }
+    // Singleton instance - now inherited from AbstractSingleton
+    // public static ForceManager Instance { get; private set; }
 
     // Should only track active entities
     private Dictionary<ForceType, HashSet<GameObject>> simulatedEntities = new Dictionary<ForceType, HashSet<GameObject>>();
 
     [SerializeField] bool showDebugForces = false;
 
-    private void Awake()
+    protected override void Awake()
     {
-        // Singleton setup
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        base.Awake(); // Call base singleton setup
 
         // Initialize dictionary for all entity types
         foreach (ForceType type in System.Enum.GetValues(typeof(ForceType)))
