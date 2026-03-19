@@ -11,6 +11,14 @@ public class Cone
     public Vector2 direction;
     public float angle; // in degrees
     public float maxDistance;
+
+    /// <summary>
+    /// Initializes a new instance of the Cone class with the specified origin, direction, angle, and maximum distance.
+    /// </summary>
+    /// <param name="origin">The origin point of the cone.</param>
+    /// <param name="direction">The direction vector of the cone.</param>
+    /// <param name="angle">The angle of the cone in degrees.</param>
+    /// <param name="maxDistance">The maximum distance from the origin.</param>
     public Cone(Vector2 origin, Vector2 direction, float angle, float maxDistance)
     {
         this.origin = origin;
@@ -30,15 +38,23 @@ public class Cone
         {
             float currentAngle = startAngle + i * angleStep;
             Vector2 rayDirection = Quaternion.Euler(0, 0, currentAngle) * this.direction;
+            Debug.DrawRay(this.origin, rayDirection * maxDistance, Color.red);
             RaycastHit2D? hit = raycastFunc(this.origin + rayDirection * maxDistance, this.origin, myTeam, maxDistance, sensorType);
             if (hit.HasValue)
             {
+                Debug.Log($"Hit {hit.Value.collider.gameObject.name} at distance {hit.Value.distance}");
                 hits.Add(hit.Value);
             }
         }
         return hits;
     }
 
+    /// <summary>
+    /// Retrieves a list of visible ally GameObjects within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>A list of GameObjects that are allies and visible within the cone.</returns>
     public List<GameObject> GetVisibleAlliesInCone(Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleObject(end, origin, team, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -48,6 +64,12 @@ public class Cone
                    .ToList();
     }
 
+    /// <summary>
+    /// Retrieves a list of visible enemy GameObjects within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>A list of GameObjects that are enemies and visible within the cone.</returns>
     public List<GameObject> GetVisibleEnemiesInCone(Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleObject(end, origin, team, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -57,6 +79,13 @@ public class Cone
                    .ToList();
     }
 
+    /// <summary>
+    /// Retrieves a list of visible ally GameObjects of specified entity types within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="entityTypes">An array of entity types to filter the allies by.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>A list of GameObjects that are allies of the specified types and visible within the cone.</returns>
     public List<GameObject> GetVisibleAlliesInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -66,6 +95,13 @@ public class Cone
                    .ToList();
     }
 
+    /// <summary>
+    /// Retrieves a list of visible enemy GameObjects of specified entity types within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="entityTypes">An array of entity types to filter the enemies by.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>A list of GameObjects that are enemies of the specified types and visible within the cone.</returns>
     public List<GameObject> GetVisibleEnemiesInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -75,18 +111,38 @@ public class Cone
                    .ToList();
     }
 
+    /// <summary>
+    /// Retrieves a list of all visible GameObjects within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>A list of all GameObjects that are visible within the cone.</returns>
     public List<GameObject> GetVisibleObjectsInCone(Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleObject(end, origin, team, dist, sensor), myTeam, this.maxDistance, sensorType);
         return hits.Select(hit => hit.collider.gameObject).Distinct().ToList();
     }
 
+    /// <summary>
+    /// Retrieves a list of visible GameObjects of specified entity types within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="entityTypes">An array of entity types to filter the objects by.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>A list of GameObjects of the specified types that are visible within the cone.</returns>
     public List<GameObject> GetVisibleObjectsInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
         return hits.Select(hit => hit.collider.gameObject).Distinct().ToList();
     }
 
+    /// <summary>
+    /// Finds the closest visible ally GameObject of specified entity types within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="entityTypes">An array of entity types to filter the allies by.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>The closest visible ally GameObject of the specified types, or null if no allies are found.</returns>
     public GameObject GetClosestVisibleAllyInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -95,6 +151,12 @@ public class Cone
                    .FirstOrDefault().collider.gameObject;
     }
 
+    /// <summary>
+    /// Finds the closest visible ally GameObject within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>The closest visible ally GameObject, or null if no allies are found.</returns>
     public GameObject GetClosestVisibleAllyInCone(Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleObject(end, origin, team, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -103,6 +165,13 @@ public class Cone
                    .FirstOrDefault().collider.gameObject;
     }
 
+    /// <summary>
+    /// Finds the closest visible enemy GameObject of specified entity types within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="entityTypes">An array of entity types to filter the enemies by.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>The closest visible enemy GameObject of the specified types, or null if no enemies are found.</returns>
     public GameObject GetClosestVisibleEnemyInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -113,6 +182,12 @@ public class Cone
         return bestHit.collider.gameObject;
     }
 
+    /// <summary>
+    /// Finds the closest visible enemy GameObject within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>The closest visible enemy GameObject, or null if no enemies are found.</returns>
     public GameObject GetClosestVisibleEnemyInCone(Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleObject(end, origin, team, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -124,6 +199,13 @@ public class Cone
         return bestHit.collider.gameObject;
     }
 
+    /// <summary>
+    /// Finds the closest visible GameObject of specified entity types within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="entityTypes">An array of entity types to filter the objects by.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>The closest visible GameObject of the specified types, or null if no objects are found.</returns>
     public GameObject GetClosestVisibleObjectInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = this.GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -131,6 +213,12 @@ public class Cone
         return bestHit.collider.gameObject;
     }
 
+    /// <summary>
+    /// Finds the closest visible GameObject within the cone for the specified team using the given sensor type.
+    /// </summary>
+    /// <param name="myTeam">The team of the entity performing the visibility check.</param>
+    /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
+    /// <returns>The closest visible GameObject, or null if no objects are found.</returns>
     public GameObject GetClosestVisibleObjectInCone(Team myTeam, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleObject(end, origin, team, dist, sensor), myTeam, this.maxDistance, sensorType);
@@ -138,11 +226,22 @@ public class Cone
         return bestHit.collider.gameObject;
     }
 
+    /// <summary>
+    /// Filters the provided list of GameObjects to include only those within the cone.
+    /// </summary>
+    /// <param name="gameObjects">The list of GameObjects to filter.</param>
+    /// <returns>A new list containing only the GameObjects that are within the cone.</returns>
     public List<GameObject> KeepObjectsInCone(List<GameObject> gameObjects)
     {
         return gameObjects.Where(obj => IsObjectInCone(obj)).ToList();
     }
 
+    /// <summary>
+    /// Determines whether the specified GameObject is within the cone.
+    /// </summary>
+    /// <param name="target">The GameObject to check.</param>
+    /// <param name="drawDebugLines">If true, draws debug lines for visualization. Defaults to false.</param>
+    /// <returns>True if the GameObject is within the cone; otherwise, false.</returns>
     public bool IsObjectInCone(GameObject target, bool drawDebugLines = false)
     {
         Collider2D collider = target.GetComponent<Collider2D>();
@@ -176,6 +275,11 @@ public class Cone
         return angleToTarget < this.angle / 2;
     }
 
+    /// <summary>
+    /// Determines whether the specified position is within the cone.
+    /// </summary>
+    /// <param name="targetPosition">The position to check.</param>
+    /// <returns>True if the position is within the cone; otherwise, false.</returns>
     public bool IsPositionInCone(Vector2 targetPosition)
     {
         Vector2 toTarget = targetPosition - this.origin;
