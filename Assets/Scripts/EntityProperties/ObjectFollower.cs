@@ -18,16 +18,7 @@ public class ObjectFollower : MonoBehaviour
         isUI = rectTransform != null;
     }
 
-    public void Follow(GameObject obj)
-    {
-        Follow(obj, false);
-    }
-    public void Follow(GameObject obj, bool rotateWithParent)
-    {
-        followedObject = obj;
-        this.rotateWithParent = rotateWithParent;
-    }
-    public void Follow(GameObject obj, bool rotateWithParent, float angle)
+    public void Follow(GameObject obj, bool rotateWithParent= true, float angle = 0f)
     {
         this.followedObject = obj;
         this.rotateWithParent = rotateWithParent;
