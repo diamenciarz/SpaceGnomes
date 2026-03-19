@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 312429289421503905}
   - component: {fileID: 889484533115138402}
   m_Layer: 5
-  m_Name: FieldOfView
+  m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -131,7 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deltaPosition: {x: 0, y: 0, z: 0}
   deltaAngle: 0
-  rotateWithParent: 1
+  rotateWithParent: 0
 --- !u!1 &5144326948476530306
 GameObject:
   m_ObjectHideFlags: 0
