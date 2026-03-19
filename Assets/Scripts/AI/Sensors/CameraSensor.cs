@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
 
 public class CameraSensor : MonoBehaviour, ISensor
@@ -11,60 +12,71 @@ public class CameraSensor : MonoBehaviour, ISensor
     [SerializeField] private float range = 10f;
     [SerializeField] [Tooltip("Angle of vision in degrees")] private float fov = 60f;
     [SerializeField] bool debug = false;
+    [Header("Sense Types")]
     [SerializeField] HasEntityType.EntityType[] detectTypes;
+    [SerializeField] bool detectMouse = false;
     [Header("Instances")]
-    [SerializeField] GameObject fieldOfViewPrefab;
     [SerializeField] Transform sensorViewPoint;
 
+    public EntityTeam.Team team => entityTeam.team;
+    
     private ProgressBar fovScript;
     private EntityTeam entityTeam;
-    public EntityTeam.Team team => entityTeam.team;
+    private Cone visionCone;
+
     void Start()
     {
         entityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
         if (!entityTeam) Debug.LogError("CameraSensor could not find EntityTeam on parent!");
-        if (displayFOV) InstantiateFieldOfView();
+        if (displayFOV) UIManager.Instance.InstantiateFieldOfView(sensorViewPoint.gameObject, range, fov, true, fov/2);
+        visionCone = GetVisionCone();
     }
 
-    private void InstantiateFieldOfView()
+    public void SetFOV(float newFov)
     {
-        GameObject instance = Instantiate(fieldOfViewPrefab);
-        instance.transform.SetParent(EntityCounter.Instance.canvas.gameObject.transform, false);
-        fovScript = instance.GetComponent<ProgressBar>();
-        fovScript.SetScale(range); // We assume that every ProgressBar is scaled to 1 unit by default
-        fovScript.SetProgress(fov / 360f); // Normalize FOV to [0, 1] range
-        ObjectFollower follower = instance.GetComponent<ObjectFollower>();
-        follower.Follow(sensorViewPoint.gameObject, true, 0);
-        follower.SetDeltaAngle(fov/2); // Rotate to face forward
+        fov = newFov;
+        visionCone = GetVisionCone();
     }
-    private GeometryUtils.Cone GetVisionCone()
+
+    public void SetRange(float newRange)
+    {
+        range = newRange;
+        visionCone = GetVisionCone();
+    }
+
+    private Cone GetVisionCone()
     {
         Vector2 dir = GeometryUtils.AngleToDirectionVector(sensorViewPoint.transform.rotation.eulerAngles.z);
-        return new GeometryUtils.Cone(sensorViewPoint.transform.position, dir, fov, range);
+        return new Cone(sensorViewPoint.transform.position, dir, fov, range);
     }
     public List<GameObject> GetVisibleEnemies()
     {
-        List<GameObject> visibleObjects = GeometryUtils.GetVisibleEnemiesInCone(GetVisionCone(), team, detectTypes, GeometryUtils.SensorType.Camera);
-        if (debug)
-        {
-            foreach (GameObject enemy in visibleObjects)
-            {
-                Debug.DrawLine(transform.position, enemy.transform.position, Color.red);
-            }
-        }
+        List<GameObject> visibleObjects = visionCone.GetVisibleEnemiesInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+        // If mouse detection is enabled, check if the mouse is in the vision cone. If it is, make it the only target.
+        HandleMouseDetection(visibleObjects);
+
+        if (debug) visibleObjects.ForEach(enemy => Debug.DrawLine(transform.position, enemy.transform.position, Color.red));
         return visibleObjects;
+    }
+    private void HandleMouseDetection(List<GameObject> visibleObjects)
+    {
+        if (detectMouse)
+        {
+            Vector2 mousePosition = GeometryUtils.GetMousePosition();
+            if (visionCone.IsPositionInCone(mousePosition)) visibleObjects = new List<GameObject> { EntityCounter.Instance.MouseCursor };
+        }
     }
     public List<GameObject> GetVisibleAllies()
     {
-        List<GameObject> visibleObjects = GeometryUtils.GetVisibleAlliesInCone(GetVisionCone(), team, GeometryUtils.SensorType.Camera);
+        List<GameObject> visibleObjects = visionCone.GetVisibleAlliesInCone(team, GeometryUtils.SensorType.Camera);
         return EntityCounter.Instance.FilterEntityTypes(visibleObjects, new List<HasEntityType.EntityType>(detectTypes));
     }
     public List<GameObject> GetVisibleObjects()
     {
-        List<GameObject> visibleObjects = GeometryUtils.GetVisibleObjectsInCone(GetVisionCone(), team, GeometryUtils.SensorType.Camera);
+        List<GameObject> visibleObjects = visionCone.GetVisibleObjectsInCone(team, GeometryUtils.SensorType.Camera);
         return EntityCounter.Instance.FilterEntityTypes(visibleObjects, new List<HasEntityType.EntityType>(detectTypes));
     }
-    public GameObject GetClosestVisibleEnemy() => GeometryUtils.GetClosestVisibleEnemyInCone(GetVisionCone(), team, detectTypes, GeometryUtils.SensorType.Camera);
-    public GameObject GetClosestVisibleAlly() => GeometryUtils.GetClosestVisibleAllyInCone(GetVisionCone(), team, detectTypes, GeometryUtils.SensorType.Camera);
-    public GameObject GetClosestVisibleObject() => GeometryUtils.GetClosestVisibleObjectInCone(GetVisionCone(), team, detectTypes, GeometryUtils.SensorType.Camera);
+    public GameObject GetClosestVisibleEnemy() => visionCone.GetClosestVisibleEnemyInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+    public GameObject GetClosestVisibleAlly() => visionCone.GetClosestVisibleAllyInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+    public GameObject GetClosestVisibleObject() => visionCone.GetClosestVisibleObjectInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
 }
