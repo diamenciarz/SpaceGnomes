@@ -6,17 +6,30 @@ using UnityEngine.UI;
 public class ProgressBar : MonoBehaviour
 {
     [Header("Appearance Settings")]
-    [SerializeField] bool disappearAfterInactive = true;
-    [SerializeField] float delayBeforeDisappear = 3f;
-    [SerializeField] float disappearDuration = 1f;
-    [SerializeField] float appearAlpha = 0.7f;
-    [SerializeField] bool disappearOnlyWhenFull = false;
+    [SerializeField][Tooltip("After delayBeforeDisappear since the last SetProgress() call, will disappear over disappearDuration. If false, will only react to ShowBar() and HideBar()")]
+    private bool _showWhenUpdatingProgress;
+    public bool showWhenUpdatingProgress
+    {
+        get => _showWhenUpdatingProgress;
+        set
+        {
+            _showWhenUpdatingProgress = value;
+            if (!value) SetAlpha(appearAlpha);
+        }
+    }
+    [SerializeField][Range(0f, 10f)][Tooltip("0 is instant")] float delayBeforeDisappear = 3f;
+    [SerializeField][Range(0f, 10f)][Tooltip("0 is instant")] float disappearDuration = 1f;
+    [SerializeField][Range(0f,10f)][Tooltip("0 is instant")] float appearDuration = 1f;
+    [SerializeField][Range(0f, 1f)][Tooltip("maximum opacity at full visibility")] float appearAlpha = 0.7f;
+    [SerializeField][Tooltip("Once full progress, will wait delayBeforeDisappear and disappear over disappearDuration")]
+    bool disappearOnlyWhenFullProgress = false;
 
     private Slider slider;
     private Image fillImage;
-    private bool disappearing = false;
-    private float currentDelay;
-    private Coroutine disappearCoroutine;
+    [Tooltip("If true, it will start disappearing after delayBeforeDisappear,\notherwise it will stay visible until ShowBar() or HideBar() is called.\nIt will calculate the alpha based on the time since the last SetProgress() call,\ndelayBeforeDisappear and the disappearDuration.")]
+    private bool isDisappearing = false;
+    private float lastActivity; // Time of the last SetProgress() call, used to track when to start disappearing
+    private bool transitionIsInstant => appearDuration == 0f && disappearDuration == 0f;
 
     private void Awake()
     {
@@ -25,84 +38,115 @@ public class ProgressBar : MonoBehaviour
         {
             fillImage = slider.fillRect.GetComponent<Image>();
         }
-        currentDelay = delayBeforeDisappear;
+    }
+    public void Initialize(float alpha, float scale, float progress)
+    {
         SetAlpha(appearAlpha);
+        SetScale(scale);
+        SetProgress(progress);
     }
     public void SetScale(float scale)
     {
         RectTransform rectTransform = GetComponent<RectTransform>();
+        Debug.Log($"ProgressBar: Setting scale to {scale}");
         rectTransform.localScale = new Vector3(scale, scale, scale);
     }
     public void SetProgress(float progress)
     {
         // Updating the progress does not necessarily make the bar visible
+        Debug.Log($"Set progress to {progress}");
         slider.value = progress;
+        if(_showWhenUpdatingProgress && isDisappearing)
+        {
+            float currentAlpha = fillImage.color.a;
+            // Calculate the alpha we should be at if it was not disappearing, and use the higher of the two to avoid sudden jumps in opacity
+            float calculatedLastActivityTime = transitionIsInstant ? 0f : (Time.time - (1 - currentAlpha / appearAlpha) * disappearDuration - delayBeforeDisappear);
+            lastActivity = Time.time;
+            isDisappearing = false;
+        }
     }
     public void ShowBar()
     {
-        ShowBar(delayBeforeDisappear);
+        lastActivity = Time.time;
+        isDisappearing = false;
     }
-    public void ShowBar(float duration)
+    public void HideBar()
     {
-        // Showing the bar activates it and resets the disappearance timer
-        currentDelay = duration;
-        gameObject.SetActive(true);
-        SetAlpha(appearAlpha);
-        if (disappearCoroutine != null)
-        {
-            StopCoroutine(disappearCoroutine);
-        }
-        disappearing = true;
-        disappearCoroutine = StartCoroutine(DisappearAfterDelay());
+        lastActivity = Time.time;
+        isDisappearing = true;
     }
     private void Update()
     {
-        if (disappearAfterInactive)
+        UpdateDisappearingMode();
+        HandleDisappearingOnFullProgress();
+        UpdateVisibility();
+    }
+    private void UpdateDisappearingMode()
+    {
+        if (showWhenUpdatingProgress && !transitionIsInstant)
         {
-            bool shouldDisappear = disappearOnlyWhenFull ? slider.value >= 1f : true;
-            if (shouldDisappear)
+            //disappearOnlyWhenFullProgress
+            // If it is time to start disappearing
+            if (disappearOnlyWhenFullProgress)
             {
-                if (!disappearing)
+                if(fillImage.color.a == slider.maxValue) // If we are at full progress, start the timer to disappear
                 {
-                    disappearing = true;
-                    Debug.Log("ProgressBar: Starting disappearance coroutine.");
-                    if (disappearCoroutine != null)
+                    if (!isDisappearing && (Time.time - lastActivity) > appearDuration + delayBeforeDisappear)
                     {
-                        StopCoroutine(disappearCoroutine);
+                        lastActivity = Time.time;
+                        isDisappearing = true;
                     }
-                    disappearCoroutine = StartCoroutine(DisappearAfterDelay());
                 }
             }
             else
             {
-                disappearing = false;
-                SetAlpha(appearAlpha);
+                if (!isDisappearing && (Time.time - lastActivity) > appearDuration + delayBeforeDisappear)
+                {
+                    lastActivity = Time.time;
+                    isDisappearing = true;
+                } 
             }
         }
     }
-    private IEnumerator DisappearAfterDelay()
+    private float CalculateLastActivityTimeFromAlpha(float currentAlpha)
     {
-        yield return new WaitForSeconds(currentDelay);
-        float startAlpha = fillImage != null ? fillImage.color.a : 1f;
-        float time = 0f;
-        while (time < disappearDuration)
+        if(isDisappearing) return Time.time - (1 - currentAlpha / appearAlpha) * disappearDuration - delayBeforeDisappear;
+        else return Time.time - (currentAlpha / appearAlpha) * appearDuration;
+    }
+    private void HandleDisappearingOnFullProgress()
+    {
+        if (disappearOnlyWhenFullProgress && slider.value >= slider.maxValue && !isDisappearing)
         {
-            time += Time.deltaTime;
-            float alpha = Mathf.Lerp(startAlpha, 0f, time / disappearDuration);
-            SetAlpha(alpha);
-            yield return null;
+            lastActivity = Time.time;
+            isDisappearing = true;
         }
-        currentDelay = delayBeforeDisappear;
-        disappearCoroutine = null;
-        gameObject.SetActive(false);
+    }
+    private void UpdateVisibility()
+    {
+        if (transitionIsInstant)
+        {
+            float newAlpha = isDisappearing ? 0f : appearAlpha;
+            SetAlpha(newAlpha);
+            return;
+        }
+        if (isDisappearing)
+        {
+            if(disappearDuration==0) SetAlpha(0f);
+            if(Time.time - lastActivity < delayBeforeDisappear) return; // Not time to disappear yet
+            float newAlpha = Mathf.Lerp(appearAlpha, 0f, (Time.time - lastActivity - delayBeforeDisappear) / disappearDuration);
+            SetAlpha(newAlpha);
+        }
+        else
+        {
+            if (appearDuration == 0) SetAlpha(appearAlpha);
+            float newAlpha = Mathf.Lerp(0f, appearAlpha, (Time.time - lastActivity) / appearDuration);
+            SetAlpha(newAlpha);
+        }
     }
     private void SetAlpha(float alpha)
     {
-        if (fillImage != null)
-        {
-            Color color = fillImage.color;
-            color.a = alpha;
-            fillImage.color = color;
-        }
+        Color color = fillImage.color;
+        color.a = alpha;
+        fillImage.color = color;
     }
 }

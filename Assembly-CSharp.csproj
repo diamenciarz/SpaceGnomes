@@ -108,6 +108,8 @@
     <Compile Include="Assets\Scripts\EntityProperties\EntityPositionTracker.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\TailEntityBehavior.cs" />
     <Compile Include="Assets\Scripts\Singletons\AbstractSingleton.cs" />
+    <Compile Include="Assets\Scripts\Utils\Cone.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\MouseFollower.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

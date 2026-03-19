@@ -1798,6 +1798,10 @@ PrefabInstance:
       propertyPath: coneAngle
       value: 270
       objectReference: {fileID: 0}
+    - target: {fileID: 7466481567582663110, guid: d3b6207cce9cfc74aa75e6a6fd488903, type: 3}
+      propertyPath: m_Name
+      value: RotateTransform
+      objectReference: {fileID: 0}
     - target: {fileID: 7709116492208047901, guid: d3b6207cce9cfc74aa75e6a6fd488903, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.231

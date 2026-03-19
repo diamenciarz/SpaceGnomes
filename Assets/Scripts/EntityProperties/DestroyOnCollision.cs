@@ -30,7 +30,6 @@ public class DestroyOnCollision : MonoBehaviour
 
         if (ShouldIgnoreAlly(other, entityType))
         {
-            Debug.Log("Ignoring ally collision with " + other.name);
             return;
         }
         if (targetEntityTypes.Contains(entityType.Type))
