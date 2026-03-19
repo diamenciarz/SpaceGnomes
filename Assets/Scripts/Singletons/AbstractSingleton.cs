@@ -28,6 +28,10 @@ public abstract class AbstractSingleton<T> : MonoBehaviour where T : AbstractSin
         if (instance == null)
         {
             instance = (T)this;
+            if (transform.parent != null)
+            {
+                transform.SetParent(null);
+            }
             DontDestroyOnLoad(gameObject);
         }
         else if (instance != this)

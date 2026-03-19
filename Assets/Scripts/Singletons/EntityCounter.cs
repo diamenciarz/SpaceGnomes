@@ -20,7 +20,7 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
     // Toggle to draw grid in Scene view (Gizmos)
     public bool EnableGridDebug = false;
 
-    // Should only track active entities
+    // Should only track active entities. Type is the "EntityType" enum value, and value is the set of entities of that type
     private Dictionary<System.Type, Dictionary<int, EntityTracker>> trackers =
         new Dictionary<System.Type, Dictionary<int, EntityTracker>>();
 
@@ -32,6 +32,7 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
         public Dictionary<GameObject, Vector2Int> EntityToCell = new Dictionary<GameObject, Vector2Int>();
     }
     private GameObject dummyPointObject = null;
+    public GameObject MouseCursor = null;
     protected override void Awake()
     {
         base.Awake(); // Call base singleton setup
@@ -48,6 +49,15 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
         foreach (ForceManager.ForceType type in System.Enum.GetValues(typeof(ForceManager.ForceType)))
         {
             trackers[typeof(ForceManager.ForceType)][(int)type] = new EntityTracker();
+        }
+        InstantiateMouseFollower();
+    }
+    private void InstantiateMouseFollower()
+    {
+        if (MouseCursor == null)
+        {
+            MouseCursor = new GameObject("MouseFollower");
+            MouseCursor.AddComponent<MouseFollower>();
         }
     }
     public GameObject GetEntityParent(GameObject obj)
