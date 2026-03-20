@@ -15,6 +15,7 @@ public class Rotator : MonoBehaviour
     private GameObject targetObject;
     private Vector2 targetPosition;
     private bool usePosition = false;
+    private Cache<Cone> rotationCone;
     public Vector2 GetCurrentDirection()
     {
         return GeometryUtils.AngleToDirectionVector(rotator.rotation.eulerAngles.z);
@@ -36,15 +37,28 @@ public class Rotator : MonoBehaviour
         targetObject = null;
         usePosition = false;
     }
-
+    private void Start()
+    {
+        rotationCone = CacheManager.Instance.CreateCache<Cone>(CacheBehavior.EndOfUpdate);
+    }
     private void Update()
     {
         RotateTowardsTarget();
     }
+    public Cone GetRotationCone()
+    {
+        if(!rotationCone.isCached) rotationCone.Set(
+            new Cone(
+                rotator.position,
+                GeometryUtils.AngleToDirectionVector(transform.rotation.eulerAngles.z),
+                coneAngle,
+                Mathf.Infinity));
+        return rotationCone.Get();
+    }
 
     private void RotateTowardsTarget()
     {
-        Vector2 direction;
+        Vector2 direction = Vector2.zero;
         if (usePosition)
         {
             direction = targetPosition - (Vector2)rotator.position;
@@ -52,7 +66,6 @@ public class Rotator : MonoBehaviour
         else if (targetObject != null)
         {
             direction = (Vector2)targetObject.transform.position - (Vector2)rotator.position;
-            if (debug) Debug.DrawLine(rotator.position, targetObject.transform.position, Color.red);
         }
         else
         {
@@ -61,32 +74,16 @@ public class Rotator : MonoBehaviour
 
         if (direction != Vector2.zero)
         {
-            float relativeTargetAngle = CalculateRelativeTargetAngle(direction);
+            Cone myCone = GetRotationCone();
+            float relativeTargetAngle = myCone.CalculateRelativePositionAngle(direction);
             if (useCone)
             {
-                relativeTargetAngle = ClampAngleToCone(relativeTargetAngle, coneAngle / 2f);
+                relativeTargetAngle = myCone.ClampAngleToCone(relativeTargetAngle);
             }
             if(debug) Debug.DrawRay(rotator.position, GeometryUtils.AngleToDirectionVector(relativeTargetAngle + transform.rotation.eulerAngles.z), Color.blue);
             float currentRelativeAngle = GeometryUtils.ClampAngle180(rotator.localRotation.eulerAngles.z);
             float newLocalAngle = Mathf.MoveTowards(currentRelativeAngle, relativeTargetAngle, maxRotationSpeed * Time.deltaTime);
             rotator.localRotation = Quaternion.Euler(0f, 0f, newLocalAngle);
-        }
-    }
-    private float CalculateRelativeTargetAngle(Vector2 direction)
-    {
-        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        float myAngle = GeometryUtils.ClampAngle180(transform.rotation.eulerAngles.z);
-        return GeometryUtils.ClampAngle180(targetAngle - myAngle);
-    }
-    private float ClampAngleToCone(float relativeTargetAngle, float halfAngle)
-    {
-        if (Mathf.Abs(relativeTargetAngle) > halfAngle)
-        {
-            return Mathf.Sign(relativeTargetAngle) * halfAngle;
-        }
-        else
-        {
-            return relativeTargetAngle;
         }
     }
 }

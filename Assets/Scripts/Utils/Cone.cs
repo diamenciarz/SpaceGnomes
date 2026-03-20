@@ -4,11 +4,13 @@ using System.Linq;
 using UnityEngine;
 using static EntityTeam;
 using static GeometryUtils;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class Cone
 {
     public Vector2 origin;
     public Vector2 direction;
+    public float zMiddleAngle;
     public float angle; // in degrees
     public float maxDistance;
 
@@ -16,15 +18,45 @@ public class Cone
     /// Initializes a new instance of the Cone class with the specified origin, direction, angle, and maximum distance.
     /// </summary>
     /// <param name="origin">The origin point of the cone.</param>
-    /// <param name="direction">The direction vector of the cone.</param>
-    /// <param name="angle">The angle of the cone in degrees.</param>
+    /// <param name="direction">The direction vector of the cone exactly halfway through the angle.</param>
+    /// <param name="coneAngle">The angle of the cone in degrees.</param>
     /// <param name="maxDistance">The maximum distance from the origin.</param>
-    public Cone(Vector2 origin, Vector2 direction, float angle, float maxDistance)
+    public Cone(Vector2 origin, Vector2 direction, float coneAngle, float maxDistance)
     {
         this.origin = origin;
+        this.zMiddleAngle = GeometryUtils.DirectionVectorToAngle(direction);
         this.direction = direction.normalized;
-        this.angle = angle;
+        this.angle = coneAngle;
         this.maxDistance = maxDistance;
+    }
+    public Cone(Vector2 origin, float zMiddleAngle, float coneAngle, float maxDistance)
+    {
+        this.origin = origin;
+        this.zMiddleAngle = zMiddleAngle;
+        this.direction = GeometryUtils.AngleToDirectionVector(zMiddleAngle);
+        this.angle = coneAngle;
+        this.maxDistance = maxDistance;
+
+    }
+    public override string ToString()
+    {
+        return $"Cone(origin: {origin}, direction: {direction}, angle: {angle}, maxDistance: {maxDistance})";
+    }
+
+    public float CalculateRelativePositionAngle(Vector2 direction)
+    {
+        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float myAngle = GeometryUtils.ClampAngle180(this.zMiddleAngle);
+        return GeometryUtils.ClampAngle180(targetAngle - myAngle);
+    }
+    /// <summary>
+    /// 
+    public float ClampAngleToCone(float relativePositionAngle)
+    {
+        float halfConeAngle = this.angle / 2;
+        bool positionOutsideCone = Mathf.Abs(relativePositionAngle) > halfConeAngle;
+        float clampedAngle = positionOutsideCone ? Mathf.Sign(relativePositionAngle) * halfConeAngle : relativePositionAngle;
+        return clampedAngle;
     }
 
     static float RAYS_PER_DEGREE = 0.5f;
@@ -38,11 +70,9 @@ public class Cone
         {
             float currentAngle = startAngle + i * angleStep;
             Vector2 rayDirection = Quaternion.Euler(0, 0, currentAngle) * this.direction;
-            Debug.DrawRay(this.origin, rayDirection * maxDistance, Color.red);
             RaycastHit2D? hit = raycastFunc(this.origin + rayDirection * maxDistance, this.origin, myTeam, maxDistance, sensorType);
             if (hit.HasValue)
             {
-                Debug.Log($"Hit {hit.Value.collider.gameObject.name} at distance {hit.Value.distance}");
                 hits.Add(hit.Value);
             }
         }
@@ -226,6 +256,24 @@ public class Cone
         return bestHit.collider.gameObject;
     }
 
+    public GameObject GetClosestObjectInCone(List<GameObject> gameObjects)
+    {
+        // Find an object that is in the cone and closest to the origin of the cone use closest point in collider if it has one, otherwise use the position of the object
+        GameObject closestObject = null;
+        float closestDistance = Mathf.Infinity;
+        foreach (GameObject obj in gameObjects)
+        {
+            if(!IsObjectInCone(obj)) continue;
+            float distance = ((Vector2)obj.transform.position - this.origin).magnitude;
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestObject = obj;
+            }
+        }
+        return closestObject;
+    }
+
     /// <summary>
     /// Filters the provided list of GameObjects to include only those within the cone.
     /// </summary>
@@ -245,6 +293,7 @@ public class Cone
     public bool IsObjectInCone(GameObject target, bool drawDebugLines = false)
     {
         Collider2D collider = target.GetComponent<Collider2D>();
+        // Here we check if any point (closest to origin) is in the cone.
         Vector2 targetPosition = Vector2.zero;
         if (collider)
         {
@@ -262,7 +311,8 @@ public class Cone
         // Here we find a point that is the closest to the middle of the cone's direction
         if (collider)
         {
-            targetPosition = collider.ClosestPoint(this.origin + this.direction.normalized * this.maxDistance);
+            Vector2 coneMiddlePoint = this.origin + this.direction.normalized * toTarget.magnitude;
+            targetPosition = collider.ClosestPoint(coneMiddlePoint);
             if (drawDebugLines) Debug.DrawLine(this.origin, targetPosition, Color.green);
         }
         else

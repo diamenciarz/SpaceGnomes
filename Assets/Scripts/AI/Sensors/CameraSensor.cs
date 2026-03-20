@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.SearchService;
 using UnityEngine;
 
-public class CameraSensor : MonoBehaviour, ISensor
+public class CameraSensor : AbstractSensor
 {
 
 
@@ -22,11 +22,37 @@ public class CameraSensor : MonoBehaviour, ISensor
     private ProgressBar fovScript;
     private EntityTeam entityTeam;
 
+    private struct MouseResult
+    {
+        public bool detected;
+        public GameObject follower;
+    }
+
+    // Cache instances
+    private Cache<Cone> coneCache;
+    private Cache<MouseResult> mouseCache;
+    private Cache<List<GameObject>> visibleEnemiesCache;
+    private Cache<List<GameObject>> visibleAlliesCache;
+    private Cache<List<GameObject>> visibleObjectsCache;
+    private Cache<GameObject> closestEnemyCache;
+    private Cache<GameObject> closestAllyCache;
+    private Cache<GameObject> closestObjectCache;
+
     void Start()
     {
         entityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
         if (!entityTeam) Debug.LogError("CameraSensor could not find EntityTeam on parent!");
         if (displayFOV) UIManager.Instance.InstantiateFieldOfView(sensorViewPoint.gameObject, range, fov, true, fov/2);
+
+        // Initialize caches
+        coneCache = CacheManager.Instance.CreateCache<Cone>(CacheBehavior.EndOfUpdate);
+        mouseCache = CacheManager.Instance.CreateCache<MouseResult>(CacheBehavior.EndOfUpdate);
+        visibleEnemiesCache = CacheManager.Instance.CreateCache<List<GameObject>>(CacheBehavior.EndOfUpdate);
+        visibleAlliesCache = CacheManager.Instance.CreateCache<List<GameObject>>(CacheBehavior.EndOfUpdate);
+        visibleObjectsCache = CacheManager.Instance.CreateCache<List<GameObject>>(CacheBehavior.EndOfUpdate);
+        closestEnemyCache = CacheManager.Instance.CreateCache<GameObject>(CacheBehavior.EndOfUpdate);
+        closestAllyCache = CacheManager.Instance.CreateCache<GameObject>(CacheBehavior.EndOfUpdate);
+        closestObjectCache = CacheManager.Instance.CreateCache<GameObject>(CacheBehavior.EndOfUpdate);
     }
 
     public void SetFOV(float newFov)
@@ -39,46 +65,114 @@ public class CameraSensor : MonoBehaviour, ISensor
         range = newRange;
     }
 
-    /*
-     * <summary>The cone must be recalculated every frame because the sensor can rotate.</summary>
-     */
+    /// <summary>
+    /// The cone must be recalculated every frame because the sensor can rotate.
+    /// </summary>
     private Cone GetVisionCone()
     {
-        Vector2 dir = GeometryUtils.AngleToDirectionVector(sensorViewPoint.transform.rotation.eulerAngles.z);
-        return new Cone(sensorViewPoint.transform.position, dir, fov, range);
+        if (!coneCache.isCached)
+        {
+            Vector2 dir = GeometryUtils.AngleToDirectionVector(sensorViewPoint.transform.rotation.eulerAngles.z);
+            coneCache.Set(new Cone(sensorViewPoint.transform.position, dir, fov, range));
+        }
+        return coneCache.Get();
     }
+
     private bool DetectMouse(out GameObject mouseFollower)
     {
-        mouseFollower = null;
-        if (detectMouse)
+        if (!mouseCache.isCached)
         {
-            Vector2 mousePosition = GeometryUtils.GetMousePosition();
-            if (GetVisionCone().IsPositionInCone(mousePosition)) mouseFollower = EntityCounter.Instance.MouseCursor;
-            return true;
+            bool detected = false;
+            GameObject follower = null;
+            if (detectMouse)
+            {
+                Vector2 mousePosition = GeometryUtils.GetMousePosition();
+                if (GetVisionCone().IsPositionInCone(mousePosition))
+                {
+                    follower = EntityCounter.Instance.MouseCursor;
+                    detected = true;
+                }
+            }
+            mouseCache.Set(new MouseResult { detected = detected, follower = follower });
         }
-        return false;
+        MouseResult res = mouseCache.Get();
+        mouseFollower = res.follower;
+        return res.detected;
     }
-    public List<GameObject> GetVisibleEnemies()
+
+    public override List<GameObject> GetVisibleEnemies()
     {
-        // If mouse detection is enabled, check if the mouse is in the vision cone. If it is, make it the only target.
-        if (DetectMouse(out GameObject mouseFollower)) return new List<GameObject> { mouseFollower };
-        return GetVisionCone().GetVisibleEnemiesInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+        if (!visibleEnemiesCache.isCached)
+        {
+            List<GameObject> result;
+            if (DetectMouse(out GameObject mouseFollower))
+            {
+                result = new List<GameObject> { mouseFollower };
+            }
+            else
+            {
+                result = GetVisionCone().GetVisibleEnemiesInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+            }
+            visibleEnemiesCache.Set(result);
+        }
+        return visibleEnemiesCache.Get();
     }
-    public List<GameObject> GetVisibleAllies()
+
+    public override List<GameObject> GetVisibleAllies()
     {
-        return GetVisionCone().GetVisibleAlliesInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+        if (!visibleAlliesCache.isCached)
+        {
+            List<GameObject> result = GetVisionCone().GetVisibleAlliesInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+            visibleAlliesCache.Set(result);
+        }
+        return visibleAlliesCache.Get();
     }
-    public List<GameObject> GetVisibleObjects()
+
+    public override List<GameObject> GetVisibleObjects()
     {
-        List<GameObject> visibleObjects = GetVisionCone().GetVisibleObjectsInCone(team, GeometryUtils.SensorType.Camera);
-        return EntityCounter.Instance.FilterEntityTypes(visibleObjects, new List<HasEntityType.EntityType>(detectTypes));
+        if (!visibleObjectsCache.isCached)
+        {
+            List<GameObject> result = GetVisionCone().GetVisibleObjectsInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+            visibleObjectsCache.Set(result);
+        }
+        return visibleObjectsCache.Get();
     }
-    public GameObject GetClosestVisibleEnemy()
+
+    public override GameObject GetClosestVisibleEnemy()
     {
-        // If mouse detection is enabled, check if the mouse is in the vision cone. If it is, make it the only target.
-        if (DetectMouse(out GameObject mouseFollower)) return mouseFollower;
-        return GetVisionCone().GetClosestVisibleEnemyInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+        if (!closestEnemyCache.isCached)
+        {
+            GameObject result;
+            if (DetectMouse(out GameObject mouseFollower))
+            {
+                result = mouseFollower;
+            }
+            else
+            {
+                result = GetVisionCone().GetClosestVisibleEnemyInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+            }
+            closestEnemyCache.Set(result);
+        }
+        return closestEnemyCache.Get();
     }
-    public GameObject GetClosestVisibleAlly() => GetVisionCone().GetClosestVisibleAllyInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
-    public GameObject GetClosestVisibleObject() => GetVisionCone().GetClosestVisibleObjectInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+
+    public override GameObject GetClosestVisibleAlly()
+    {
+        if (!closestAllyCache.isCached)
+        {
+            GameObject result = GetVisionCone().GetClosestVisibleAllyInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+            closestAllyCache.Set(result);
+        }
+        return closestAllyCache.Get();
+    }
+
+    public override GameObject GetClosestVisibleObject()
+    {
+        if (!closestObjectCache.isCached)
+        {
+            GameObject result = GetVisionCone().GetClosestVisibleObjectInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+            closestObjectCache.Set(result);
+        }
+        return closestObjectCache.Get();
+    }
 }

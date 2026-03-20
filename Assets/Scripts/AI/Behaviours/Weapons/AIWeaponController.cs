@@ -1,58 +1,71 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class AIWeaponController : MonoBehaviour
 {
     [Serializable]
-    class WeaponConfig
+    class Weapon
     {
         public AbstractWeaponController weaponController;
-        public CameraSensor cameraSensor;
         public Rotator rotator;
+    }
+    [Serializable]
+    class WeaponGroup
+    {
+        public List<AbstractSensor> sensors = new List<AbstractSensor>();
+        public List<Weapon> weapons = new List<Weapon>();
     }
     [SerializeField][Tooltip("Targets a position the target will be when the bullet reaches it")] 
     bool predictTrajectories;
-    [SerializeField] List<WeaponConfig> weaponConfigs = new List<WeaponConfig>();
+    [SerializeField] List<WeaponGroup> weaponGroups = new List<WeaponGroup>();
     void Update()
     {
-        ControlWeapons();
+        ControlWeaponGroups();
     }
-    private void ControlWeapons()
+    private void ControlWeaponGroups()
     {
-        foreach (WeaponConfig config in weaponConfigs)
+        weaponGroups.ForEach(group => HandleWeaponGroup(group));
+    }
+    private void HandleWeaponGroup(WeaponGroup group)
+    {
+        List<GameObject> visibleEnemies = new List<GameObject>();
+        group.sensors.ForEach(sensor => visibleEnemies.AddRange(sensor.GetVisibleEnemies()));
+
+        // For each weapon, check if any enemies are in its Rotator movement arc (consider true if null)
+        foreach (Weapon weapon in group.weapons)
         {
-            GameObject target = config.cameraSensor.GetClosestVisibleEnemy();
-            
-            if (!target)
+            Cone rotationCone = weapon.rotator.GetRotationCone();
+            GameObject closestEnemy = rotationCone.GetClosestObjectInCone(visibleEnemies);
+            if (!closestEnemy)
             {
-                config.weaponController.SetShooting(false);
-                config.rotator.StopTargeting();
-                continue;
+                weapon.weaponController.SetAction(false);
+                weapon.rotator.StopTargeting();
             }
             else
             {
-                config.weaponController.SetShooting(true);
-                RotateToTarget(config, target);
+                weapon.weaponController.SetAction(true);
+                RotateToTarget(weapon, closestEnemy);
             }
         }
     }
-    private void RotateToTarget(WeaponConfig config, GameObject target)
+    private void RotateToTarget(Weapon weapon, GameObject target)
     {
         if (!predictTrajectories)
         {
-            config.rotator.SetTarget(target);
+            weapon.rotator.SetTarget(target);
             return;
         }
         Trajectory targetTrajectory = target.GetComponent<Trajectory>();
         if (!targetTrajectory)
         {
-            config.rotator.SetTarget(target);
+            weapon.rotator.SetTarget(target);
             return;
         }
-        Vector2 shootingPoint = config.weaponController.GetShootingPointTransform().position;
-        Vector2 hitPosition = GeometryUtils.CalculateTrajectoryHitCoordinates(targetTrajectory, shootingPoint, config.weaponController.GetProjectileSpeed());
-        config.rotator.SetTarget(hitPosition);
+        Vector2 shootingPoint = weapon.weaponController.GetShootingPointTransform().position;
+        Vector2 hitPosition = GeometryUtils.CalculateTrajectoryHitCoordinates(targetTrajectory, shootingPoint, weapon.weaponController.GetProjectileSpeed());
+        weapon.rotator.SetTarget(hitPosition);
 
     }
 }

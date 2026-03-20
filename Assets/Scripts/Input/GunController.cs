@@ -63,7 +63,7 @@ public class GunController : AbstractWeaponController
     }
 
 
-    public override void SetShooting(bool isShooting)
+    public override void SetAction(bool isShooting)
     {
         this.isShooting = isShooting;
     }

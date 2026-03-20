@@ -52,23 +52,9 @@ public class Cache<T> : CacheBase
     }
 }
 
-public class CacheManager : MonoBehaviour
+public class CacheManager : AbstractSingleton<CacheManager>
 {
-    public static CacheManager Instance { get; private set; }
-
     private List<CacheBase> caches = new List<CacheBase>();
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
-
     void Update()
     {
         foreach (var cache in caches)
@@ -83,7 +69,6 @@ public class CacheManager : MonoBehaviour
             }
         }
     }
-
     public Cache<T> CreateCache<T>(CacheBehavior behavior, float interval = 0f)
     {
         var cache = new Cache<T>(behavior, interval);

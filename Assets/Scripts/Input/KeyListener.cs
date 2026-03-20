@@ -84,7 +84,7 @@ public class KeyListener : MonoBehaviour
             {
                 foreach (var controller in actionControllers[action.Key])
                 {
-                    controller.SetShooting(action.Value);
+                    controller.SetAction(action.Value);
                 }
             }
         }

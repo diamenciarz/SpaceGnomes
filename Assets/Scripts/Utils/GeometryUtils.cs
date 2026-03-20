@@ -52,9 +52,7 @@ public static class GeometryUtils
     }
     public static float DirectionVectorToAngle(Vector2 direction)
     {
-        direction = direction.normalized;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        return angle;
+        return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
     }
     public static bool PointBetweenTwoPoints(Vector2 point, Vector2 A, Vector2 B)
     {
