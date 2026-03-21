@@ -19,15 +19,21 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
     private Dictionary<string, PoolConfig> configMap = new Dictionary<string, PoolConfig>();
     private Transform poolParent; // Parent transform for inactive objects
 
+    private bool initialized = false;
+
     protected override void Awake()
     {
         base.Awake(); // Call base singleton setup
-
+        InitializePools();
+    }
+    private void InitializePools()
+    {
+        initialized = true;
         // Initialize pools
         poolParent = new GameObject("PooledObjects").transform;
         DontDestroyOnLoad(poolParent);
 
-        foreach (var config in poolConfigs)
+        foreach (PoolConfig config in poolConfigs)
         {
             if (config.prefab == null || string.IsNullOrEmpty(config.poolId))
             {
@@ -59,12 +65,14 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
 
     public GameObject Spawn(GameObject obj, Vector3 position, Quaternion rotation)
     {
+        if(!initialized) InitializePools();
         GameObject newObject = Instantiate(obj);
         return ActivateObject(newObject, position, rotation);
     }
 
     public GameObject Spawn(string poolId, Vector3 position, Quaternion rotation)
     {
+        if(!initialized) InitializePools();
         if (!pools.ContainsKey(poolId) || string.IsNullOrEmpty(poolId))
         {
             Debug.LogError($"No pool found for ID: {poolId}");
@@ -92,12 +100,14 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
     }
     public Func<float, float> GetObjectSpeed(string poolId)
     {
+        if(!initialized) InitializePools();
         configMap.TryGetValue(poolId, out PoolConfig config);
         if (config == null) throw new Exception($"No pool config found for ID: {poolId}");
         return GetObjectSpeed(config.prefab);
     }
     public Func<float, float> GetObjectSpeed(GameObject obj)
     {
+        if(!initialized) InitializePools();
         AutonomousMovementController bulletController = obj.GetComponent<AutonomousMovementController>();
         if (bulletController != null) return bulletController.VelocityFunction;
 
@@ -140,6 +150,7 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
     /** Only objects with HasEntityType can be despawned **/
     public void Despawn(GameObject obj)
     {
+        if(!initialized) InitializePools();
         ActivateOnDespawned(obj);
         HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
         if (hasEntityType)
@@ -151,6 +162,7 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
 
     public void Despawn(GameObject obj, string poolId)
     {
+        if(!initialized) InitializePools();
         if (!pools.ContainsKey(poolId))
         {
             Debug.LogWarning($"No pool found for ID: {poolId}. Destroying object.");

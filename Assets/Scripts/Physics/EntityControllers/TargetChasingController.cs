@@ -30,6 +30,12 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private float lastFixedVelocity;
     private float lastFixedTime;
 
+    public override void Activate()
+    {
+        base.Activate();
+        // Set initial velocity along forward direction (transform.up)
+        rb.velocity = transform.up * initialVelocity;
+    }
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -42,7 +48,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private void Update()
     {
         UpdateTarget();
-        Debug.DrawLine(transform.position, target.transform.position, Color.red);
+        if(target) Debug.DrawLine(transform.position, target.transform.position, Color.red);
     }
     private void UpdateTarget()
     {
@@ -65,12 +71,6 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     {
         this.target = target;
     }
-    public override void Activate()
-    {
-        base.Activate();
-        // Set initial velocity along forward direction (transform.up)
-        rb.velocity = transform.up * initialVelocity;
-    }
     private void HandleMovement()
     {
         // Apply thrust according to velocity function
@@ -82,9 +82,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
             rb.velocity = rb.velocity.normalized * targetVelocity;
         }
         // Handle rotation torque
-        float rotationInput = CalculateRotationInput();
-        float torque = CalculateRotationTorque(rotationInput);
-        rb.AddTorque(torque * Time.fixedDeltaTime);
+        if(target) RotateToTarget();
     }
     private float CalculateFixedDeltaVelocity()
     {
@@ -109,6 +107,12 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         {
             return 0;
         }
+    }
+    private void RotateToTarget()
+    {
+        float rotationInput = CalculateRotationInput();
+        float torque = CalculateRotationTorque(rotationInput);
+        rb.AddTorque(torque * Time.fixedDeltaTime);
     }
     private float CalculateRotationInput()
     {

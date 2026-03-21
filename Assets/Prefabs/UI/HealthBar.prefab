@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 102313384607550153}
   - component: {fileID: 312429289421503905}
   - component: {fileID: 889484533115138402}
+  - component: {fileID: -7756451757078352110}
   m_Layer: 5
   m_Name: HealthBar
   m_TagString: Untagged
@@ -112,11 +113,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee9f2374037ff394683e4f0d7e770547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  disappearAfterInactive: 0
+  _showWhenUpdatingProgress: 0
   delayBeforeDisappear: 1
   disappearDuration: 1
+  appearDuration: 1
   appearAlpha: 0.3
-  disappearOnlyWhenFull: 0
+  disappearOnlyWhenFullProgress: 0
 --- !u!114 &889484533115138402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,6 +134,19 @@ MonoBehaviour:
   deltaPosition: {x: 0, y: 0, z: 0}
   deltaAngle: 0
   rotateWithParent: 0
+--- !u!114 &-7756451757078352110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1698827673125149811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e65b6ca1066a64841af089ffd47e9376, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poolId: HealthBar
 --- !u!1 &5144326948476530306
 GameObject:
   m_ObjectHideFlags: 0

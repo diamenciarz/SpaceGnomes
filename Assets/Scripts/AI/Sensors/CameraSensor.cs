@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.SearchService;
 using UnityEngine;
 
 public class CameraSensor : AbstractSensor
 {
-
-
     [Header("Camera settings")]
     [SerializeField][Tooltip("If false, the FieldOfView cone will never become visible")] private bool displayFOV;
     [SerializeField] private float range = 10f;
@@ -38,12 +37,20 @@ public class CameraSensor : AbstractSensor
     private Cache<GameObject> closestAllyCache;
     private Cache<GameObject> closestObjectCache;
 
+    private void OnEnable()
+    {
+        if(fovScript) fovScript.gameObject.SetActive(displayFOV);
+    }
+    private void OnDisable()
+    {
+        if(fovScript) fovScript.gameObject.SetActive(false);
+    }
     void Start()
     {
         entityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
         if (!entityTeam) Debug.LogError("CameraSensor could not find EntityTeam on parent!");
-        if (displayFOV) UIManager.Instance.InstantiateFieldOfView(sensorViewPoint.gameObject, range, fov, true, fov/2);
-
+        if (displayFOV) fovScript = UIManager.Instance.InstantiateFieldOfView(sensorViewPoint.gameObject, range, fov, fov / 2, true);
+        Debug.Log($"CameraSensor on {gameObject.transform.parent.name} initialized");
         // Initialize caches
         coneCache = CacheManager.Instance.CreateCache<Cone>(CacheBehavior.EndOfUpdate);
         mouseCache = CacheManager.Instance.CreateCache<MouseResult>(CacheBehavior.EndOfUpdate);
@@ -54,7 +61,6 @@ public class CameraSensor : AbstractSensor
         closestAllyCache = CacheManager.Instance.CreateCache<GameObject>(CacheBehavior.EndOfUpdate);
         closestObjectCache = CacheManager.Instance.CreateCache<GameObject>(CacheBehavior.EndOfUpdate);
     }
-
     public void SetFOV(float newFov)
     {
         fov = newFov;
@@ -64,11 +70,10 @@ public class CameraSensor : AbstractSensor
     {
         range = newRange;
     }
-
     /// <summary>
     /// The cone must be recalculated every frame because the sensor can rotate.
     /// </summary>
-    private Cone GetVisionCone()
+    public Cone GetVisionCone()
     {
         if (!coneCache.isCached)
         {
@@ -77,7 +82,11 @@ public class CameraSensor : AbstractSensor
         }
         return coneCache.Get();
     }
-
+    /// <summary>
+    /// If the sensor is set to detect the mouse, it will check if the mouse is within its vision cone.
+    /// If it is, it will return the mouse as the only visible enemy. Otherwise, it will return the enemies detected by the vision cone as usual.
+    /// </summary>
+    /// <returns></returns>
     public override List<GameObject> GetVisibleEnemies()
     {
         if (!visibleEnemiesCache.isCached)
@@ -115,7 +124,11 @@ public class CameraSensor : AbstractSensor
         }
         return visibleObjectsCache.Get();
     }
-
+    /// <summary>
+    /// If the sensor is set to detect the mouse, it will check if the mouse is within its vision cone.
+    /// If it is, it will return the mouse as the closest visible enemy. Otherwise, it will return the closest enemy detected by the vision cone as usual.
+    /// </summary>
+    /// <returns></returns>
     public override GameObject GetClosestVisibleEnemy()
     {
         if (!closestEnemyCache.isCached)

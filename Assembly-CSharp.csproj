@@ -71,7 +71,7 @@
     <Compile Include="Assets\Scripts\Damage\Health.cs" />
     <Compile Include="Assets\Scripts\Utils\Cone.cs" />
     <Compile Include="Assets\Scripts\Damage\DamageOnTouch.cs" />
-    <Compile Include="Assets\Scripts\Physics\EntityControllers\BulletController.cs" />
+    <Compile Include="Assets\Scripts\Physics\EntityControllers\StraightLineMovementController.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\Trajectory.cs" />
     <Compile Include="Assets\Scripts\AI\AIControlInput.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\HasEntityType.cs" />
@@ -115,6 +115,10 @@
     <Compile Include="Assets\Scripts\Singletons\TeamSpriteHandler.cs" />
     <Compile Include="Assets\Scripts\Unused\TeamSwitcherTest.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\PooledObjectProperty.cs" />
+    <Compile Include="Assets\Scripts\Physics\EntityControllers\TargetChasingController.cs" />
+    <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\AutonomousMovementController.cs" />
+    <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\ISettableTarget.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\DespawnOthersOnDespawn.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

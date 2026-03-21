@@ -49,7 +49,7 @@ MonoBehaviour:
   range: 10
   fov: 60
   detectTypes: 0100000004000000
-  fieldOfViewPrefab: {fileID: 1698827673125149811, guid: 09008ffff9d2b8a4191b2205993c2ab1, type: 3}
+  detectMouse: 0
   sensorViewPoint: {fileID: 6121753063332892029}
 --- !u!1 &8063564290379923370
 GameObject:
@@ -75,7 +75,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8063564290379923370}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.77, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

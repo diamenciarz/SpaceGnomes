@@ -2,8 +2,11 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// This script allows an object to be automatically despawned when it collides with certain types of entities.
+/// </summary>
 [RequireComponent(typeof(Collider2D))]
-[RequireComponent(typeof(PooledObjectProperty))]
+
 public class DestroyOnCollision : MonoBehaviour
 {
     [SerializeField]
@@ -37,6 +40,11 @@ public class DestroyOnCollision : MonoBehaviour
         {
             //Debug.Log(gameObject.name + " collided with " + other.gameObject.name);
             isDestroyed = true;
+            if (pooledObjectProperty == null)
+            {
+                ObjectPoolManager.Instance.Despawn(gameObject);
+                return;
+            }
             ObjectPoolManager.Instance.Despawn(gameObject, pooledObjectProperty.poolId);
         }
     }

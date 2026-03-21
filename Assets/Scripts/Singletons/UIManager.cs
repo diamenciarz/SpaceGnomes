@@ -65,23 +65,77 @@ public class UIManager : AbstractSingleton<UIManager>
         if (PrefabByType == null) PrefabByType = new Dictionary<UITypes, GameObject>();
         BuildPrefabMap();
     }
+    /// <summary>
+    /// Compatibility wrapper for existing code that used the old FOV-specific factory.
+    /// Calls the new generic InstantiateUI and returns the ProgressBar component when available.
+    /// </summary>
+    public ProgressBar InstantiateFieldOfView(GameObject followObj, float radius, float arc = 360f, float deltaAngle = 0f, bool rotateWithParent = true)
+    {
+        GameObject go = InstantiateUI(UITypes.FieldOfView, followObj, radius, arc, 360f, rotateWithParent, deltaAngle);
+        if (go == null) return null;
+        Debug.Log($"Instantiated Field of View UI element: {go.name}");
+        return go.GetComponent<ProgressBar>();
+    }
+    public void DestroyFieldOfView(GameObject fovObj)
+    {
+        if (fovObj == null) Debug.LogError("UIManager: Attempted to destroy null FOV object!");
+        RemoveFromCache(UITypes.FieldOfView, fovObj);
+        Debug.Log($"Destroying Field of View UI element: {fovObj.name}");
+        Destroy(fovObj);
+    }
+    public ProgressBar InstantiateHealthBar(GameObject followObj, float scale, float maxHealth)
+    {
+        GameObject go = InstantiateUI(UITypes.HealthBar, followObj, scale, maxHealth, maxHealth, false, 0);
+        if (go == null) return null;
+        return go.GetComponent<ProgressBar>();
+    }
+    public void DestroyHealthBar(GameObject healthBarObj)
+    {
+        if (healthBarObj == null) Debug.LogError("UIManager: Attempted to destroy null Health Bar object!");
+        RemoveFromCache(UITypes.HealthBar, healthBarObj);
+        Destroy(healthBarObj);
+    }
+    public ProgressBar InstantiateAmmoBar(GameObject followObj, float scale, float maxHealth)
+    {
+        GameObject go = InstantiateUI(UITypes.AmmoBar, followObj, scale, maxHealth, maxHealth, false, 0);
+        if (go == null) return null;
+        return go.GetComponent<ProgressBar>();
+    }
+    public void DestroyAmmoBar(GameObject ammoBarObj)
+    {
+        if (ammoBarObj == null) Debug.LogError("UIManager: Attempted to destroy null Ammo Bar object!");
+        RemoveFromCache(UITypes.AmmoBar, ammoBarObj);
+        Destroy(ammoBarObj);
+    }
 
     /// <summary>
     /// Factory method: instantiate a UI element of the given type and cache it.
     /// If the prefab contains an ObjectFollower or ProgressBar, this will apply the provided parameters.
     /// </summary>
-    public GameObject InstantiateUI(UITypes type, GameObject followObj = null, float radius = 1f, float arc = 360f, bool rotateWithParent = true, float deltaAngle = 180f)
+    private GameObject InstantiateUI(UITypes type, GameObject followObj, float scale = 1f, float progress = 360f, float maxValue=360f, bool rotateWithParent = true, float deltaAngle = 180f)
+    {
+        GameObject prefab = GetPrefab(type);
+        if (prefab == null) return null;
+
+        GameObject instance = Instantiate(prefab);
+        if (EntityCounter.Instance != null && EntityCounter.Instance.canvas != null)
+            instance.transform.SetParent(EntityCounter.Instance.canvas.gameObject.transform, false);
+        SetupObjectFollower(instance, followObj, rotateWithParent, deltaAngle);
+        SetupProgressBar(instance, scale, progress, maxValue);
+        AddToCache(type, instance);
+        return instance;
+    }
+    private GameObject GetPrefab(UITypes type)
     {
         if (!PrefabByType.TryGetValue(type, out GameObject prefab) || prefab == null)
         {
             Debug.LogError($"UIManager: No prefab assigned for UI type {type}");
             return null;
         }
-
-        GameObject instance = Instantiate(prefab);
-        if (EntityCounter.Instance != null && EntityCounter.Instance.canvas != null)
-            instance.transform.SetParent(EntityCounter.Instance.canvas.gameObject.transform, false);
-
+        return prefab;
+    }
+    private void SetupObjectFollower(GameObject instance, GameObject followObj, bool rotateWithParent, float deltaAngle)
+    {
         ObjectFollower objectFollower = instance.GetComponent<ObjectFollower>();
         if (objectFollower != null && followObj != null)
         {
@@ -90,66 +144,30 @@ public class UIManager : AbstractSingleton<UIManager>
             objectFollower.Follow(followObj, rotateWithParent, deltaAngle);
             objectFollower.SetDeltaAngle(deltaAngle);
         }
-
+    }
+    private void SetupProgressBar(GameObject instance, float scale, float progress, float maxValue)
+    {
         ProgressBar barScript = instance.GetComponent<ProgressBar>();
         if (barScript != null)
         {
-            barScript.SetScale(radius);
-            barScript.SetProgress(arc / 360f);
+            barScript.SetScale(scale);
+            barScript.SetProgress(progress / maxValue);
         }
-
+    }
+    private void AddToCache(UITypes type, GameObject instance)
+    {
         if (!cachedUI.TryGetValue(type, out var set))
         {
             set = new HashSet<GameObject>();
             cachedUI[type] = set;
         }
         set.Add(instance);
-
-        return instance;
     }
-
-    /// <summary>
-    /// Compatibility wrapper for existing code that used the old FOV-specific factory.
-    /// Calls the new generic InstantiateUI and returns the ProgressBar component when available.
-    /// </summary>
-    public ProgressBar InstantiateFieldOfView(GameObject followObj, float radius, float arc = 360f, bool rotateWithParent = true, float deltaAngle = 180f)
+    private void RemoveFromCache(UITypes type, GameObject instance)
     {
-        GameObject go = InstantiateUI(UITypes.FieldOfView, followObj, radius, arc, rotateWithParent, deltaAngle);
-        if (go == null) return null;
-        return go.GetComponent<ProgressBar>();
-    }
-
-    /// <summary>
-    /// Destroy a UI instance and remove it from the cache if present.
-    /// Returns true if the instance was found in the cache and destroyed.
-    /// </summary>
-    public bool DestroyUI(GameObject instance)
-    {
-        if (instance == null) return false;
-        foreach (var kv in cachedUI)
+        if (cachedUI.TryGetValue(type, out var set))
         {
-            if (kv.Value.Remove(instance))
-            {
-                Destroy(instance);
-                return true;
-            }
+            set.Remove(instance);
         }
-        // Not found in cache, still destroy.
-        Destroy(instance);
-        return false;
-    }
-
-    /// <summary>
-    /// Destroy a UI instance for a specific type.
-    /// </summary>
-    public bool DestroyUI(UITypes type, GameObject instance)
-    {
-        if (instance == null) return false;
-        if (cachedUI.TryGetValue(type, out var set) && set.Remove(instance))
-        {
-            Destroy(instance);
-            return true;
-        }
-        return false;
     }
 }

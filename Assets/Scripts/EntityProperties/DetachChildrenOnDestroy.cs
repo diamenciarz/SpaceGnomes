@@ -7,6 +7,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static DetachChildrenOnDestroy;
 
+/// <summary>
+/// This script allows an object to automatically detach specified child objects when it is despawned.
+/// Each child object will be given a portion of the parent's mass based on their relativeMass value,
+/// and will be detached with the same velocity and angular velocity as the parent at the moment of despawn.
+/// </summary>
 public class DetachChildrenOnDestroy : ActivateOnDespawn
 {
     [System.Serializable]

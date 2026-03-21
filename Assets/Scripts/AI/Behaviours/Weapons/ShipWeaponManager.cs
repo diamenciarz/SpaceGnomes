@@ -43,23 +43,18 @@ public class ShipWeaponManager : MonoBehaviour
         foreach (Weapon weapon in group.weapons)
         {
             Cone rotationCone = weapon.rotator.GetRotationCone();
-            bool mouseCursorVisible = IsMouseCursorVisible(rotationCone, visibleEnemies);
+            bool mouseCursorVisible = visibleEnemies.Contains(EntityCounter.Instance.MouseCursor);
             if (isControlledByPlayer || mouseCursorVisible)
             {
                 HandleMouseControl(weapon, mouseCursorVisible);
                 return;
             }
             List<Vector2> enemyPositions = visibleEnemies.Select(enemy => GetPredictedTargetPosition(weapon, enemy)).ToList();
-            Vector2? targetPosition = rotationCone.GetClosestPositionInCone(enemyPositions);
+            Vector2? targetPosition = rotationCone.GetClosestPosition(enemyPositions);
             int targetIndex = enemyPositions.FindIndex(pos => pos == targetPosition);
             GameObject target = targetIndex != -1 ? visibleEnemies[targetIndex] : null;
             HandleAIControl(weapon, targetPosition, target);
         }
-    }
-    private bool IsMouseCursorVisible(Cone rotationCone, List<GameObject> visibleEnemies)
-    {
-        if (!visibleEnemies.Contains(EntityCounter.Instance.MouseCursor)) return false;
-        return rotationCone.IsObjectInCone(EntityCounter.Instance.MouseCursor);
     }
     private void HandleMouseControl(Weapon weapon, bool mouseCursorVisible)
     {
@@ -71,15 +66,15 @@ public class ShipWeaponManager : MonoBehaviour
         }
         else
         {
-            //StopRotation(weapon);
-            DefaultRotation(weapon);
+            StopRotation(weapon);
+            //DefaultRotation(weapon);
             weapon.weaponController.isControlledByPlayer = false;
         }
     }
     private void HandleAIControl(Weapon weapon, Vector2? targetPosition, GameObject target)
     {
         weapon.weaponController.isControlledByPlayer = false;
-        if(targetPosition.HasValue)
+        if(target)
         {
             RotateToTarget(weapon, targetPosition.Value);
             weapon.weaponController.SetAction(true, target);
