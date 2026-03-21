@@ -256,6 +256,11 @@ public class Cone
         return bestHit.collider.gameObject;
     }
 
+    /// <summary>
+    /// Finds the closest GameObject from the provided list that is within the cone, regardless of visibility. Uses the closest point in the collider if available, otherwise uses the object's position.
+    /// </summary>
+    /// <param name="gameObjects"> The list of GameObjects to check against the cone.</param>
+    /// <returns></returns>
     public GameObject GetClosestObjectInCone(List<GameObject> gameObjects)
     {
         // Find an object that is in the cone and closest to the origin of the cone use closest point in collider if it has one, otherwise use the position of the object
@@ -269,6 +274,30 @@ public class Cone
             {
                 closestDistance = distance;
                 closestObject = obj;
+            }
+        }
+        return closestObject;
+    }
+
+    /// <summary>
+    /// Finds the closest position from the provided list that is within the cone. Uses the position directly since it's already a Vector2.
+    /// </summary>
+    /// <param name="positions">The list of positions to check against the cone.</param>
+    /// <returns></returns>
+    public Vector2? GetClosestPositionInCone(List<Vector2> positions)
+    {
+        // Find an object that is in the cone and closest to the origin of the cone use closest point in collider if it has one, otherwise use the position of the object
+        Vector2? closestObject = null;
+        float closestDistance = Mathf.Infinity;
+        foreach (Vector2 pos in positions)
+        {
+            if (!IsPositionInCone(pos)) continue;
+            
+            float distance = ((Vector2)pos - this.origin).magnitude;
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestObject = pos;
             }
         }
         return closestObject;

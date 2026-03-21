@@ -10,7 +10,6 @@ public class ActivateOnSpawn : MonoBehaviour
     // This method is intended to be overridden in derived classes
     public virtual void Activate()
     {
-        Debug.Log("ActivateOnSpawn activated for " + gameObject.name);
         if (OnSpawned != null)
         {
             OnSpawned(gameObject);

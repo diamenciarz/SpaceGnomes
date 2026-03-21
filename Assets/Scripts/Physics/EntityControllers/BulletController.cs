@@ -18,6 +18,7 @@ public class BulletController : ActivateOnSpawn
 
     public override void Activate()
     {
+        base.Activate();
         // Set initial velocity along forward direction (transform.up)
         rb.velocity = transform.up * initialVelocity;
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class ShipWeaponManager : MonoBehaviour
 {
@@ -43,38 +44,42 @@ public class ShipWeaponManager : MonoBehaviour
         {
             Cone rotationCone = weapon.rotator.GetRotationCone();
             bool mouseCursorVisible = IsMouseCursorVisible(rotationCone, visibleEnemies);
-            GameObject target = rotationCone.GetClosestObjectInCone(visibleEnemies);
-
             if (isControlledByPlayer || mouseCursorVisible)
             {
                 HandleMouseControl(weapon, mouseCursorVisible);
+                return;
             }
-            else
-            {
-                HandleAIControl(weapon, target);
-            }
+            List<Vector2> enemyPositions = visibleEnemies.Select(enemy => GetPredictedTargetPosition(weapon, enemy)).ToList();
+            Vector2? targetPosition = rotationCone.GetClosestPositionInCone(enemyPositions);
+            HandleAIControl(weapon, targetPosition);
         }
+    }
+    private bool IsMouseCursorVisible(Cone rotationCone, List<GameObject> visibleEnemies)
+    {
+        if (!visibleEnemies.Contains(EntityCounter.Instance.MouseCursor)) return false;
+        return rotationCone.IsObjectInCone(EntityCounter.Instance.MouseCursor);
     }
     private void HandleMouseControl(Weapon weapon, bool mouseCursorVisible)
     {
         if(mouseCursorVisible)
         {
-            RotateToTarget(weapon, EntityCounter.Instance.MouseCursor);
+            RotateToTarget(weapon, EntityCounter.Instance.MouseCursor.transform.position);
             weapon.weaponController.isControlledByPlayer = true;
+            //SetAction is handled by the player input, so we don't set it here
         }
         else
         {
-            StopRotation(weapon);
-            //DefaultRotation(weapon);
+            //StopRotation(weapon);
+            DefaultRotation(weapon);
             weapon.weaponController.isControlledByPlayer = false;
         }
     }
-    private void HandleAIControl(Weapon weapon, GameObject target)
+    private void HandleAIControl(Weapon weapon, Vector2? targetPosition)
     {
         weapon.weaponController.isControlledByPlayer = false;
-        if(target)
+        if(targetPosition.HasValue)
         {
-            RotateToTarget(weapon, target);
+            RotateToTarget(weapon, targetPosition.Value);
             weapon.weaponController.SetAction(true);
         }
         else
@@ -84,27 +89,24 @@ public class ShipWeaponManager : MonoBehaviour
             weapon.weaponController.SetAction(false);
         }
     }
-    private bool IsMouseCursorVisible(Cone rotationCone, List<GameObject> visibleEnemies)
+    private void RotateToTarget(Weapon weapon, Vector2 targetPosition)
     {
-        if (!visibleEnemies.Contains(EntityCounter.Instance.MouseCursor)) return false;
-        return rotationCone.IsObjectInCone(EntityCounter.Instance.MouseCursor);
+        weapon.rotator.SetTarget(targetPosition);
     }
-    private void RotateToTarget(Weapon weapon, GameObject target)
+    private Vector2 GetPredictedTargetPosition(Weapon weapon, GameObject target)
     {
         if (!predictTrajectories)
         {
-            weapon.rotator.SetTarget(target);
-            return;
+            return target.transform.position;
         }
         Trajectory targetTrajectory = target.GetComponent<Trajectory>();
         if (!targetTrajectory)
         {
-            weapon.rotator.SetTarget(target);
-            return;
+            return target.transform.position;
         }
         Vector2 shootingPoint = weapon.weaponController.GetShootingPointTransform().position;
         Vector2 hitPosition = GeometryUtils.CalculateTrajectoryHitCoordinates(targetTrajectory, shootingPoint, weapon.weaponController.GetProjectileSpeed());
-        weapon.rotator.SetTarget(hitPosition);
+        return hitPosition;
     }
     private void StopRotation(Weapon weapon)
     {
