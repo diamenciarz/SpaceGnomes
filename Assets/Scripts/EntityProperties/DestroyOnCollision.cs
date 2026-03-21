@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 
 [RequireComponent(typeof(Collider2D))]
+[RequireComponent(typeof(PooledObjectProperty))]
 public class DestroyOnCollision : MonoBehaviour
 {
     [SerializeField]
     [Tooltip("Ignores ally ships, projectiles, and missiles")] private bool ignoreAllies = false;
     [SerializeField] private List<HasEntityType.EntityType> targetEntityTypes = new List<HasEntityType.EntityType> { HasEntityType.EntityType.Ship, HasEntityType.EntityType.Wall };
-    [SerializeField] private string poolId = "PlasmaBullet"; // Pool ID for this object
 
+    private PooledObjectProperty pooledObjectProperty;
     private EntityTeam.Team myTeam;
     private bool isDestroyed = false;
-
     private void Start()
     {
+        pooledObjectProperty = GetComponent<PooledObjectProperty>();
         EntityTeam entityTeam = GetComponent<EntityTeam>();
         myTeam = entityTeam ? entityTeam.team : EntityTeam.Team.Neutral;
     }
@@ -36,7 +37,7 @@ public class DestroyOnCollision : MonoBehaviour
         {
             //Debug.Log(gameObject.name + " collided with " + other.gameObject.name);
             isDestroyed = true;
-            ObjectPoolManager.Instance.Despawn(gameObject, poolId);
+            ObjectPoolManager.Instance.Despawn(gameObject, pooledObjectProperty.poolId);
         }
     }
     private bool ShouldIgnoreAlly(Collider2D other, HasEntityType entityType)

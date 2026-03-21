@@ -2,13 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PooledObjectProperty))]
 public class DestroyAfterDelay : ActivateOnSpawn
 {
     [SerializeField] private float lifetime = 3f;
-    [SerializeField] private string poolId = ""; // Pool ID for this bullet
 
+    private PooledObjectProperty pooledObjectProperty;
     private float timer;
 
+    private void Awake()
+    {
+        pooledObjectProperty = GetComponent<PooledObjectProperty>();
+    }
     public override void Activate()
     {
         timer = 0f;
@@ -22,7 +27,7 @@ public class DestroyAfterDelay : ActivateOnSpawn
         if (timer >= lifetime)
         {
             Debug.Log("Despawning after delay: " + gameObject.name);
-            ObjectPoolManager.Instance.Despawn(gameObject, poolId);
+            ObjectPoolManager.Instance.Despawn(gameObject, pooledObjectProperty.poolId);
         }
     }
 }
