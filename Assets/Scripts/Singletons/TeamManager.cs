@@ -14,7 +14,22 @@ public class TeamManager : AbstractSingleton<TeamManager>
     {
         base.Awake(); // Call base singleton setup
     }
+    public void ChangeEntityTeam(GameObject entity, Team newTeam)
+    {
+        EntityTeam entityTeam = GetParentEntityTeam(entity);
+        entityTeam.SetTeam(newTeam);
+        GameObject entityParent = EntityCounter.Instance.GetEntityParent(entity);
+        SetEntityTexturesToTeamColor(entityParent, newTeam);
 
+    }
+    public void SetEntityTexturesToTeamColor(GameObject obj, Team team)
+    {
+        SpriteRenderer[] renderers = obj.GetComponentsInChildren<SpriteRenderer>();
+        foreach (SpriteRenderer renderer in renderers)
+        {
+            TeamSpriteHandler.Instance.UpdateSprite(renderer, team);
+        }
+    }
     public Team GetEntityTeam(GameObject entity)
     {
         Health hm = entity.GetComponent<Health>();

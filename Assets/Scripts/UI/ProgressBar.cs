@@ -48,13 +48,11 @@ public class ProgressBar : MonoBehaviour
     public void SetScale(float scale)
     {
         RectTransform rectTransform = GetComponent<RectTransform>();
-        Debug.Log($"ProgressBar: Setting scale to {scale}");
         rectTransform.localScale = new Vector3(scale, scale, scale);
     }
     public void SetProgress(float progress)
     {
         // Updating the progress does not necessarily make the bar visible
-        Debug.Log($"Set progress to {progress}");
         slider.value = progress;
         if(_showWhenUpdatingProgress && isDisappearing)
         {

@@ -78,28 +78,6 @@ public class CameraSensor : AbstractSensor
         return coneCache.Get();
     }
 
-    private bool DetectMouse(out GameObject mouseFollower)
-    {
-        if (!mouseCache.isCached)
-        {
-            bool detected = false;
-            GameObject follower = null;
-            if (detectMouse)
-            {
-                Vector2 mousePosition = GeometryUtils.GetMousePosition();
-                if (GetVisionCone().IsPositionInCone(mousePosition))
-                {
-                    follower = EntityCounter.Instance.MouseCursor;
-                    detected = true;
-                }
-            }
-            mouseCache.Set(new MouseResult { detected = detected, follower = follower });
-        }
-        MouseResult res = mouseCache.Get();
-        mouseFollower = res.follower;
-        return res.detected;
-    }
-
     public override List<GameObject> GetVisibleEnemies()
     {
         if (!visibleEnemiesCache.isCached)
@@ -174,5 +152,31 @@ public class CameraSensor : AbstractSensor
             closestObjectCache.Set(result);
         }
         return closestObjectCache.Get();
+    }
+    private bool DetectMouse(out GameObject mouseFollower)
+    {
+        if(team != EntityTeam.playerTeam)
+        {
+            mouseFollower = null;
+            return false; // Player's own camera sensor should not detect the mouse as an enemy
+        }
+        if (!mouseCache.isCached)
+        {
+            bool detected = false;
+            GameObject follower = null;
+            if (detectMouse)
+            {
+                Vector2 mousePosition = GeometryUtils.GetMousePosition();
+                if (GetVisionCone().IsPositionInCone(mousePosition))
+                {
+                    follower = EntityCounter.Instance.MouseCursor;
+                    detected = true;
+                }
+            }
+            mouseCache.Set(new MouseResult { detected = detected, follower = follower });
+        }
+        MouseResult res = mouseCache.Get();
+        mouseFollower = res.follower;
+        return res.detected;
     }
 }
