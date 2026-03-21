@@ -32,6 +32,17 @@ public class Rotator : MonoBehaviour
         usePosition = true;
     }
 
+    public void SetDefaultRotation()
+    {
+        targetPosition = GetDefaultRotationPosition();
+        usePosition = true;
+    }
+    private Vector2 GetDefaultRotationPosition()
+    {
+        // Calculate a position that would make the rotator face its default rotation (0 degrees)
+        return rotator.position + transform.right; // 10 units in the default direction
+    }
+
     public void StopTargeting()
     {
         targetObject = null;

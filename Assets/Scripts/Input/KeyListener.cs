@@ -21,17 +21,17 @@ public class KeyListener : MonoBehaviour
 
     [SerializeField] private List<KeyActionPair> keyBindings = new List<KeyActionPair>();
     private Dictionary<KeyCode, ShipAction> keyActionMap = new Dictionary<KeyCode, ShipAction>();
-    private Dictionary<ShipAction, List<AbstractWeaponController>> actionControllers = new Dictionary<ShipAction, List<AbstractWeaponController>>();
+    private Dictionary<ShipAction, List<AbstractActionController>> actionControllers = new Dictionary<ShipAction, List<AbstractActionController>>();
 
     private void Awake()
     {
         // Find all IWeaponController components in children
-        AbstractWeaponController[] weaponControllers = GetComponentsInChildren<AbstractWeaponController>();
+        AbstractActionController[] weaponControllers = GetComponentsInChildren<AbstractActionController>();
 
         // Initialize actionControllers dictionary
         foreach (ShipAction action in Enum.GetValues(typeof(ShipAction)))
         {
-            actionControllers[action] = new List<AbstractWeaponController>();
+            actionControllers[action] = new List<AbstractActionController>();
         }
 
         // Map controllers to their action types
@@ -82,9 +82,9 @@ public class KeyListener : MonoBehaviour
         {
             if (actionControllers.ContainsKey(action.Key))
             {
-                foreach (var controller in actionControllers[action.Key])
+                foreach (AbstractActionController controller in actionControllers[action.Key])
                 {
-                    controller.SetAction(action.Value);
+                    if(controller.isControlledByPlayer) controller.SetAction(action.Value);
                 }
             }
         }
