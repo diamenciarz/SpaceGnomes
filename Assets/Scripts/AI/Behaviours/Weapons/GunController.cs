@@ -16,6 +16,7 @@ public class GunController : AbstractWeaponController
     private float replenishTimer;
     private float fireTimer;
     private bool isShooting;
+    private GameObject optionalTarget;
 
     public override ShipAction GetActionType() => activateOn;
     public override Transform GetShootingPointTransform() => firePoint;
@@ -64,9 +65,10 @@ public class GunController : AbstractWeaponController
     }
 
 
-    public override void SetAction(bool isShooting)
+    public override void SetAction(bool isShooting, GameObject optionalTarget)
     {
         this.isShooting = isShooting;
+        this.optionalTarget = optionalTarget;
     }
 
     private bool CanShoot()

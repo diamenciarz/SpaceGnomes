@@ -51,7 +51,9 @@ public class ShipWeaponManager : MonoBehaviour
             }
             List<Vector2> enemyPositions = visibleEnemies.Select(enemy => GetPredictedTargetPosition(weapon, enemy)).ToList();
             Vector2? targetPosition = rotationCone.GetClosestPositionInCone(enemyPositions);
-            HandleAIControl(weapon, targetPosition);
+            int targetIndex = enemyPositions.FindIndex(pos => pos == targetPosition);
+            GameObject target = targetIndex != -1 ? visibleEnemies[targetIndex] : null;
+            HandleAIControl(weapon, targetPosition, target);
         }
     }
     private bool IsMouseCursorVisible(Cone rotationCone, List<GameObject> visibleEnemies)
@@ -74,19 +76,19 @@ public class ShipWeaponManager : MonoBehaviour
             weapon.weaponController.isControlledByPlayer = false;
         }
     }
-    private void HandleAIControl(Weapon weapon, Vector2? targetPosition)
+    private void HandleAIControl(Weapon weapon, Vector2? targetPosition, GameObject target)
     {
         weapon.weaponController.isControlledByPlayer = false;
         if(targetPosition.HasValue)
         {
             RotateToTarget(weapon, targetPosition.Value);
-            weapon.weaponController.SetAction(true);
+            weapon.weaponController.SetAction(true, target);
         }
         else
         {
             StopRotation(weapon);
             //DefaultRotation(weapon); // Not sure if this is necessary, it will make the weapon point in a default direction when there are no targets, which might look weird
-            weapon.weaponController.SetAction(false);
+            weapon.weaponController.SetAction(false, null);
         }
     }
     private void RotateToTarget(Weapon weapon, Vector2 targetPosition)
@@ -111,11 +113,11 @@ public class ShipWeaponManager : MonoBehaviour
     private void StopRotation(Weapon weapon)
     {
         weapon.rotator.StopTargeting();
-        weapon.weaponController.SetAction(false);
+        weapon.weaponController.SetAction(false, null);
     }
     private void DefaultRotation(Weapon weapon)
     {
         weapon.rotator.SetDefaultRotation();
-        weapon.weaponController.SetAction(false);
+        weapon.weaponController.SetAction(false, null);
     }
 }

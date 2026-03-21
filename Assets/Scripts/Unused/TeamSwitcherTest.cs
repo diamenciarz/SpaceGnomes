@@ -14,7 +14,7 @@ public class TeamSwitcherTest : AbstractActionController
         return ShipAction.ShootUltimate;
     }
 
-    public override void SetAction(bool isOn)
+    public override void SetAction(bool isOn, GameObject optionalTarget)
     {
         if (isOn)
         {

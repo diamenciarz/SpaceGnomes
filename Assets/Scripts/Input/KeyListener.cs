@@ -84,7 +84,7 @@ public class KeyListener : MonoBehaviour
             {
                 foreach (AbstractActionController controller in actionControllers[action.Key])
                 {
-                    if(controller.isControlledByPlayer) controller.SetAction(action.Value);
+                    if(controller.isControlledByPlayer) controller.SetAction(action.Value, null);
                 }
             }
         }
