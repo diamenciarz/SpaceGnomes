@@ -90,20 +90,19 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
         obj = pool.Dequeue();
         return ActivateObject(obj, position, rotation);
     }
-    public float GetInitialObjectSpeed(string poolId)
+    public Func<float, float> GetObjectSpeed(string poolId)
     {
         configMap.TryGetValue(poolId, out PoolConfig config);
         if (config == null) throw new Exception($"No pool config found for ID: {poolId}");
-        return GetInitialObjectSpeed(config.prefab);
+        return GetObjectSpeed(config.prefab);
     }
-    public float GetInitialObjectSpeed(GameObject obj)
+    public Func<float, float> GetObjectSpeed(GameObject obj)
     {
-        BulletController bulletController = obj.GetComponent<BulletController>();
-        if (bulletController != null) return bulletController.InitialVelocity;
+        AutonomousMovementController bulletController = obj.GetComponent<AutonomousMovementController>();
+        if (bulletController != null) return bulletController.VelocityFunction;
 
         // Handle other cases as needed
-
-        return 0;
+        return ((float a) => 0);
     }
     private GameObject ActivateObject(GameObject obj, Vector3 position, Quaternion rotation)
     {

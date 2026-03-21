@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GunController : AbstractWeaponController
@@ -18,7 +19,7 @@ public class GunController : AbstractWeaponController
 
     public override ShipAction GetActionType() => activateOn;
     public override Transform GetShootingPointTransform() => firePoint;
-    public override float GetProjectileSpeed() => ObjectPoolManager.Instance.GetInitialObjectSpeed(bulletPoolId);
+    public override Func<float, float> GetProjectileSpeed() => ObjectPoolManager.Instance.GetObjectSpeed(bulletPoolId);
 
     private void Start()
     {

@@ -1,14 +1,14 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class BulletController : ActivateOnSpawn
-// Consider making this into a generic forward movement controller
+public class StraightLineMovementController : AutonomousMovementController
 {
     [SerializeField] private float initialVelocity = 20f;
 
+    public new Func<float, float> VelocityFunction => GetVelocityAtTime;
+    
     private Rigidbody2D rb;
-
-    public float InitialVelocity => initialVelocity;
 
     private void Awake()
     {
@@ -23,5 +23,9 @@ public class BulletController : ActivateOnSpawn
         rb.velocity = transform.up * initialVelocity;
     }
 
-
+    private float GetVelocityAtTime(float time)
+    {
+        // For a simple bullet, velocity is constant, so we ignore time
+        return initialVelocity;
+    }
 }
