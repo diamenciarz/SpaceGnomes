@@ -414,4 +414,17 @@ public class Cone
         float angleToTarget = Vector2.Angle(this.direction, toTarget);
         return angleToTarget < this.angle / 2;
     }
+    public void DebugDisplayCone(Color color)
+    {
+        // DrawRays with RAYS_PER_DEGREE spacing
+        int rayCount = Mathf.CeilToInt(this.angle * RAYS_PER_DEGREE);
+        Debug.Log($"Drawing {rayCount} rays given angle {angle}");
+        for (int i = 0; i < rayCount; i++)
+        {
+            float angle = this.zMiddleAngle - this.angle/2 + (i*(1/RAYS_PER_DEGREE));
+            Vector2 direction = GeometryUtils.AngleToDirectionVector(angle);
+            float radius = maxDistance != Mathf.Infinity ? maxDistance : 10;
+            Debug.DrawRay(this.origin, direction * radius, color);
+        }
+    }
 }
