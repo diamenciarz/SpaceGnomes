@@ -65,6 +65,7 @@ public class UIManager : AbstractSingleton<UIManager>
         if (PrefabByType == null) PrefabByType = new Dictionary<UITypes, GameObject>();
         BuildPrefabMap();
     }
+    private const float DEFAULT_CAMERA_SIZE = 10f;
     /// <summary>
     /// Compatibility wrapper for existing code that used the old FOV-specific factory.
     /// Calls the new generic InstantiateUI and returns the ProgressBar component when available.
@@ -73,14 +74,13 @@ public class UIManager : AbstractSingleton<UIManager>
     {
         GameObject go = InstantiateUI(UITypes.FieldOfView, followObj, radius, arc, 360f, rotateWithParent, deltaAngle);
         if (go == null) return null;
-        Debug.Log($"Instantiated Field of View UI element: {go.name}");
+        go.transform.localScale = go.transform.localScale * (DEFAULT_CAMERA_SIZE / Camera.main.orthographicSize);
         return go.GetComponent<ProgressBar>();
     }
     public void DestroyFieldOfView(GameObject fovObj)
     {
         if (fovObj == null) Debug.LogError("UIManager: Attempted to destroy null FOV object!");
         RemoveFromCache(UITypes.FieldOfView, fovObj);
-        Debug.Log($"Destroying Field of View UI element: {fovObj.name}");
         Destroy(fovObj);
     }
     public ProgressBar InstantiateHealthBar(GameObject followObj, float scale, float maxHealth)
