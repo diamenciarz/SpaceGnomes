@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static TeamUpdater;
 
 public class ObjectMissingIcon : MonoBehaviour
 {
@@ -24,7 +23,7 @@ public class ObjectMissingIcon : MonoBehaviour
     private GameObject objectToFollow;
     private Camera mainCamera;
     private SpriteRenderer[] mySpriteRenderers;
-    private Team followedObjectTeam;
+    private EntityTeam followedObjectTeam;
     private bool isVisible = true;
     private bool isDestroyed = false;
 
@@ -39,17 +38,7 @@ public class ObjectMissingIcon : MonoBehaviour
     {
         mySpriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         mainCamera = Camera.main;
-        followedObjectTeam = GetFollowedObjectTeam();
-    }
-    private Team GetFollowedObjectTeam()
-    {
-        ITeamable teamable = objectToFollow.GetComponent<ITeamable>();
-        if (teamable == null)
-        {
-            Debug.LogError("Followed object does not have a team");
-            return null;
-        }
-        return teamable.GetTeam();
+        followedObjectTeam = TeamManager.Instance.GetParentEntityTeam(objectToFollow);
     }
     #endregion
 
@@ -68,17 +57,17 @@ public class ObjectMissingIcon : MonoBehaviour
         {
             return;
         }
-        if (followedObjectTeam.teamInstance == TeamInstance.Team1)
+        if (TeamManager.Instance.IsAlly(followedObjectTeam.team, EntityTeam.playerTeam))
         {
             GetComponent<SpriteRenderer>().color = allyColor;
             return;
         }
-        if (followedObjectTeam.IsEnemy(new Team(TeamInstance.Team1)))
+        if (TeamManager.Instance.IsEnemy(followedObjectTeam.team, EntityTeam.playerTeam))
         {
             GetComponent<SpriteRenderer>().color = enemyColor;
             return;
         }
-        if (followedObjectTeam.IsNeutral(new Team(TeamInstance.Team1)))
+        if (followedObjectTeam.team == EntityTeam.Team.Neutral)
         {
             GetComponent<SpriteRenderer>().color = neutralColor;
             return;
@@ -126,7 +115,7 @@ public class ObjectMissingIcon : MonoBehaviour
     }
     private void UpdatePosition()
     {
-        Vector2 newPosition = CameraInformation.ClampPositionOnScreen(objectToFollow.transform.position, screenEdgeOffset);
+        Vector2 newPosition = CameraInformation.Instance.ClampPositionOnScreen(objectToFollow.transform.position, screenEdgeOffset);
         transform.position = new Vector3(newPosition.x, newPosition.y, 1);
     }
     private void UpdateScale()
@@ -147,7 +136,7 @@ public class ObjectMissingIcon : MonoBehaviour
         {
             return;
         }
-        if (CameraInformation.IsPositionOnScreen(objectToFollow.transform.position, screenEdgeOffset))
+        if (CameraInformation.Instance.IsPositionOnScreen(objectToFollow.transform.position, screenEdgeOffset))
         {
             SetSpriteVisibility(false);
             return;
