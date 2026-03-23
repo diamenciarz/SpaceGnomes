@@ -5,13 +5,13 @@ using UnityEngine;
 public class DebrisGenerator : MonoBehaviour, ISerializationCallbackReceiver
 {
     [Header("Instances")]
-    [SerializeField] List<string> objectsToGenerate;
-    [SerializeField] List<float> weights;
-    [SerializeField] List<float> maxVelocities;
-    [SerializeField] int OBSTACLE_LIMIT = 100;
+    [SerializeField] List<string> objectsToGenerate = new List<string>();
+    [SerializeField] List<float> weights = new List<float>();
+    [SerializeField] List<float> maxVelocities = new List<float>();
+    [SerializeField][Tooltip("The maximum number of space debris on the map before new debris stops generating")] int DEBRIS_MAP_LIMIT = 100;
 
     [Header("Generation settings")]
-    [SerializeField] float delay = 10;
+    [SerializeField][Tooltip("Time between consecutive debris generations")] float delay = 10;
     [SerializeField][Range(0, 10)][Tooltip("The minimum number of objects generated after each delay")] int minGeneratedObjects = 2;
     [SerializeField][Range(1, 20)][Tooltip("The maximum number of objects generated after each delay")] int maxGeneratedObjects = 5;
     [Header("Generated coordinate settings")]
@@ -40,7 +40,7 @@ public class DebrisGenerator : MonoBehaviour, ISerializationCallbackReceiver
     }
     private void GenerateRandomObj()
     {
-        if (EntityCounter.Instance.GetEntities(EntityTypeProperty.EntityType.SpaceDebris).Count > OBSTACLE_LIMIT)
+        if (EntityCounter.Instance.GetEntities(EntityTypeProperty.EntityType.SpaceDebris).Count > DEBRIS_MAP_LIMIT)
         {
             return;
         }
