@@ -27,4 +27,4 @@ MonoBehaviour:
   debugCollisions: 0
   debugMovementVectors: 1
   debugConsideredDistances: 0
-  slowdownDistance: 6
+  slowdownDistance: 7

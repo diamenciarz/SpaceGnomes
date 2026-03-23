@@ -6,12 +6,12 @@ using UnityEngine;
 public class TailEntityBehavior : MovementBehavior
 {
     [Header("Tail Entity Settings")]
-    [SerializeField][Range(1f, 20f)][Tooltip("Will start slowing down if going too fast within this distance of target (tail) position. [Must be greater than stopChaseRange]")]
+    [SerializeField][Range(1f, 20f)][Tooltip("Will start slowing down if going too fast within this distance of target (tail) position. [Must be greater than stopChaseRange + 0.1]")]
     float slowdownDistance = 2f;
     protected override void OnValidate()
     {
         base.OnValidate();
-        if (slowdownDistance < stopChaseRange) slowdownDistance = stopChaseRange;
+        if (slowdownDistance < stopChaseRange+0.1f) slowdownDistance = stopChaseRange+0.1f;
     }
     protected override Vector2 CalculateChaseVector(MovementBehaviorData data)
     {
