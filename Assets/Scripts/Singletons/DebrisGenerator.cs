@@ -6,8 +6,9 @@ public class DebrisGenerator : MonoBehaviour, ISerializationCallbackReceiver
 {
     [Header("Instances")]
     [SerializeField] List<string> objectsToGenerate;
-    [SerializeField] List<int> weights;
+    [SerializeField] List<float> weights;
     [SerializeField] List<float> maxVelocities;
+    [SerializeField] int OBSTACLE_LIMIT = 100;
 
     [Header("Generation settings")]
     [SerializeField] float delay = 10;
@@ -39,7 +40,7 @@ public class DebrisGenerator : MonoBehaviour, ISerializationCallbackReceiver
     }
     private void GenerateRandomObj()
     {
-        if (StaticDataHolder.listDictionary[StaticDataHolder.ObjectTypes.Obstacle].Count > StaticDataHolder.OBSTACLE_LIMIT)
+        if (EntityCounter.Instance.GetEntities(EntityTypeProperty.EntityType.SpaceDebris).Count > OBSTACLE_LIMIT)
         {
             return;
         }
@@ -52,8 +53,8 @@ public class DebrisGenerator : MonoBehaviour, ISerializationCallbackReceiver
     enum GenerationSide { Top, Bottom, Left, Right }
     private GenerationSide GetRandomSide()
     {
-        float sum = StaticMapInformation.mapWidth + StaticMapInformation.mapHeight;
-        bool generateFromCeil = Random.Range(0f, sum) > StaticMapInformation.mapWidth;
+        float sum = MapInformation.Instance.mapWidth + MapInformation.Instance.mapHeight;
+        bool generateFromCeil = Random.Range(0f, sum) > MapInformation.Instance.mapWidth;
         if (generateFromCeil)
         {
             if (Random.Range(0, 2) == 0) return GenerationSide.Top;
@@ -69,24 +70,24 @@ public class DebrisGenerator : MonoBehaviour, ISerializationCallbackReceiver
     {
         if(side == GenerationSide.Top)
         {
-            return StaticMapInformation.GetMapPercentagePosition(Random.Range(0, 1f), 1) + new Vector2(0, outOfMapOffset);
+            return MapInformation.Instance.GetMapPercentagePosition(Random.Range(0, 1f), 1) + new Vector2(0, outOfMapOffset);
         }
         else if(side == GenerationSide.Bottom)
         {
-            return StaticMapInformation.GetMapPercentagePosition(Random.Range(0, 1f), 0) - new Vector2(0, outOfMapOffset);
+            return MapInformation.Instance.GetMapPercentagePosition(Random.Range(0, 1f), 0) - new Vector2(0, outOfMapOffset);
         }
         else if(side == GenerationSide.Right)
         {
-            return StaticMapInformation.GetMapPercentagePosition(1, Random.Range(0, 1f)) + new Vector2(outOfMapOffset, 0);
+            return MapInformation.Instance.GetMapPercentagePosition(1, Random.Range(0, 1f)) + new Vector2(outOfMapOffset, 0);
         }
         else // Left
         {
-            return StaticMapInformation.GetMapPercentagePosition(0, Random.Range(0, 1f)) - new Vector2(outOfMapOffset, 0);
+            return MapInformation.Instance.GetMapPercentagePosition(0, Random.Range(0, 1f)) - new Vector2(outOfMapOffset, 0);
         }
     }
-    private float GetRandomDirection(GenerationSide side)
+    private Quaternion GetRandomDirection(GenerationSide side)
     {
-        float defaultDirection = GetDefaultDirection();
+        float defaultDirection = GetDefaultDirection(side);
         return Quaternion.Euler(0, 0, Random.Range(defaultDirection - generatedAngleSpread, defaultDirection + generatedAngleSpread));
     }
     private float GetDefaultDirection(GenerationSide side)

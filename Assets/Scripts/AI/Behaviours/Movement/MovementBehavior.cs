@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static GeometryUtils;
-using static EntityType;
+using static EntityTypeProperty;
 
 public abstract class MovementBehavior : ScriptableObject
 {
@@ -38,9 +38,9 @@ public abstract class MovementBehavior : ScriptableObject
     [SerializeField][Range(1f, 5f)] protected float avoidCollisionLookaheadTime = 2f;
 
     [Header("Instances")]
-    [SerializeField] protected List<EntityType.EntityType> chaseEntityTypes;
-    [SerializeField] protected List<EntityType.EntityType> avoidEntityTypes;
-    [SerializeField] protected List<EntityType.EntityType> retreatFromEntityTypes;
+    [SerializeField] protected List<EntityTypeProperty.EntityType> chaseEntityTypes;
+    [SerializeField] protected List<EntityTypeProperty.EntityType> avoidEntityTypes;
+    [SerializeField] protected List<EntityTypeProperty.EntityType> retreatFromEntityTypes;
 
     [Header("Debugging Settings")]
     [SerializeField] protected bool debugCollisions = false;

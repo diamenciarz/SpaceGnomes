@@ -5,7 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static GeometryUtils;
-using static EntityType;
+using static EntityTypeProperty;
 
 [RequireComponent(typeof(EntityTeam))]
 [RequireComponent(typeof(Rigidbody2D))]

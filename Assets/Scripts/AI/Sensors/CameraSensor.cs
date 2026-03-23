@@ -11,7 +11,7 @@ public class CameraSensor : AbstractSensor
     [SerializeField] private float range = 10f;
     [SerializeField] [Tooltip("Angle of vision in degrees")] private float fov = 60f;
     [Header("Sense Types")]
-    [SerializeField] EntityType.EntityType[] detectTypes;
+    [SerializeField] EntityTypeProperty.EntityType[] detectTypes;
     [SerializeField] bool detectMouse = false;
     [Header("Instances")]
     [SerializeField] Transform sensorViewPoint;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.SearchService;
 using UnityEngine;
-using static EntityType;
 using static UnityEngine.EventSystems.EventTrigger;
 
 public class EntityCounter : AbstractSingleton<EntityCounter>
@@ -38,10 +37,10 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
         base.Awake(); // Call base singleton setup
 
         // Initialize trackers for all entity types
-        trackers[typeof(EntityType.EntityType)] = new Dictionary<int, EntityTracker>();
-        foreach (EntityType.EntityType type in System.Enum.GetValues(typeof(EntityType.EntityType)))
+        trackers[typeof(EntityTypeProperty.EntityType)] = new Dictionary<int, EntityTracker>();
+        foreach (EntityTypeProperty.EntityType type in System.Enum.GetValues(typeof(EntityTypeProperty.EntityType)))
         {
-            trackers[typeof(EntityType.EntityType)][(int)type] = new EntityTracker();
+            trackers[typeof(EntityTypeProperty.EntityType)][(int)type] = new EntityTracker();
         }
 
         // Initialize trackers for all force types
@@ -116,10 +115,10 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
     // Call this when an entity moves to update its spatial bucket
     public void UpdateEntityPosition(GameObject obj)
     {
-        EntityType hasEntityType = obj.GetComponent<EntityType>();
+        EntityTypeProperty hasEntityType = obj.GetComponent<EntityTypeProperty>();
         if (hasEntityType != null)
         {
-            UpdatePosition(obj, typeof(EntityType.EntityType), (int)hasEntityType.Type);
+            UpdatePosition(obj, typeof(EntityTypeProperty.EntityType), (int)hasEntityType.Type);
         }
 
         // Also update force position if applicable
@@ -188,10 +187,10 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
 
     public void RegisterEntity(GameObject obj)
     {
-        EntityType hasEntityType = obj.GetComponent<EntityType>();
+        EntityTypeProperty hasEntityType = obj.GetComponent<EntityTypeProperty>();
         if (hasEntityType != null)
         {
-            Register(obj, typeof(EntityType.EntityType), (int)hasEntityType.Type);
+            Register(obj, typeof(EntityTypeProperty.EntityType), (int)hasEntityType.Type);
         }
         else
         {
@@ -206,10 +205,10 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
 
     public void UnregisterEntity(GameObject obj)
     {
-        EntityType hasEntityType = obj.GetComponent<EntityType>();
+        EntityTypeProperty hasEntityType = obj.GetComponent<EntityTypeProperty>();
         if (hasEntityType != null)
         {
-            Unregister(obj, typeof(EntityType.EntityType), (int)hasEntityType.Type);
+            Unregister(obj, typeof(EntityTypeProperty.EntityType), (int)hasEntityType.Type);
         }
         else
         {
@@ -228,24 +227,24 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
     //    UpdatePosition(obj, typeof(ForceManager.ForceType), (int)type);
     //}
 
-    public List<GameObject> GetEntities(EntityType.EntityType type)
+    public List<GameObject> GetEntities(EntityTypeProperty.EntityType type)
     {
-        return new List<GameObject>(trackers[typeof(EntityType.EntityType)][(int)type].AllEntities);
+        return new List<GameObject>(trackers[typeof(EntityTypeProperty.EntityType)][(int)type].AllEntities);
     }
 
-    public List<GameObject> GetNearbyEntities(Vector2 center, List<EntityType.EntityType> types, float radius)
+    public List<GameObject> GetNearbyEntities(Vector2 center, List<EntityTypeProperty.EntityType> types, float radius)
     {
         List<GameObject> entities = new List<GameObject>();
-        foreach (EntityType.EntityType type in types)
+        foreach (EntityTypeProperty.EntityType type in types)
         {
-            entities.AddRange(GetNearby(typeof(EntityType.EntityType), (int)type, center, radius));
+            entities.AddRange(GetNearby(typeof(EntityTypeProperty.EntityType), (int)type, center, radius));
         }
         return entities;
     }
     // New: Get entities of type within radius of center (2D circle query)
-    public List<GameObject> GetNearbyEntities(EntityType.EntityType type, Vector2 center, float radius)
+    public List<GameObject> GetNearbyEntities(EntityTypeProperty.EntityType type, Vector2 center, float radius)
     {
-        return GetNearby(typeof(EntityType.EntityType), (int)type, center, radius);
+        return GetNearby(typeof(EntityTypeProperty.EntityType), (int)type, center, radius);
     }
 
     public List<GameObject> GetNearbyForceEntities(ForceManager.ForceType type, Vector2 center, float radius)
@@ -254,7 +253,7 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
     }
 
     // Updated: Use spatial query for closest (more efficient)
-    public GameObject FindClosestEntity(EntityType.EntityType type, Vector3 position)
+    public GameObject FindClosestEntity(EntityTypeProperty.EntityType type, Vector3 position)
     {
         Vector2 pos2D = new Vector2(position.x, position.y);
         float minDist = float.MaxValue;
@@ -275,7 +274,7 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
         // Fallback to full scan if no nearby (rare)
         if (closest == null)
         {
-            closest = GeometryUtils.FindClosestEntityToPosition(trackers[typeof(EntityType.EntityType)][(int)type].AllEntities, position);
+            closest = GeometryUtils.FindClosestEntityToPosition(trackers[typeof(EntityTypeProperty.EntityType)][(int)type].AllEntities, position);
         }
 
         return closest;
@@ -284,12 +283,12 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
     /// <summary>
     /// Keeps only objects with HasEntityType script attached whose type is in the list
     /// </summary>
-    public List<GameObject> FilterEntityTypes(List<GameObject> entities, List<EntityType.EntityType> entityTypes)
+    public List<GameObject> FilterEntityTypes(List<GameObject> entities, List<EntityTypeProperty.EntityType> entityTypes)
     {
         List<GameObject> filteredObjects = new List<GameObject>();
         foreach (GameObject obj in entities)
         {
-            EntityType entityTypeComponent = obj.GetComponent<EntityType>();
+            EntityTypeProperty entityTypeComponent = obj.GetComponent<EntityTypeProperty>();
             if (entityTypeComponent == null) continue;
             if (entityTypes.Contains(entityTypeComponent.Type)) 
             {

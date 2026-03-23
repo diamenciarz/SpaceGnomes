@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static EntityTeam;
-using static EntityType;
 using static UnityEngine.EventSystems.EventTrigger;
 
 public class TeamManager : AbstractSingleton<TeamManager>
@@ -87,17 +86,17 @@ public class TeamManager : AbstractSingleton<TeamManager>
         return myTeam != otherTeam;
     }
 
-    public List<GameObject> GetNearbyEntitiesInTeam(List<EntityType.EntityType> types, Vector2 center, float radius, Team team)
+    public List<GameObject> GetNearbyEntitiesInTeam(List<EntityTypeProperty.EntityType> types, Vector2 center, float radius, Team team)
     {
         List<GameObject> entitiesInTeam = new List<GameObject>();
-        foreach (EntityType.EntityType type in types)
+        foreach (EntityTypeProperty.EntityType type in types)
         {
             entitiesInTeam.AddRange(GetNearbyEntitiesInTeam(type, center, radius, team));
         }
         return entitiesInTeam;
     }
     
-    public List<GameObject> GetNearbyEntitiesInTeam(EntityType.EntityType type, Vector2 center, float radius, Team team)
+    public List<GameObject> GetNearbyEntitiesInTeam(EntityTypeProperty.EntityType type, Vector2 center, float radius, Team team)
     {
         List<GameObject> entitiesInTeam = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
@@ -109,17 +108,17 @@ public class TeamManager : AbstractSingleton<TeamManager>
         }
         return entitiesInTeam;
     }
-    public List<GameObject> GetNearbyEntitiesInTeams(List<EntityType.EntityType> types, Vector2 center, float radius, List<Team> teams)
+    public List<GameObject> GetNearbyEntitiesInTeams(List<EntityTypeProperty.EntityType> types, Vector2 center, float radius, List<Team> teams)
     {
         List<GameObject> entitiesInTeam = new List<GameObject>();
-        foreach (EntityType.EntityType type in types)
+        foreach (EntityTypeProperty.EntityType type in types)
         {
             entitiesInTeam.AddRange(GetNearbyEntitiesInTeams(type, center, radius, teams));
         }
         return entitiesInTeam;
     }
 
-    public List<GameObject> GetNearbyEntitiesInTeams(EntityType.EntityType type, Vector2 center, float radius, List<Team> teams)
+    public List<GameObject> GetNearbyEntitiesInTeams(EntityTypeProperty.EntityType type, Vector2 center, float radius, List<Team> teams)
     {
         List<GameObject> entitiesInTeam = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
@@ -131,17 +130,17 @@ public class TeamManager : AbstractSingleton<TeamManager>
         }
         return entitiesInTeam;
     }
-    public List<GameObject> GetEntitiesInTeam(List<EntityType.EntityType> types, Team team)
+    public List<GameObject> GetEntitiesInTeam(List<EntityTypeProperty.EntityType> types, Team team)
     {
         List<GameObject> entitiesInTeam = new List<GameObject>();
-        foreach (EntityType.EntityType type in types)
+        foreach (EntityTypeProperty.EntityType type in types)
         {
             entitiesInTeam.AddRange(GetEntitiesInTeam(type, team));
         }
         return entitiesInTeam;
     }
 
-    public List<GameObject> GetEntitiesInTeam(EntityType.EntityType type, Team team)
+    public List<GameObject> GetEntitiesInTeam(EntityTypeProperty.EntityType type, Team team)
     {
         List<GameObject> entitiesInTeam = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))
@@ -154,17 +153,17 @@ public class TeamManager : AbstractSingleton<TeamManager>
         return entitiesInTeam;
     }
 
-    public List<GameObject> GetNearbyAllies(Vector2 center, Team myTeam, List<EntityType.EntityType> types,  float radius)
+    public List<GameObject> GetNearbyAllies(Vector2 center, Team myTeam, List<EntityTypeProperty.EntityType> types,  float radius)
     {
         List<GameObject> allies = new List<GameObject>();
-        foreach (EntityType.EntityType type in types)
+        foreach (EntityTypeProperty.EntityType type in types)
         {
             allies.AddRange(GetNearbyAllies(center, myTeam, type, radius));
         }
         return allies;
     }
 
-    public List<GameObject> GetNearbyAllies(Vector2 center, Team myTeam, EntityType.EntityType type,  float radius)
+    public List<GameObject> GetNearbyAllies(Vector2 center, Team myTeam, EntityTypeProperty.EntityType type,  float radius)
     {
         List<GameObject> allies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
@@ -177,17 +176,17 @@ public class TeamManager : AbstractSingleton<TeamManager>
         return allies;
     }
 
-    public List<GameObject> GetNearbyEnemies(Vector2 center, Team myTeam, List<EntityType.EntityType> types, float radius)
+    public List<GameObject> GetNearbyEnemies(Vector2 center, Team myTeam, List<EntityTypeProperty.EntityType> types, float radius)
     {
         List<GameObject> enemies = new List<GameObject>();
-        foreach (EntityType.EntityType type in types)
+        foreach (EntityTypeProperty.EntityType type in types)
         {
             enemies.AddRange(GetNearbyEnemies(center, myTeam, type, radius));
         }
         return enemies;
     }
 
-    public List<GameObject> GetNearbyEnemies(Vector2 center, Team myTeam, EntityType.EntityType type, float radius)
+    public List<GameObject> GetNearbyEnemies(Vector2 center, Team myTeam, EntityTypeProperty.EntityType type, float radius)
     {
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetNearbyEntities(type, center, radius))
@@ -200,17 +199,17 @@ public class TeamManager : AbstractSingleton<TeamManager>
         return enemies;
     }
 
-    public List<GameObject> GetAllies(EntityType.EntityType[] types, Team myTeam)
+    public List<GameObject> GetAllies(EntityTypeProperty.EntityType[] types, Team myTeam)
     {
         List<GameObject> allies = new List<GameObject>();
-        foreach (EntityType.EntityType type in types)
+        foreach (EntityTypeProperty.EntityType type in types)
         {
             allies.AddRange(GetAllies(type, myTeam));
         }
         return allies;
     }
 
-    public List<GameObject> GetAllies(EntityType.EntityType type, Team myTeam)
+    public List<GameObject> GetAllies(EntityTypeProperty.EntityType type, Team myTeam)
     {
         List<GameObject> allies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))
@@ -223,17 +222,17 @@ public class TeamManager : AbstractSingleton<TeamManager>
         return allies;
     }
 
-    public List<GameObject> GetEnemies(EntityType.EntityType[] types, Team myTeam)
+    public List<GameObject> GetEnemies(EntityTypeProperty.EntityType[] types, Team myTeam)
     {
         List<GameObject> enemies = new List<GameObject>();
-        foreach (EntityType.EntityType type in types)
+        foreach (EntityTypeProperty.EntityType type in types)
         {
             enemies.AddRange(GetEnemies(type, myTeam));
         }
         return enemies;
     }
 
-    public List<GameObject> GetEnemies(EntityType.EntityType type, Team myTeam)
+    public List<GameObject> GetEnemies(EntityTypeProperty.EntityType type, Team myTeam)
     {
         List<GameObject> enemies = new List<GameObject>();
         foreach (GameObject entity in EntityCounter.Instance.GetEntities(type))

@@ -11,7 +11,7 @@ public class DestroyOnCollision : MonoBehaviour
 {
     [SerializeField]
     [Tooltip("Ignores ally ships, projectiles, and missiles")] private bool ignoreAllies = false;
-    [SerializeField] private List<EntityType.EntityType> targetEntityTypes = new List<EntityType.EntityType> { EntityType.EntityType.Ship, EntityType.EntityType.Wall };
+    [SerializeField] private List<EntityTypeProperty.EntityType> targetEntityTypes = new List<EntityTypeProperty.EntityType> { EntityTypeProperty.EntityType.Ship, EntityTypeProperty.EntityType.Wall };
 
     private PooledObjectProperty pooledObjectProperty;
     private EntityTeam.Team myTeam;
@@ -29,7 +29,7 @@ public class DestroyOnCollision : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (isDestroyed) return;
-        EntityType entityType = other.GetComponent<EntityType>();
+        EntityTypeProperty entityType = other.GetComponent<EntityTypeProperty>();
         if (!entityType) return;
 
         if (ShouldIgnoreAlly(other, entityType))
@@ -48,7 +48,7 @@ public class DestroyOnCollision : MonoBehaviour
             ObjectPoolManager.Instance.Despawn(gameObject, pooledObjectProperty.poolId);
         }
     }
-    private bool ShouldIgnoreAlly(Collider2D other, EntityType entityType)
+    private bool ShouldIgnoreAlly(Collider2D other, EntityTypeProperty entityType)
     {
         if (!ignoreAllies) return false;
         
@@ -57,17 +57,17 @@ public class DestroyOnCollision : MonoBehaviour
         
         return GetIgnoredEntities().Contains(entityType.Type);
     }
-    private EntityType.EntityType[] GetIgnoredEntities()
+    private EntityTypeProperty.EntityType[] GetIgnoredEntities()
     {
         if (ignoreAllies)
         {
-            return new EntityType.EntityType[]
+            return new EntityTypeProperty.EntityType[]
             {
-                EntityType.EntityType.Ship,
-                EntityType.EntityType.Projectile,
-                EntityType.EntityType.Missile
+                EntityTypeProperty.EntityType.Ship,
+                EntityTypeProperty.EntityType.Projectile,
+                EntityTypeProperty.EntityType.Missile
             };
         }
-        return System.Array.Empty<EntityType.EntityType>();
+        return System.Array.Empty<EntityTypeProperty.EntityType>();
     }
 }

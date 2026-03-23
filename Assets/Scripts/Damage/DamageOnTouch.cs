@@ -7,7 +7,7 @@ public class DamageOnTouch : MonoBehaviour
 {
     [SerializeField] private float damage = 10f;
     [SerializeField][Tooltip("Only deal damage to objects with these entity types. Will damage nothing if left empty.")] 
-    List<EntityType.EntityType> damageEntityTypes = new();
+    List<EntityTypeProperty.EntityType> damageEntityTypes = new();
 
     private EntityTeam entityTeam;
 
@@ -23,7 +23,7 @@ public class DamageOnTouch : MonoBehaviour
         Health health = other.GetComponent<Health>();
         if (health == null) return;
         
-        EntityType otherEntityType = other.GetComponent<EntityType>();
+        EntityTypeProperty otherEntityType = other.GetComponent<EntityTypeProperty>();
         if (otherEntityType == null) return; // Only damage objects with an Entity Type
         
         if (!damageEntityTypes.Contains(otherEntityType.Type)) return;

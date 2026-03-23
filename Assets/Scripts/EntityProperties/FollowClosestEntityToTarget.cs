@@ -6,7 +6,7 @@ public class FollowClosestEntityToTarget : MonoBehaviour
 {
     [SerializeField] bool followMouseInstead;
 
-    [SerializeField] private List<EntityType.EntityType> targetTypesToFollow = new List<EntityType.EntityType>();
+    [SerializeField] private List<EntityTypeProperty.EntityType> targetTypesToFollow = new List<EntityTypeProperty.EntityType>();
     private GameObject parentObject;
     private GameObject currentTarget;
     private EntityTeam parentEntityTeam;
@@ -40,7 +40,7 @@ public class FollowClosestEntityToTarget : MonoBehaviour
         if (parentObject != null)
         {
             spriteRenderer.enabled = true;
-            float cameraRadius = CameraInformation.GetCameraSize().magnitude;
+            float cameraRadius = CameraInformation.Instance.GetCameraSize().magnitude;
             List<GameObject> potentialTargets = TeamManager.Instance.GetNearbyEnemies(transform.position, parentEntityTeam.team, targetTypesToFollow, cameraRadius);
             if (potentialTargets.Count > 0) currentTarget = GeometryUtils.FindClosestEntityToObject(potentialTargets, parentObject);
         }
@@ -68,7 +68,7 @@ public class FollowClosestEntityToTarget : MonoBehaviour
         parentObject = null;
         FindObjectToFollow();
     }
-    public void SetTargetTypesToFollow(EntityType.EntityType[] types)
+    public void SetTargetTypesToFollow(List<EntityTypeProperty.EntityType> types)
     {
         targetTypesToFollow = types;
     }
