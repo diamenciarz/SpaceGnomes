@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8340970637158299242
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8340970637158299237}
+  - component: {fileID: 8340970637158299236}
+  m_Layer: 0
+  m_Name: TeamSpriteHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8340970637158299237
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8340970637158299242}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8340970637158299236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8340970637158299242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51e152eca0bc2d64b9f8db894bd65822, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteTriples:
+  - redSprite: {fileID: 21300000, guid: b2b2b7d4ebc4e0a409d67d3755e09b21, type: 3}
+    blueSprite: {fileID: 21300000, guid: 9344813f09b3b2848b4151458633a3f4, type: 3}
+    greenSprite: {fileID: 21300000, guid: 02f3ff0112397a043a65c9844caeb719, type: 3}
+  - redSprite: {fileID: 21300000, guid: d601099192b06684fab3fc412aa9c445, type: 3}
+    blueSprite: {fileID: 21300000, guid: bd7bba6cac241a04aa9ae94227885d94, type: 3}
+    greenSprite: {fileID: 21300000, guid: 6f8382ba12c564d489027682685c2fd7, type: 3}
+  - redSprite: {fileID: 21300000, guid: 2218bae8f1a2bae45a5a90dcb5a1e267, type: 3}
+    blueSprite: {fileID: 21300000, guid: 5364ec49c1d8a05469bff8c95623df6d, type: 3}
+    greenSprite: {fileID: 21300000, guid: fc48fc53b02a0754794400abb4ec3bb5, type: 3}
+  - redSprite: {fileID: 21300000, guid: dbbafa65ddc2d0744b768fd6b099fb8d, type: 3}
+    blueSprite: {fileID: 21300000, guid: 131a8b984c1ee774fafdbc93b2d4be03, type: 3}
+    greenSprite: {fileID: 21300000, guid: 651c0a545c3c4104aa1b0d58878b2bc0, type: 3}
+  - redSprite: {fileID: 21300000, guid: 458d1d336b24cab499a5076319812b62, type: 3}
+    blueSprite: {fileID: 21300000, guid: 119a1fd275b4e39468966d904d51c989, type: 3}
+    greenSprite: {fileID: 21300000, guid: beeeb0ebb1f348549a6a335e5a2ff0c4, type: 3}
+  - redSprite: {fileID: 21300000, guid: fa3254eb43609c1499d2bce470779d61, type: 3}
+    blueSprite: {fileID: 21300000, guid: a53745215ed9bea4999605d3713a9a08, type: 3}
+    greenSprite: {fileID: 21300000, guid: 52f844a84780a8642924e69b58a5cbf3, type: 3}
+  - redSprite: {fileID: 21300000, guid: 849e840b3a7c3e749bd2cec45b42b1bf, type: 3}
+    blueSprite: {fileID: 21300000, guid: ca1ce2a524f7b9648a13fbf868c2a718, type: 3}
+    greenSprite: {fileID: 21300000, guid: 380fb6cef8c80454f96504ecfecf88d3, type: 3}
+  - redSprite: {fileID: 21300000, guid: 3567cdd3792dcb949a2d0b10131d9560, type: 3}
+    blueSprite: {fileID: 21300000, guid: 901ef4483b6fb9441a4f3d555c045cfa, type: 3}
+    greenSprite: {fileID: 21300000, guid: 74a59a3ff0094264f97d4d908572fab3, type: 3}
+  - redSprite: {fileID: 21300000, guid: 314b6fb1e6d09854ab3ec29bc6e27eec, type: 3}
+    blueSprite: {fileID: 21300000, guid: 53ce3e7416cf64542a6808a580282e42, type: 3}
+    greenSprite: {fileID: 21300000, guid: 8d3a2e4df259c994ba34114076786c64, type: 3}
+  - redSprite: {fileID: 21300000, guid: 9d27531a9da0ed742adc10d992343a92, type: 3}
+    blueSprite: {fileID: 21300000, guid: 988254853a746f949a1d4082d7f16ac1, type: 3}
+    greenSprite: {fileID: 21300000, guid: c51b578aa26f8354880227f455c477db, type: 3}
+  - redSprite: {fileID: 21300000, guid: 12518b69cc13627418f38c020e52be4a, type: 3}
+    blueSprite: {fileID: 21300000, guid: 5c23e844f02af2741b84c6dfde1f12bb, type: 3}
+    greenSprite: {fileID: 21300000, guid: c84fc4db7fa189a438e57fbc238fd45c, type: 3}
+  - redSprite: {fileID: 21300000, guid: 899773e3db456df4188c23327a130961, type: 3}
+    blueSprite: {fileID: 21300000, guid: 6c469d7fff4f2d34e81241b4a657e2a0, type: 3}
+    greenSprite: {fileID: 21300000, guid: f538ddf0a8df3ab4d898d945689d94b2, type: 3}
+  - redSprite: {fileID: 21300000, guid: 2fa65815386e89d4e9c446b039a360ae, type: 3}
+    blueSprite: {fileID: 21300000, guid: fa9ff2e9acd15284a906075954a02a57, type: 3}
+    greenSprite: {fileID: 21300000, guid: 60920c037ac3e8447b6946cb2c61df46, type: 3}
+  - redSprite: {fileID: 21300000, guid: 92a1ea217b4cc3a469fec4cc415d8f50, type: 3}
+    blueSprite: {fileID: 21300000, guid: 2ca54932fe1a8534a9838bb3d7b0aa90, type: 3}
+    greenSprite: {fileID: 21300000, guid: 6642027515876e545b8c9665d0d1c7d8, type: 3}
+  - redSprite: {fileID: 21300000, guid: 1e8fe343f5c74d84c94f134ebe93f6a7, type: 3}
+    blueSprite: {fileID: 21300000, guid: 4fc5435f1acbcfd44a946ad21b1d891c, type: 3}
+    greenSprite: {fileID: 21300000, guid: c55dbdeab4c5c284a92676c68eca9f42, type: 3}
+  - redSprite: {fileID: 21300000, guid: 3ccbab60d351c6b4cb6ed3d0798be637, type: 3}
+    blueSprite: {fileID: 21300000, guid: 791fb6a554ccd4049a593e94884be367, type: 3}
+    greenSprite: {fileID: 21300000, guid: 24a36797275cd534283b79bf5a3f28be, type: 3}
+  - redSprite: {fileID: 21300000, guid: c5f1163cd273a60499784f81c01bb5fb, type: 3}
+    blueSprite: {fileID: 21300000, guid: 4ee5cb775ea9b70448a5dea5483458df, type: 3}
+    greenSprite: {fileID: 21300000, guid: d47f4110896d46d418518795baf6e96f, type: 3}
+  - redSprite: {fileID: 21300000, guid: 9f2402a0be4fcc64ba467a0ae2801c91, type: 3}
+    blueSprite: {fileID: 21300000, guid: da81c4add7914f9419881bf3490fae84, type: 3}
+    greenSprite: {fileID: 21300000, guid: fda605b03f8e32e47bf55d4964b206f5, type: 3}
+  - redSprite: {fileID: 21300000, guid: 08700d2c5af42244db8d6e64da6f0848, type: 3}
+    blueSprite: {fileID: 21300000, guid: 1bd667bdff2f5d542b7d76883cf0f68b, type: 3}
+    greenSprite: {fileID: 21300000, guid: 27ae6639d62c4dc45abcbb76da55355f, type: 3}

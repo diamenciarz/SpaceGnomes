@@ -56,6 +56,7 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\EntityProperties\DespawnOthersOnDespawn.cs" />
     <Compile Include="Assets\Scripts\Singletons\AbstractSingleton.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\DestroyAfterDelay.cs" />
     <Compile Include="Assets\Scripts\Singletons\TeamManager.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\ShipWeaponManager.cs" />
     <Compile Include="Assets\Scripts\AI\Sensors\AbstractSensor.cs" />
     <Compile Include="Assets\Scripts\Damage\Health.cs" />
+    <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\ISettableTarget.cs" />
     <Compile Include="Assets\Scripts\Utils\Cone.cs" />
     <Compile Include="Assets\Scripts\Damage\DamageOnTouch.cs" />
     <Compile Include="Assets\Scripts\Physics\EntityControllers\StraightLineMovementController.cs" />
@@ -76,6 +78,7 @@
     <Compile Include="Assets\Scripts\AI\AIControlInput.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\HasEntityType.cs" />
     <Compile Include="Assets\Scripts\Physics\PhysicalForces\ForceProperty.cs" />
+    <Compile Include="Assets\Scripts\Unused\TeamSwitcherTest.cs" />
     <Compile Include="Assets\Scripts\Input\ControlInput.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\MoveToPositionBehavior.cs" />
     <Compile Include="Assets\Scripts\Utils\GeometryUtils.cs" />
@@ -86,7 +89,9 @@
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\AttackAndRetreatBehavior.cs" />
     <Compile Include="Assets\Scripts\Damage\IDamage.cs" />
     <Compile Include="Assets\Scripts\Damage\DamageCounter.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\PooledObjectProperty.cs" />
     <Compile Include="Assets\Scripts\Unused\CellularAutomata\CPUCellularAutomata.cs" />
+    <Compile Include="Assets\Scripts\Physics\EntityControllers\TargetChasingController.cs" />
     <Compile Include="Assets\Scripts\Debug\DetectCollisions.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\ChaseEntityOmnidirectionalBehavior.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\EntityTeam.cs" />
@@ -105,20 +110,15 @@
     <Compile Include="Assets\Scripts\Utils\CacheManager.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\Rotator.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\MouseFollower.cs" />
+    <Compile Include="Assets\Scripts\Singletons\TeamSpriteHandler.cs" />
     <Compile Include="Assets\Scripts\Utils\Line2D.cs" />
     <Compile Include="Assets\Scripts\UI\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\AI\Sensors\CameraSensor.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\DestroyWithObjects.cs" />
     <Compile Include="Assets\Scripts\Singletons\EntityCounter.cs" />
+    <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\AutonomousMovementController.cs" />
     <Compile Include="Assets\Scripts\Unused\CellularAutomata\GPUCellularAutomata.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\EntityPositionTracker.cs" />
-    <Compile Include="Assets\Scripts\Singletons\TeamSpriteHandler.cs" />
-    <Compile Include="Assets\Scripts\Unused\TeamSwitcherTest.cs" />
-    <Compile Include="Assets\Scripts\EntityProperties\PooledObjectProperty.cs" />
-    <Compile Include="Assets\Scripts\Physics\EntityControllers\TargetChasingController.cs" />
-    <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\AutonomousMovementController.cs" />
-    <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\ISettableTarget.cs" />
-    <Compile Include="Assets\Scripts\EntityProperties\DespawnOthersOnDespawn.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

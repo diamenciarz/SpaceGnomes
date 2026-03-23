@@ -14,45 +14,69 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     [SerializeField] private AnimationCurve accelerationCurve = AnimationCurve.Linear(0, 0, 1, 1); // Curve for acceleration
     [SerializeField] private float accelerationDelay = 0.5f; // Delay before starting acceleration
 
+    [Header("Movement Settings")]
+    [SerializeField, Range(0f, 1f)] private float perpendicularDamping = 0.1f;
+    
     [Header("Rotation Settings")]
-    [SerializeField] private float steerTorque = 10000f;
-
-    [Header("Physics Settings")]
+    [SerializeField] private float steerTorque = 5000f;
     [SerializeField][Range(0f, 360)] float maxAngularVelocity = 100f;
+    [SerializeField][Range(1f, 10f)] private float maxAngularDampingMultiplier = 2f;
 
     [Header("Instance Settings")]
     [SerializeField] private List<AbstractSensor> sensors = new List<AbstractSensor>();
 
+    // Physics Settings
+    [Tooltip("This value makes force calculation match the desired deltaVelocity")] 
+    private float THRUST_MULTIPLIER = 45f;
+
+
     public new Func<float, float> VelocityFunction => GetVelocityAtTime;
 
-    private Rigidbody2D rb;
+    private Rigidbody2D rb2d;
     private GameObject target;
     private float lastFixedVelocity;
     private float lastFixedTime;
+    private float startTime;
 
     public override void Activate()
     {
         base.Activate();
         // Set initial velocity along forward direction (transform.up)
-        rb.velocity = transform.up * initialVelocity;
+        rb2d.velocity = transform.up * initialVelocity;
+        lastFixedTime = Time.time;
+        lastFixedVelocity = initialVelocity;
+        startTime = Time.time;
     }
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        rb.isKinematic = true; // Ensure kinematic for manual velocity control
+        rb2d = GetComponent<Rigidbody2D>();
     }
     private void FixedUpdate()
     {
         HandleMovement();
+        ApplyPerpendicularDamping();
     }
     private void Update()
     {
         UpdateTarget();
         if(target) Debug.DrawLine(transform.position, target.transform.position, Color.red);
     }
+    private void ApplyPerpendicularDamping()
+    {
+        Vector2 forward = transform.up;
+        Vector2 velocity = rb2d.velocity;
+        // Project velocity onto forward direction
+        Vector2 forwardVelocity = Vector2.Dot(velocity, forward) * forward;
+        // Calculate perpendicular velocity
+        Vector2 perpendicularVelocity = velocity - forwardVelocity;
+        // Apply damping to perpendicular velocity
+        Vector2 dampedPerpendicularVelocity = perpendicularVelocity * (1f - perpendicularDamping);
+        // Reconstruct velocity with damped perpendicular component
+        rb2d.velocity = forwardVelocity + dampedPerpendicularVelocity;
+    }
     private void UpdateTarget()
     {
-        if (target == null) return;
+        if (target != null) return;
         Cone myDirectionCone = new Cone(transform.position, transform.up, 360f, Mathf.Infinity);
         List<GameObject> detectedObjects = GetDetectedObjects();
         target = myDirectionCone.GetClosestObjectInCone(detectedObjects, Cone.ConeDistance.SmallestAngle);
@@ -75,54 +99,85 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     {
         // Apply thrust according to velocity function
         float fixedDeltaVelocity = CalculateFixedDeltaVelocity();
-        float thrustForce = fixedDeltaVelocity * rb.mass / Time.fixedDeltaTime; // F = m * a, where a = Δv / Δt
-        rb.AddForce(transform.up * thrustForce * Time.fixedDeltaTime);
-        if (rb.velocity.magnitude > targetVelocity)
-        {
-            rb.velocity = rb.velocity.normalized * targetVelocity;
-        }
+        float thrustForce = fixedDeltaVelocity * rb2d.mass / Time.fixedDeltaTime; // F = m * a, where a = Δv / Δt
+        rb2d.AddForce(transform.up * thrustForce * Time.fixedDeltaTime * THRUST_MULTIPLIER);
+        ClampVelocity();
         // Handle rotation torque
-        if(target) RotateToTarget();
+        if (!target) return;
+        float steerInput = CalculateRotationInput();
+        float torque = CalculateRotationTorque(steerInput);
+        Debug.Log($"Steer Input: {steerInput}, Torque: {torque}");
+        rb2d.AddTorque(torque * Time.fixedDeltaTime);
+
+        ClampAngularVelocity();
+        // Angular velocity goes above maxAngularVelocity
+        // Eliminate wobbling 
+    }
+    private void ClampVelocity()
+    {
+        if (rb2d.velocity.magnitude > targetVelocity)
+        {
+            rb2d.velocity = rb2d.velocity.normalized * targetVelocity;
+        }
+    }
+    private void ClampAngularVelocity()
+    {
+        if(Mathf.Abs(rb2d.angularVelocity) > maxAngularVelocity) rb2d.angularVelocity = maxAngularVelocity * Mathf.Sign(rb2d.angularVelocity);
     }
     private float CalculateFixedDeltaVelocity()
     {
-        float velocityLastTime = lastFixedVelocity;
-        float velocityNow = VelocityFunction(lastFixedTime + Time.fixedDeltaTime);
-        float deltaVelocity = velocityNow - velocityLastTime;
-        lastFixedTime += Time.fixedDeltaTime;
-        lastFixedVelocity = velocityNow;
-        return deltaVelocity;
+        if (lastFixedTime + Time.fixedDeltaTime > startTime + accelerationDelay + accelerationTime)
+        {
+            // If we've passed the acceleration phase, return the last delta velocity calculated at the end of the acceleration phase
+            // This is fine because we clamp RigidBody2D velocity to targetVelocity after the acceleration phase, so any extra velocity from the curve won't affect the physics
+            float velocityLastTime = lastFixedVelocity;
+            float velocityBefore= VelocityFunction(lastFixedTime - Time.fixedDeltaTime - startTime);
+            float deltaVelocity = velocityLastTime - velocityBefore;
+            return deltaVelocity;
+        }
+        else
+        {
+            float velocityLastTime = lastFixedVelocity;
+            float velocityNow = VelocityFunction(lastFixedTime + Time.fixedDeltaTime - startTime);
+            float deltaVelocity = velocityNow - velocityLastTime;
+            lastFixedTime += Time.fixedDeltaTime;
+            lastFixedVelocity = velocityNow;
+            return deltaVelocity;
+        }
     }
     private float CalculateRotationTorque(float steerInput)
     {
-        float angularVelocity = rb.angularVelocity;
-        float desiredTorque = -steerInput * steerTorque;
+        float angularVelocity = rb2d.angularVelocity;
+
+        // Check if steer input opposes the current rotation
+        if (steerInput != 0f && Mathf.Sign(steerInput) * Mathf.Sign(angularVelocity) < 0f)
+        {
+            // Apply the higher of steerTorque or maxAngularDampingTorque to decelerate
+            float maxAngularDampingTorque = steerTorque * maxAngularDampingMultiplier;
+             // Deceleration torque
+            return Mathf.Sign(steerInput) * maxAngularDampingTorque;
+        }
 
         // Otherwise, apply the standard steer torque
-        if (Mathf.Abs(angularVelocity) < maxAngularVelocity)
+        if (Mathf.Abs(angularVelocity) <= maxAngularVelocity)
         {
-            return desiredTorque;
+            // Acceleration torque
+            return steerInput * steerTorque;
         }
         else
         {
             return 0;
         }
     }
-    private void RotateToTarget()
-    {
-        float rotationInput = CalculateRotationInput();
-        float torque = CalculateRotationTorque(rotationInput);
-        rb.AddTorque(torque * Time.fixedDeltaTime);
-    }
     private float CalculateRotationInput()
     {
-        Vector2 directionToTarget = (Vector2)target.transform.position - rb.position;
+        Vector2 directionToTarget = (Vector2)target.transform.position - rb2d.position;
         float angleToTarget = Vector2.SignedAngle(transform.up, directionToTarget);
-        return Mathf.Clamp(angleToTarget / 180f, -1f, 1f); // Normalize to [-1, 1]
+        return Mathf.Clamp(angleToTarget/180, -1, 1); // Normalize to [-1, 1]
     }
     private float GetVelocityAtTime(float time)
     {
-        float mass = rb.mass;
+        float mass = rb2d.mass;
         if (time < accelerationDelay)
         {
             return initialVelocity;

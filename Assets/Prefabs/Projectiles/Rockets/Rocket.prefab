@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8193621863937109803}
   - component: {fileID: 3527395173836871067}
+  - component: {fileID: 1869291265047155788}
   - component: {fileID: 7182323447926699894}
   - component: {fileID: 2648434844840027301}
   - component: {fileID: 5666344187680287799}
@@ -95,6 +96,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!70 &1869291265047155788
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3611232887168421049}
+  m_Enabled: 0
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.003894329, y: 0}
+  m_Size: {x: 0.19231033, y: 0.68933845}
+  m_Direction: 0
 --- !u!70 &7182323447926699894
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -119,11 +136,11 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3611232887168421049}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.1
+  m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 0
@@ -144,7 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 847960e0450ad3a42b3e8ea753e96756, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialVelocity: 10
+  initialVelocity: 2
   targetVelocity: 20
   accelerationTime: 2
   accelerationCurve:
@@ -154,7 +171,7 @@ MonoBehaviour:
       time: 0
       value: 0
       inSlope: 0
-      outSlope: 1
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -162,8 +179,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 1
-      outSlope: 0
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -172,8 +189,10 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   accelerationDelay: 0.5
-  steerTorque: 10000
-  maxAngularVelocity: 100
+  perpendicularDamping: 1
+  steerTorque: 800
+  maxAngularVelocity: 90
+  maxAngularDampingMultiplier: 3
   sensors:
   - {fileID: 3390904295761830887}
 --- !u!114 &3205544630134639897
@@ -203,7 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ignoreAllies: 1
-  targetEntityTypes: 010000000000000004000000
+  targetEntityTypes: 010000000400000000000000
 --- !u!114 &-7580439671291849363
 MonoBehaviour:
   m_ObjectHideFlags: 0
