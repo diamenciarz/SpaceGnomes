@@ -10,6 +10,7 @@ public class GunController : AbstractWeaponController
     [SerializeField] private bool waitForFullAmmo = false; // Wait for all ammo to replenish?
     [SerializeField] private float fireRate = 0.2f; // Time between shots
     [SerializeField] ShipAction activateOn;
+    [SerializeField] bool addMyVelocityToProjectile = false;
 
     private EntityTeam parentEntityTeam;
     private int currentAmmo;
@@ -17,6 +18,7 @@ public class GunController : AbstractWeaponController
     private float fireTimer;
     private bool isShooting;
     private GameObject optionalTarget;
+    private Rigidbody2D parentRB2D;
 
     public override ShipAction GetActionType() => activateOn;
     public override Transform GetShootingPointTransform() => firePoint;
@@ -28,6 +30,8 @@ public class GunController : AbstractWeaponController
         replenishTimer = 0f;
         fireTimer = 0f;
         UpdateParentEntityTeam();
+        parentRB2D  = EntityCounter.Instance.GetEntityParent(gameObject).GetComponent<Rigidbody2D>();
+        if (!parentRB2D) Debug.LogWarning("Parent entity does not have a Rigidbody2D component!");
     }
     public void UpdateParentEntityTeam()
     {
@@ -95,6 +99,12 @@ public class GunController : AbstractWeaponController
         if (entityTeam)
         {
             TeamManager.Instance.SetEntityTeam(projectile, parentEntityTeam.team);
+        }
+        if (addMyVelocityToProjectile)
+        {
+            Rigidbody2D projectileRB2D = projectile.GetComponent<Rigidbody2D>();
+            if(!projectileRB2D) Debug.LogWarning("Projectile does not have a Rigidbody2D component!");
+            projectileRB2D.velocity += parentRB2D.velocity;
         }
     }
 }

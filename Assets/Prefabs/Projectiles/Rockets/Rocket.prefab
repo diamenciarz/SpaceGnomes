@@ -188,8 +188,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  accelerationDelay: 0.5
-  perpendicularDamping: 1
+  accelerationDelay: 1
+  initialPerpendicularDamping: 0.02
+  perpendicularDamping: 0.1
   steerTorque: 800
   maxAngularVelocity: 90
   maxAngularDampingMultiplier: 3
