@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class MathUtils
@@ -32,5 +33,25 @@ public static class MathUtils
             lastV = velocities[i];
         }
         return accSum / (count-1-startIndex);
+    }
+    public static int GetWeightedIndex(List<float> weights)
+    {
+        if (weights.Count == 0) return 0;
+        float totalWeight = weights.Sum();
+        if (totalWeight <= 0f) return 0;
+
+        float randomValue = UnityEngine.Random.Range(0f, totalWeight);
+        float cumulativeWeight = 0f;
+
+        for (int i = 0; i < weights.Count; i++)
+        {
+            cumulativeWeight += weights[i];
+            if (randomValue <= cumulativeWeight)
+            {
+                return i;
+            }
+        }
+        // Fallback in case of floating point precision issues
+        return weights.Count - 1;
     }
 }

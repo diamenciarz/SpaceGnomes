@@ -2,21 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraInformation : MonoBehaviour
+/// <summary>
+/// This singleton class will keep track of the camera's size and position in world units 
+/// and will provide methods to check if a position is on screen and to clamp positions to be on screen.
+/// </summary>
+public class CameraInformation : AbstractSingleton<CameraInformation>
 {
-
-    private static float xMin;
-    private static float xMax;
-    private static float yMin;
-    private static float yMax;
-
     /// <summary>
     /// This is given in world units. Y means height, X means width
     /// </summary>
+    private float xMin;
+    private float xMax;
+    private float yMin;
+    private float yMax;
 
-    static Camera mainCamera;
-    private static bool hasCalculatedCameraSize = false;
-    private static Vector2 cameraSize;
+
+    Camera mainCamera;
+    private bool hasCalculatedCameraSize = false;
+    private Vector2 cameraSize;
 
     private void Awake()
     {
@@ -24,7 +27,7 @@ public class CameraInformation : MonoBehaviour
         RecountScreenEdges();
     }
 
-    private static void CalculateCameraSize()
+    private void CalculateCameraSize()
     {
         SetMainCamera(Camera.main);
         cameraSize.y = 2f * mainCamera.orthographicSize;
@@ -50,10 +53,10 @@ public class CameraInformation : MonoBehaviour
 
     #region Accessor methods
     /// <summary>
-    /// Camera size in game units
+    /// Camera size is given in world units. Y means height, X means width.
     /// </summary>
     /// <returns></returns>
-    public static Vector2 GetCameraSize()
+    public Vector2 GetCameraSize()
     {
         if (!hasCalculatedCameraSize)
         {
@@ -61,7 +64,7 @@ public class CameraInformation : MonoBehaviour
         }
         return cameraSize;
     }
-    public static bool IsPositionOnScreen(Vector2 position)
+    public bool IsPositionOnScreen(Vector2 position)
     {
         return IsPositionOnScreen(position, 0);
     }
@@ -69,16 +72,16 @@ public class CameraInformation : MonoBehaviour
     /// <param name="position"></param>
     /// <param name="offsetToCenter">The distance from the edge of the screen that is considered to be outside</param>
     /// </summary>
-    public static bool IsPositionOnScreen(Vector2 position, float offsetToCenter)
+    public bool IsPositionOnScreen(Vector2 position, float offsetToCenter)
     {
         return IsPositionOnScreen(position, offsetToCenter, offsetToCenter, offsetToCenter, offsetToCenter);
     }
-    public static bool IsPositionOnScreen(Vector2 position, float leftOffset, float rightOffset, float topOffset, float bottomOffset)
+    public bool IsPositionOnScreen(Vector2 position, float leftOffset, float rightOffset, float topOffset, float bottomOffset)
     {
         return position.x > xMin + leftOffset && position.x < xMax - rightOffset
             && position.y > yMin + bottomOffset && position.y < yMax - topOffset;
     }
-    public static Vector2 ClampPositionOnScreen(Vector2 position)
+    public Vector2 ClampPositionOnScreen(Vector2 position)
     {
         return ClampPositionOnScreen(position, 0);
     }
@@ -88,11 +91,11 @@ public class CameraInformation : MonoBehaviour
     /// <param name="position"></param>
     /// <param name="offsetToCenter">The distance from the edge of the screen that is considered to be outside</param>
     /// <returns></returns>
-    public static Vector2 ClampPositionOnScreen(Vector2 position, float offsetToCenter)
+    public Vector2 ClampPositionOnScreen(Vector2 position, float offsetToCenter)
     {
         return ClampPositionOnScreen(position, offsetToCenter, offsetToCenter, offsetToCenter, offsetToCenter);
     }
-    public static Vector2 ClampPositionOnScreen(Vector2 position, float leftOffset, float rightOffset, float topOffset, float bottomOffset)
+    public Vector2 ClampPositionOnScreen(Vector2 position, float leftOffset, float rightOffset, float topOffset, float bottomOffset)
     {
         float newXPosition = Mathf.Clamp(position.x, xMin + leftOffset, xMax - rightOffset);
         float newYPosition = Mathf.Clamp(position.y, yMin + bottomOffset, yMax - topOffset);
@@ -101,7 +104,7 @@ public class CameraInformation : MonoBehaviour
     /// <returns>
     /// An array with the bottomLeft corner of the camera at index 0 and topRight corner at index 1 given in world units.
     /// </returns>
-    public static Vector2[] GetDiagonalCameraPoints()
+    public Vector2[] GetDiagonalCameraPoints()
     {
         return new Vector2[]
         {
@@ -112,7 +115,7 @@ public class CameraInformation : MonoBehaviour
     #endregion
 
     #region Mutator methods
-    public static void SetMainCamera(Camera cam)
+    public void SetMainCamera(Camera cam)
     {
         mainCamera = cam;
     }
