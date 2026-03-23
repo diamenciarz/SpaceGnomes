@@ -30,7 +30,7 @@ public class ObjectFollower : MonoBehaviour
         deltaAngle = angle;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (followedObject != null)
         {
