@@ -55,6 +55,7 @@ public class Rotator : MonoBehaviour
     private void Update()
     {
         RotateTowardsTarget();
+        //GetRotationCone().DebugDisplayCone(Color.gray);
     }
     public Cone GetRotationCone()
     {
@@ -83,6 +84,7 @@ public class Rotator : MonoBehaviour
             return; // No target set
         }
 
+        Debug.DrawRay(rotator.position, direction, Color.red);
         if (direction != Vector2.zero)
         {
             Cone myCone = GetRotationCone();

@@ -31,7 +31,6 @@ public class DestroyAfterDelay : ActivateOnSpawn
         if (timer >= lifetime)
         {
             isDestroyed = true;
-            Debug.Log("Despawning after delay: " + gameObject.name);
             if (pooledObjectProperty == null)
             {
                 ObjectPoolManager.Instance.Despawn(gameObject);

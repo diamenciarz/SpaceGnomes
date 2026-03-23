@@ -50,7 +50,6 @@ public class CameraSensor : AbstractSensor
         entityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
         if (!entityTeam) Debug.LogError("CameraSensor could not find EntityTeam on parent!");
         if (displayFOV) fovScript = UIManager.Instance.InstantiateFieldOfView(sensorViewPoint.gameObject, range, fov, fov / 2, true);
-        Debug.Log($"CameraSensor on {gameObject.transform.parent.name} initialized");
         // Initialize caches
         coneCache = CacheManager.Instance.CreateCache<Cone>(CacheBehavior.EndOfUpdate);
         mouseCache = CacheManager.Instance.CreateCache<MouseResult>(CacheBehavior.EndOfUpdate);
@@ -65,7 +64,11 @@ public class CameraSensor : AbstractSensor
     {
         fov = newFov;
     }
+    private void Update()
+    {
+        //GetVisionCone().DebugDisplayCone(Color.blue);
 
+    }
     public void SetRange(float newRange)
     {
         range = newRange;
