@@ -19,7 +19,7 @@ public class TeamSwitcherTest : AbstractActionController
         if (isOn)
         {
             EntityTeam entityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
-            TeamManager.Instance.ChangeEntityTeam(gameObject, entityTeam.team == Team.Team1 ? Team.Team2 : Team.Team1);
+            TeamManager.Instance.SetEntityTeam(gameObject, entityTeam.team == Team.Team1 ? Team.Team2 : Team.Team1);
         }
     }
 }
