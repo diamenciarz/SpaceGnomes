@@ -15,6 +15,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     [SerializeField] private float accelerationDelay = 0.5f; // Delay before starting acceleration
 
     [Header("Movement Settings")]
+    [SerializeField, Range(0f, 1f), Tooltip("This is applied during the delay period")] private float initialPerpendicularDamping = 0.1f;
     [SerializeField, Range(0f, 1f)] private float perpendicularDamping = 0.1f;
     
     [Header("Rotation Settings")]
@@ -46,6 +47,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         lastFixedTime = Time.time;
         lastFixedVelocity = initialVelocity;
         startTime = Time.time;
+        target = null;
     }
     private void Awake()
     {
@@ -70,9 +72,14 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         // Calculate perpendicular velocity
         Vector2 perpendicularVelocity = velocity - forwardVelocity;
         // Apply damping to perpendicular velocity
-        Vector2 dampedPerpendicularVelocity = perpendicularVelocity * (1f - perpendicularDamping);
+        Vector2 dampedPerpendicularVelocity = perpendicularVelocity * (1f - GetPerpendicularDamping());
         // Reconstruct velocity with damped perpendicular component
         rb2d.velocity = forwardVelocity + dampedPerpendicularVelocity;
+    }
+    private float GetPerpendicularDamping()
+    {
+        if (Time.time < startTime + accelerationDelay) return initialPerpendicularDamping;
+        return perpendicularDamping;
     }
     private void UpdateTarget()
     {
@@ -106,7 +113,6 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         if (!target) return;
         float steerInput = CalculateRotationInput();
         float torque = CalculateRotationTorque(steerInput);
-        Debug.Log($"Steer Input: {steerInput}, Torque: {torque}");
         rb2d.AddTorque(torque * Time.fixedDeltaTime);
 
         ClampAngularVelocity();
