@@ -8,8 +8,12 @@ public class CameraFocusManager : AbstractSingleton<CameraFocusManager>
 
     private List<GameObject> hiddenObservedObjects = new List<GameObject>();
     private Coroutine currentLookingAnimation;
-    private GameObject lookPositionObj = new GameObject("Look position");
+    private GameObject lookPositionObj;
 
+    private void Start()
+    {
+        lookPositionObj = new GameObject("Look position");
+    }
     private IEnumerator LookTimer(Vector2 position, float waitSec, List<GameObject> hiddenObservedObjects)
     {
         lookPositionObj.transform.position = position;
