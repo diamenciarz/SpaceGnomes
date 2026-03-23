@@ -94,7 +94,7 @@ public class GunController : AbstractWeaponController
         EntityTeam entityTeam = projectile.GetComponentInParent<EntityTeam>();
         if (entityTeam)
         {
-            entityTeam.SetTeam(parentEntityTeam.team);
+            TeamManager.Instance.SetEntityTeam(projectile, parentEntityTeam.team);
         }
     }
 }

@@ -181,9 +181,10 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
             Trajectory trajectory = childInfo.child.GetComponent<Trajectory>();
             if (!trajectory) trajectory = childInfo.child.AddComponent<Trajectory>();
 
+            // Set the team of the child to be the same as the parent
             EntityTeam entityTeam = childInfo.child.GetComponent<EntityTeam>();
             if (!entityTeam) entityTeam = childInfo.child.AddComponent<EntityTeam>();
-            entityTeam.SetTeam(TeamManager.Instance.GetEntityTeam(gameObject));
+            TeamManager.Instance.SetEntityTeam(childInfo.child, TeamManager.Instance.GetEntityTeam(gameObject));
 
             Collider2D collider2D = childInfo.child.GetComponent<Collider2D>();
             if (collider2D) collider2D.usedByComposite = true;
