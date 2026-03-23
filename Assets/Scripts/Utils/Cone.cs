@@ -105,7 +105,7 @@ public class Cone
     /// <param name="myTeam">The team of the entity performing the visibility check.</param>
     /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
     /// <returns>A list of GameObjects that are enemies and visible within the cone.</returns>
-    public List<GameObject> GetVisibleEnemiesInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public List<GameObject> GetVisibleEnemiesInCone(Team myTeam, EntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
         return hits.Where(hit => TeamManager.Instance.IsEnemy(TeamManager.Instance.GetEntityTeam(hit.collider.gameObject), myTeam))
@@ -136,7 +136,7 @@ public class Cone
     /// <param name="entityTypes">An array of entity types to filter the allies by.</param>
     /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
     /// <returns>A list of GameObjects that are allies of the specified types and visible within the cone.</returns>
-    public List<GameObject> GetVisibleAlliesInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public List<GameObject> GetVisibleAlliesInCone(Team myTeam, EntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
         return hits.Where(hit => TeamManager.Instance.IsAlly(TeamManager.Instance.GetEntityTeam(hit.collider.gameObject), myTeam))
@@ -164,7 +164,7 @@ public class Cone
     /// <param name="entityTypes">An array of entity types to filter the objects by.</param>
     /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
     /// <returns>A list of GameObjects of the specified types that are visible within the cone.</returns>
-    public List<GameObject> GetVisibleObjectsInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public List<GameObject> GetVisibleObjectsInCone(Team myTeam, EntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
         return hits.Select(hit => hit.collider.gameObject).Distinct().ToList();
@@ -237,7 +237,7 @@ public class Cone
     /// <param name="entityTypes">An array of entity types to filter the allies by.</param>
     /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
     /// <returns>The closest visible ally GameObject of the specified types, or null if no allies are found.</returns>
-    public GameObject GetClosestVisibleAllyInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public GameObject GetClosestVisibleAllyInCone(Team myTeam, EntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
         RaycastHit2D bestHit = hits.Where(hit => TeamManager.Instance.IsAlly(TeamManager.Instance.GetEntityTeam(hit.collider.gameObject), myTeam))
@@ -270,7 +270,7 @@ public class Cone
     /// <param name="entityTypes">An array of entity types to filter the enemies by.</param>
     /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
     /// <returns>The closest visible enemy GameObject of the specified types, or null if no enemies are found.</returns>
-    public GameObject GetClosestVisibleEnemyInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public GameObject GetClosestVisibleEnemyInCone(Team myTeam, EntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
         RaycastHit2D bestHit = hits.Where(hit => TeamManager.Instance.IsEnemy(TeamManager.Instance.GetEntityTeam(hit.collider.gameObject), myTeam))
@@ -304,7 +304,7 @@ public class Cone
     /// <param name="entityTypes">An array of entity types to filter the objects by.</param>
     /// <param name="sensorType">The type of sensor used for detection. Defaults to Camera.</param>
     /// <returns>The closest visible GameObject of the specified types, or null if no objects are found.</returns>
-    public GameObject GetClosestVisibleObjectInCone(Team myTeam, HasEntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
+    public GameObject GetClosestVisibleObjectInCone(Team myTeam, EntityType.EntityType[] entityTypes, SensorType sensorType = SensorType.Camera)
     {
         List<RaycastHit2D> hits = this.GetAllHitsInCone((end, origin, team, dist, sensor) => GetFirstVisibleEntity(end, origin, team, entityTypes, dist, sensor), myTeam, this.maxDistance, sensorType);
         RaycastHit2D bestHit = hits.OrderBy(hit => hit.distance).FirstOrDefault();

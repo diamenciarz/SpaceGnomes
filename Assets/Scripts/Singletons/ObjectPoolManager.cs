@@ -119,7 +119,7 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
         // Order, location, set as registered, register, set active, activate observers
         obj.transform.position = position;
         obj.transform.rotation = rotation;
-        HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
+        EntityType hasEntityType = obj.GetComponent<EntityType>();
         if (hasEntityType)
         {
             hasEntityType.SetRegistered();
@@ -152,7 +152,7 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
     {
         if(!initialized) InitializePools();
         ActivateOnDespawned(obj);
-        HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
+        EntityType hasEntityType = obj.GetComponent<EntityType>();
         if (hasEntityType)
         {
             EntityCounter.Instance.UnregisterEntity(obj);
@@ -179,7 +179,7 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
     {
         obj.SetActive(false);
         obj.transform.SetParent(poolParent);
-        HasEntityType hasEntityType = obj.GetComponent<HasEntityType>();
+        EntityType hasEntityType = obj.GetComponent<EntityType>();
         if (hasEntityType)
         {
             EntityCounter.Instance.UnregisterEntity(obj);

@@ -11,7 +11,7 @@ public class DestroyOnCollision : MonoBehaviour
 {
     [SerializeField]
     [Tooltip("Ignores ally ships, projectiles, and missiles")] private bool ignoreAllies = false;
-    [SerializeField] private List<HasEntityType.EntityType> targetEntityTypes = new List<HasEntityType.EntityType> { HasEntityType.EntityType.Ship, HasEntityType.EntityType.Wall };
+    [SerializeField] private List<EntityType.EntityType> targetEntityTypes = new List<EntityType.EntityType> { EntityType.EntityType.Ship, EntityType.EntityType.Wall };
 
     private PooledObjectProperty pooledObjectProperty;
     private EntityTeam.Team myTeam;
@@ -29,7 +29,7 @@ public class DestroyOnCollision : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (isDestroyed) return;
-        HasEntityType entityType = other.GetComponent<HasEntityType>();
+        EntityType entityType = other.GetComponent<EntityType>();
         if (!entityType) return;
 
         if (ShouldIgnoreAlly(other, entityType))
@@ -48,7 +48,7 @@ public class DestroyOnCollision : MonoBehaviour
             ObjectPoolManager.Instance.Despawn(gameObject, pooledObjectProperty.poolId);
         }
     }
-    private bool ShouldIgnoreAlly(Collider2D other, HasEntityType entityType)
+    private bool ShouldIgnoreAlly(Collider2D other, EntityType entityType)
     {
         if (!ignoreAllies) return false;
         
@@ -57,17 +57,17 @@ public class DestroyOnCollision : MonoBehaviour
         
         return GetIgnoredEntities().Contains(entityType.Type);
     }
-    private HasEntityType.EntityType[] GetIgnoredEntities()
+    private EntityType.EntityType[] GetIgnoredEntities()
     {
         if (ignoreAllies)
         {
-            return new HasEntityType.EntityType[]
+            return new EntityType.EntityType[]
             {
-                HasEntityType.EntityType.Ship,
-                HasEntityType.EntityType.Projectile,
-                HasEntityType.EntityType.Missile
+                EntityType.EntityType.Ship,
+                EntityType.EntityType.Projectile,
+                EntityType.EntityType.Missile
             };
         }
-        return System.Array.Empty<HasEntityType.EntityType>();
+        return System.Array.Empty<EntityType.EntityType>();
     }
 }

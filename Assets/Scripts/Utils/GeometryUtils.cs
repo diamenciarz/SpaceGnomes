@@ -18,17 +18,17 @@ public static class GeometryUtils
         Radar
     }
 
-    public static List<GameObject> GetVisibleAllies(Vector2 from, Team myTeam, List<HasEntityType.EntityType> entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera, GameObject ignoreObject = null)
+    public static List<GameObject> GetVisibleAllies(Vector2 from, Team myTeam, List<EntityType.EntityType> entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera, GameObject ignoreObject = null)
     {
         List<GameObject> allies = TeamManager.Instance.GetNearbyAllies(from, myTeam, entityTypes, maxDistance);
         return KeepVisibleObjects(from, allies, myTeam, maxDistance, sensorType, ignoreObject);
     }
-    public static List<GameObject> GetVisibleEnemies(Vector2 from, Team myTeam, List<HasEntityType.EntityType> entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera, GameObject ignoreObject = null)
+    public static List<GameObject> GetVisibleEnemies(Vector2 from, Team myTeam, List<EntityType.EntityType> entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera, GameObject ignoreObject = null)
     {
         List<GameObject> enemies = TeamManager.Instance.GetNearbyEnemies(from, myTeam, entityTypes, maxDistance);
         return KeepVisibleObjects(from, enemies, myTeam, maxDistance, sensorType, ignoreObject);
     }
-    public static List<GameObject> GetVisibleObjects(Vector2 from, Team myTeam, List<HasEntityType.EntityType> entityTypes, float maxDistance=float.MaxValue, SensorType sensorType = SensorType.Camera, GameObject ignoreObject = null)
+    public static List<GameObject> GetVisibleObjects(Vector2 from, Team myTeam, List<EntityType.EntityType> entityTypes, float maxDistance=float.MaxValue, SensorType sensorType = SensorType.Camera, GameObject ignoreObject = null)
     {
         List<GameObject> entities = EntityCounter.Instance.GetNearbyEntities(from, entityTypes, maxDistance);
         return KeepVisibleObjects(from, entities, myTeam, maxDistance, sensorType, ignoreObject);
@@ -77,7 +77,7 @@ public static class GeometryUtils
         }
         return closestHit;
     }
-    public static RaycastHit2D? GetFirstVisibleEntity(Vector2 to, Vector2 from, EntityTeam.Team myTeam, HasEntityType.EntityType[] entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera)
+    public static RaycastHit2D? GetFirstVisibleEntity(Vector2 to, Vector2 from, EntityTeam.Team myTeam, EntityType.EntityType[] entityTypes, float maxDistance = float.MaxValue, SensorType sensorType = SensorType.Camera)
     {
         RaycastHit2D[] hits = RaycastInLine(to, from, maxDistance, sensorType);
         if (hits.Length == 0) return null;
@@ -88,7 +88,7 @@ public static class GeometryUtils
         foreach (RaycastHit2D hit in enemyHits)
         {
             if (closestHit.HasValue && hit.distance >= closestHit.Value.distance) continue;
-            HasEntityType entityTypeComponent = hit.collider.GetComponent<HasEntityType>();
+            EntityType entityTypeComponent = hit.collider.GetComponent<EntityType>();
             if (entityTypeComponent == null) continue;
             if (!entityTypes.Contains(entityTypeComponent.Type)) continue;
             closestHit = hit;
