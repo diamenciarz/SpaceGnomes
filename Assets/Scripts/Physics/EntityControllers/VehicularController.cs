@@ -12,9 +12,9 @@ public class VehicularController: AbstractPhysicsController
     [SerializeField, Range(0f, 1f)] private float perpendicularDamping = 0.1f;
     [Header("Rotation")]
     [SerializeField] private float steerTorque = 10000f;
-    [SerializeField] private float maxAngularDampingMultiplier = 2f;
-    [SerializeField] [Range(0f, 360)] float maxAngularVelocity = 100f;
-    [SerializeField, Range(0f, 1f)] private float angularDamping = 0.2f;
+    [SerializeField][Range(1f, 10f)] private float maxAngularDampingMultiplier = 2f;
+    [SerializeField][Range(0f, 360)] float maxAngularVelocity = 100f;
+    [SerializeField][Range(0f, 1f)] private float angularDamping = 0.2f;
     
 
     private float thrustInput;
@@ -80,8 +80,7 @@ public class VehicularController: AbstractPhysicsController
         {
             // Apply the higher of thrustForce or thrustDampingForce to decelerate
             float thrustDampingForce = thrustForce * thrustDampingMultiplier;
-            float maxForce = Mathf.Max(thrustForce, thrustDampingForce);
-            Vector2 decelerationForce = -Mathf.Sign(forwardVelocity) * forward * maxForce;
+            Vector2 decelerationForce = -Mathf.Sign(forwardVelocity) * forward * thrustDampingForce;
             return decelerationForce;
         }
 
@@ -92,21 +91,20 @@ public class VehicularController: AbstractPhysicsController
     private float CalculateRotationTorque(float steerInput)
     {
         float angularVelocity = rb2d.angularVelocity;
-        float desiredTorque = -steerInput * steerTorque;
 
         // Check if steer input opposes the current rotation
         if (steerInput != 0f && Mathf.Sign(steerInput) * Mathf.Sign(angularVelocity) > 0f)
         {
             // Apply the higher of steerTorque or maxAngularDampingTorque to decelerate
             float maxAngularDampingTorque = steerTorque * maxAngularDampingMultiplier;
-            float maxTorque = Mathf.Max(steerTorque, maxAngularDampingTorque);
-            float decelerationTorque = -Mathf.Sign(angularVelocity) * maxTorque;
+            float decelerationTorque = -Mathf.Sign(angularVelocity) * maxAngularDampingTorque;
             return decelerationTorque;
         }
 
         // Otherwise, apply the standard steer torque
         if (Mathf.Abs(angularVelocity) < maxAngularVelocity)
         {
+            float desiredTorque = -steerInput * steerTorque;
             return desiredTorque;
         }
         else
