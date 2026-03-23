@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
+/// This class holds information about the map, such as its width and height, and provides methods to get positions on the map based on percentage values.
 /// Center of map has coordinates (0,0)
 /// </summary>
 public class MapInformation: AbstractSingleton<MapInformation>
 {
-    public Vector2 bottomLeftCorner;
-    public Vector2 topRightCorner;
-
     [SerializeField] public float mapWidth;
     [SerializeField] public float mapHeight;
+
+    [HideInInspector] public Vector2 bottomLeftCorner;
+    [HideInInspector] public Vector2 topRightCorner;
 
     private void Start()
     {

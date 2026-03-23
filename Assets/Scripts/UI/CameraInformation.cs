@@ -21,8 +21,9 @@ public class CameraInformation : AbstractSingleton<CameraInformation>
     private bool hasCalculatedCameraSize = false;
     private Vector2 cameraSize;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         CalculateCameraSize();
         RecountScreenEdges();
     }
