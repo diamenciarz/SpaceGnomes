@@ -9,7 +9,7 @@ public class EntityTypeProperty : MonoBehaviour
     {
         Wall,
         Ship,
-        Projectile,
+        Plasma,
         Explosion,
         SpaceDebris,
         Missile

@@ -64,7 +64,7 @@ public class DestroyOnCollision : MonoBehaviour
             return new EntityTypeProperty.EntityType[]
             {
                 EntityTypeProperty.EntityType.Ship,
-                EntityTypeProperty.EntityType.Projectile,
+                EntityTypeProperty.EntityType.Plasma,
                 EntityTypeProperty.EntityType.Missile
             };
         }
