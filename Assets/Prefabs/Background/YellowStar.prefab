@@ -100,9 +100,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd6ebc2aefa8da488cc51f86642a814, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flickerDuration: 0.1
-  minWaitTime: 1
-  maxWaitTime: 5
+  flickerDuration: 1
+  minWaitTime: 5
+  maxWaitTime: 20
 --- !u!114 &6676668502653053871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,7 +115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d959443547ebbd4b9e72ea3ee42d639, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minDistance: 870
+  minDistance: 950
   maxDistance: 990
   recalculateOffScreen: 1
   changeSpriteOnRecalculation: 1
@@ -152,5 +152,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65166b58438b17f4d8b9f72a88ffa12f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minScale: 3
-  maxScale: 5
+  minScale: 1
+  maxScale: 3

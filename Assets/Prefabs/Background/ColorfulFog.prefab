@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6676668502653053864}
   - component: {fileID: 6676668502653053865}
   - component: {fileID: 6676668502653053871}
+  - component: {fileID: 7829590393814539971}
   - component: {fileID: 3244885849608403393}
   m_Layer: 0
   m_Name: ColorfulFog
@@ -75,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1900
-  m_Sprite: {fileID: 21300000, guid: 33d0d7f8c4b40874ab0859a18b086c5c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c9598b4e82747df46877292cc74da24e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.50980395}
   m_FlipX: 0
   m_FlipY: 0
@@ -98,13 +99,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d959443547ebbd4b9e72ea3ee42d639, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minDistance: 300
+  minDistance: 600
   maxDistance: 950
   recalculateOffScreen: 1
-  changeSpriteOnRecalculation: 0
+  changeSpriteOnRecalculation: 1
   setRandomRotation: 1
   useCustomPosition: 0
   customPosition: {x: 0, y: 0}
+--- !u!114 &7829590393814539971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6676668502653053867}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98a3024f90d25ca42aa764b6e668c131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minBrightness: 0.5
+  maxBrightness: 1
+  minSaturation: 0.5
+  maxSaturation: 1
+  minAlpha: 0.5
+  maxAlpha: 1
+  colorMode: 0
+  hue1: 0
+  hue2: 0.5
+  weightedHues:
+  - hue: 0
+    weight: 0
 --- !u!114 &3244885849608403393
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BackgroundGenerator : MonoBehaviour, ISerializationCallbackReceiver
+public class BackgroundGenerator : AbstractSingleton<BackgroundGenerator>, ISerializationCallbackReceiver
 {
-    public List<GameObject> doodads;
-    public List<int> doodadSpawnCount;
+    public List<GameObject> doodads = new List<GameObject>();
+    public List<int> doodadSpawnCount = new List<int>();
 
 
-    public List<GameObject> regularBackground;
-    public List<int> regularBGSpawnDistance;
+    public List<GameObject> regularBackground = new List<GameObject>();
+    public List<int> regularBGSpawnDistance = new List<int>();
 
     private List<Vector2> spawnedBGCoords = new List<Vector2>();
     /// <summary>
@@ -83,6 +83,13 @@ public class BackgroundGenerator : MonoBehaviour, ISerializationCallbackReceiver
             }
         }
     }
+    /// <summary>
+    /// Gets the coordinates in which the regular background items will be spawned.
+    /// The coordinates are determined by the camera size and the given distance between the items.
+    /// The coordinates are also randomly offset by up to half the distance to avoid a grid-like pattern.
+    /// </summary>
+    /// <param name="gridDistance"></param>
+    /// <returns></returns>
     private List<Vector2> GetSpawnCoordinates(float gridDistance)
     {
         Vector2[] coordinateRange = GetCoordinateRange(gridDistance);
@@ -103,6 +110,11 @@ public class BackgroundGenerator : MonoBehaviour, ISerializationCallbackReceiver
         return spawnCoordinates;
     }
 
+    /// <summary>
+    /// Gets the bottom left and top right coordinates of the area in which the regular background items will be spawned.
+    /// </summary>
+    /// <param name="gridDistance"></param>
+    /// <returns></returns>
     private Vector2[] GetCoordinateRange(float gridDistance)
     {
         Vector2[] diagonalCameraPoints = CameraInformation.Instance.GetDiagonalCameraPoints();

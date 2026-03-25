@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -10000
   m_Sprite: {fileID: 21300000, guid: 1091459e5e9a22541a04146eb3defb0d, type: 3}
-  m_Color: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 1}
+  m_Color: {r: 0.3301887, g: 0.0728907, b: 0.0728907, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minDistance: 995
-  maxDistance: 1000
+  maxDistance: 995
   recalculateOffScreen: 0
   changeSpriteOnRecalculation: 0
   setRandomRotation: 0

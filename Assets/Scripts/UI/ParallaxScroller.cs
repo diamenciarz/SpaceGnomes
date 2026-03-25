@@ -56,6 +56,13 @@ public class ParallaxScroller : MonoBehaviour
     #endregion
 
     #region Update
+    private void OnValidate()
+    {
+        if (minDistance > maxDistance)
+        {
+            maxDistance = minDistance;
+        }
+    }
     void Update()
     {
         OnScreenCheck();

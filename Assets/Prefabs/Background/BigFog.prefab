@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6676668502653053865}
   - component: {fileID: 6676668502653053871}
   - component: {fileID: 3244885849608403393}
+  - component: {fileID: 5701767053354971340}
   m_Layer: 0
   m_Name: BigFog
   m_TagString: Untagged
@@ -76,7 +77,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -1900
   m_Sprite: {fileID: 21300000, guid: dfd2ec7382d9e23458d31724f084555a, type: 3}
-  m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 0.50980395}
+  m_Color: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 0.50980395}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -121,3 +122,27 @@ MonoBehaviour:
   - {fileID: 21300000, guid: dfd2ec7382d9e23458d31724f084555a, type: 3}
   weights:
   - 1
+--- !u!114 &5701767053354971340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6676668502653053867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98a3024f90d25ca42aa764b6e668c131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minBrightness: 0.5
+  maxBrightness: 1
+  minSaturation: 0.5
+  maxSaturation: 0.75
+  minAlpha: 0.2
+  maxAlpha: 0.6
+  colorMode: 0
+  hue1: 160
+  hue2: 240
+  weightedHues:
+  - hue: 0
+    weight: 0
