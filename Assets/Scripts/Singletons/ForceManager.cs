@@ -47,6 +47,10 @@ public class ForceManager : AbstractSingleton<ForceManager>
 
     private void HandleForceCategory(ForceType type)
     {
+        if(!simulatedEntities.ContainsKey(type))
+        {
+            Debug.LogWarning("ForceManager: No entities registered for force type " + type + "only contains" + string.Join(", ", simulatedEntities.Keys));
+        }
         List<GameObject> appliers = simulatedEntities[type].Where(go => go.GetComponent<ForceProperty>().forceApplier).ToList();
         
         if(appliers.Count == 0)
