@@ -10,7 +10,7 @@ public class ScaleWithCamera : MonoBehaviour
     void Start()
     {
         initialLocalScale = transform.localScale;
-        UpdateScale(CameraInformation.Instance.ma orthographicSize);
+        UpdateScale(CameraInformation.Instance.mainCamera.orthographicSize);
         CameraInformation.Instance.OnCameraZoomChanged += UpdateScale;
     }
 
@@ -25,6 +25,5 @@ public class ScaleWithCamera : MonoBehaviour
     private void UpdateScale(float newOrthographicSize)
     {
         transform.localScale = initialLocalScale * DEFAULT_CAMERA_SIZE / newOrthographicSize;
-        Debug.Log($"Updated scale to {transform.localScale} based on camera size {newOrthographicSize}");
     }
 }

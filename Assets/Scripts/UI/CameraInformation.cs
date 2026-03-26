@@ -21,7 +21,7 @@ public class CameraInformation : AbstractSingleton<CameraInformation>
 
     public Camera mainCamera { get; private set; }
     private bool hasCalculatedCameraSize = false;
-    private Vector2 cameraSize;
+    private Vector2 cameraSize = new Vector2();
 
     [SerializeField] private float edgeDistance = 50f; // Distance from screen edge in pixels to consider mouse at edge
 

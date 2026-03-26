@@ -159,19 +159,6 @@ public static class GeometryUtils
                 return LayerMask.GetMask(new string[] { "VisionBlocking", "RadarBlocking" });
         }
     }
-    public static Vector2 GetMousePosition(bool worldCoords = true)
-    {
-        if (worldCoords)
-        {
-            Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            return new Vector2(worldPos.x, worldPos.y);
-        }
-        else
-        {
-            return new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-        }
-    }
-
     public static float ClampAngle180(float angle)
     {
         // If an Euler angle is outside the range <-180,180> bring it into it

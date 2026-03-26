@@ -65,18 +65,11 @@ public class UIManager : AbstractSingleton<UIManager>
         if (PrefabByType == null) PrefabByType = new Dictionary<UITypes, GameObject>();
         BuildPrefabMap();
     }
-    private const float DEFAULT_CAMERA_SIZE = 10f;
-    /// <summary>
-    /// Compatibility wrapper for existing code that used the old FOV-specific factory.
-    /// Calls the new generic InstantiateUI and returns the ProgressBar component when available.
-    /// </summary>
     public ProgressBar InstantiateFieldOfView(GameObject followObj, float radius, float arc = 360f, float deltaAngle = 0f, bool rotateWithParent = true)
     {
         GameObject go = InstantiateUI(UITypes.FieldOfView, followObj, radius, arc, 360f, rotateWithParent, deltaAngle);
         if (go == null) return null;
         // Adjust scale based on camera size to maintain consistent world-space radius regardless of zoom level.
-        go.transform.localScale = go.transform.localScale * DEFAULT_CAMERA_SIZE / Camera.main.orthographicSize;
-        //Debug.Log($"Instantiated FOV with radius {radius} local scale {go.transform.localScale}, global scale {go.transform.lossyScale}");
         return go.GetComponent<ProgressBar>();
     }
     public void DestroyFieldOfView(GameObject fovObj)
