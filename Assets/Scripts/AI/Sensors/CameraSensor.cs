@@ -182,7 +182,7 @@ public class CameraSensor : AbstractSensor
             GameObject follower = null;
             if (detectMouse)
             {
-                Vector2 mousePosition = GeometryUtils.GetMousePosition();
+                Vector2 mousePosition = CameraInformation.Instance.GetMousePosition();
                 if (GetVisionCone().IsPositionInCone(mousePosition))
                 {
                     follower = EntityCounter.Instance.MouseCursor;

@@ -6,6 +6,6 @@ public class MouseFollower : MonoBehaviour
 {
     void Update()
     {
-        transform.position = GeometryUtils.GetMousePosition();
+        transform.position = CameraInformation.Instance.GetMousePosition();
     }
 }

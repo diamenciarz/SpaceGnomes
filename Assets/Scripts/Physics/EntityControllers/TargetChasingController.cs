@@ -26,6 +26,10 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     [Header("Instance Settings")]
     [SerializeField] private List<AbstractSensor> sensors = new List<AbstractSensor>();
 
+    [Header("Chasing settings")]
+    [SerializeField][Tooltip("If true, will turn off perpendicularDamping for a while allowing the rocket to turn around quickly")] bool usePredatorMode = false;
+    [SerializeField][Tooltip("Time after target is acquired to turn off perpendicular damping for quick turning")] float predatorModeDuration = 1f;
+
     // Physics Settings
     [Tooltip("This value makes force calculation match the desired deltaVelocity")] 
     private float THRUST_MULTIPLIER = 45f;
@@ -38,6 +42,9 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private float lastFixedVelocity;
     private float lastFixedTime;
     private float startTime;
+
+    private float startedPredatorModeTime;
+    private bool isInPredatorMode = false;
 
     public override void Activate()
     {
@@ -79,7 +86,17 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private float GetPerpendicularDamping()
     {
         if (Time.time < startTime + accelerationDelay) return initialPerpendicularDamping;
-        return perpendicularDamping;
+        if(!isInPredatorMode) return perpendicularDamping;
+
+        if(Time.time > startedPredatorModeTime + predatorModeDuration)
+        {
+            isInPredatorMode = false;
+            return perpendicularDamping;
+        }
+        else
+        {
+            return 0f; // No damping in predator mode for quick turning
+        }
     }
     private void UpdateTarget()
     {
@@ -105,19 +122,37 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private void HandleMovement()
     {
         // Apply thrust according to velocity function
+        HandleThrust();
+        // Handle rotation torque
+        HandleTorque();
+    }
+    private void HandleThrust()
+    {
         float fixedDeltaVelocity = CalculateFixedDeltaVelocity();
         float thrustForce = fixedDeltaVelocity * rb2d.mass / Time.fixedDeltaTime; // F = m * a, where a = Δv / Δt
         rb2d.AddForce(transform.up * thrustForce * Time.fixedDeltaTime * THRUST_MULTIPLIER);
         ClampVelocity();
-        // Handle rotation torque
+    }
+    private void HandleTorque()
+    {
         if (!target) return;
-        float steerInput = CalculateRotationInput();
+        float angleToTarget = CalculateAngleToTarget();
+        float steerInput = Mathf.Clamp(angleToTarget / 180, -1, 1); // Normalize to [-1, 1]
+
+        CheckPredatorMode(angleToTarget);
+
         float torque = CalculateRotationTorque(steerInput);
         rb2d.AddTorque(torque * Time.fixedDeltaTime);
 
         ClampAngularVelocity();
-        // Angular velocity goes above maxAngularVelocity
-        // Eliminate wobbling 
+    }
+    private void CheckPredatorMode(float angleToTarget)
+    {
+        if(usePredatorMode && !isInPredatorMode && Mathf.Abs(angleToTarget) > 90f)
+        {
+            isInPredatorMode = true;
+            startedPredatorModeTime = Time.time;
+        }
     }
     private void ClampVelocity()
     {
@@ -175,11 +210,10 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
             return 0;
         }
     }
-    private float CalculateRotationInput()
+    private float CalculateAngleToTarget()
     {
         Vector2 directionToTarget = (Vector2)target.transform.position - rb2d.position;
-        float angleToTarget = Vector2.SignedAngle(transform.up, directionToTarget);
-        return Mathf.Clamp(angleToTarget/180, -1, 1); // Normalize to [-1, 1]
+        return Vector2.SignedAngle(transform.up, directionToTarget);
     }
     private float GetVelocityAtTime(float time)
     {

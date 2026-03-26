@@ -74,7 +74,9 @@ public class UIManager : AbstractSingleton<UIManager>
     {
         GameObject go = InstantiateUI(UITypes.FieldOfView, followObj, radius, arc, 360f, rotateWithParent, deltaAngle);
         if (go == null) return null;
-        go.transform.localScale = go.transform.localScale * (DEFAULT_CAMERA_SIZE / Camera.main.orthographicSize);
+        // Adjust scale based on camera size to maintain consistent world-space radius regardless of zoom level.
+        go.transform.localScale = go.transform.localScale * DEFAULT_CAMERA_SIZE / Camera.main.orthographicSize;
+        //Debug.Log($"Instantiated FOV with radius {radius} local scale {go.transform.localScale}, global scale {go.transform.lossyScale}");
         return go.GetComponent<ProgressBar>();
     }
     public void DestroyFieldOfView(GameObject fovObj)

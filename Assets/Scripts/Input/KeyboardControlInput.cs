@@ -94,7 +94,7 @@ public class KeyboardControlInput : ControlInput
     }
     private float GetMouseRotationInput()
     {
-        Vector2 worldMousePosition = GeometryUtils.GetMousePosition();
+        Vector2 worldMousePosition = CameraInformation.Instance.GetMousePosition();
         Vector2 directionToMouse = worldMousePosition - (Vector2)transform.position;
         float angleDifference = Vector2.SignedAngle(directionToMouse, transform.up);
 
