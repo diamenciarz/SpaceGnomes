@@ -26,9 +26,10 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     [Header("Instance Settings")]
     [SerializeField] private List<AbstractSensor> sensors = new List<AbstractSensor>();
 
-    [Header("Chasing settings")]
-    [SerializeField][Tooltip("If true, will turn off perpendicularDamping for a while allowing the rocket to turn around quickly")] bool usePredatorMode = false;
-    [SerializeField][Tooltip("Time after target is acquired to turn off perpendicular damping for quick turning")] float predatorModeDuration = 1f;
+    [Header("Predator Mode Settings")]
+    [SerializeField][Tooltip("If true, will turn off perpendicularDamping allowing the rocket to turn around quickly")] bool usePredatorMode = false;
+    [SerializeField][Tooltip("Predator mode will be turned on once angle to target is above this value")] float turnOnAboveAngle = 90f;
+    [SerializeField][Tooltip("Predator mode will be turned off once angle to target is below this value")] float turnOffBelowAngle = 5f;
 
     // Physics Settings
     [Tooltip("This value makes force calculation match the desired deltaVelocity")] 
@@ -43,7 +44,6 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private float lastFixedTime;
     private float startTime;
 
-    private float startedPredatorModeTime;
     private bool isInPredatorMode = false;
 
     public override void Activate()
@@ -88,7 +88,8 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         if (Time.time < startTime + accelerationDelay) return initialPerpendicularDamping;
         if(!isInPredatorMode) return perpendicularDamping;
 
-        if(Time.time > startedPredatorModeTime + predatorModeDuration)
+        float angleToTarget = CalculateAngleToTarget();
+        if(Mathf.Abs(angleToTarget) < turnOffBelowAngle)
         {
             isInPredatorMode = false;
             return perpendicularDamping;
@@ -148,11 +149,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     }
     private void CheckPredatorMode(float angleToTarget)
     {
-        if(usePredatorMode && !isInPredatorMode && Mathf.Abs(angleToTarget) > 90f)
-        {
-            isInPredatorMode = true;
-            startedPredatorModeTime = Time.time;
-        }
+        if(usePredatorMode && !isInPredatorMode && Mathf.Abs(angleToTarget) > turnOnAboveAngle) isInPredatorMode = true;
     }
     private void ClampVelocity()
     {

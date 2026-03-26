@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initialVelocity: 2
-  targetVelocity: 20
+  targetVelocity: 15
   accelerationTime: 2
   accelerationCurve:
     serializedVersion: 2
@@ -196,6 +196,8 @@ MonoBehaviour:
   maxAngularDampingMultiplier: 3
   sensors:
   - {fileID: 3390904295761830887}
+  usePredatorMode: 1
+  predatorModeDuration: 2
 --- !u!114 &3205544630134639897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -249,7 +251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb9c7a3a46cd575458f153930e7e6fac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetime: 60
+  lifetime: 20
 --- !u!114 &-6234091980034668709
 MonoBehaviour:
   m_ObjectHideFlags: 0
