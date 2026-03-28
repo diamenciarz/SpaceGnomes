@@ -20,7 +20,7 @@ public class StraightLineMovementController : AutonomousMovementController
     {
         base.Activate();
         // Set initial velocity along forward direction (transform.up)
-        rb.velocity = transform.up * initialVelocity;
+        rb.velocity = transform.right * initialVelocity;
     }
 
     private float GetVelocityAtTime(float time)

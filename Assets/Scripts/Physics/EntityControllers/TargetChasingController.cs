@@ -50,7 +50,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     {
         base.Activate();
         // Set initial velocity along forward direction (transform.up)
-        rb2d.velocity = transform.up * initialVelocity;
+        rb2d.velocity = transform.right * initialVelocity;
         lastFixedTime = Time.time;
         lastFixedVelocity = initialVelocity;
         startTime = Time.time;
@@ -72,7 +72,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     }
     private void ApplyPerpendicularDamping()
     {
-        Vector2 forward = transform.up;
+        Vector2 forward = transform.right;
         Vector2 velocity = rb2d.velocity;
         // Project velocity onto forward direction
         Vector2 forwardVelocity = Vector2.Dot(velocity, forward) * forward;
@@ -131,7 +131,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     {
         float fixedDeltaVelocity = CalculateFixedDeltaVelocity();
         float thrustForce = fixedDeltaVelocity * rb2d.mass / Time.fixedDeltaTime; // F = m * a, where a = Δv / Δt
-        rb2d.AddForce(transform.up * thrustForce * Time.fixedDeltaTime * THRUST_MULTIPLIER);
+        rb2d.AddForce(transform.right * thrustForce * Time.fixedDeltaTime * THRUST_MULTIPLIER);
         ClampVelocity();
     }
     private void HandleTorque()
@@ -210,7 +210,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private float CalculateAngleToTarget()
     {
         Vector2 directionToTarget = (Vector2)target.transform.position - rb2d.position;
-        return Vector2.SignedAngle(transform.up, directionToTarget);
+        return Vector2.SignedAngle(transform.right, directionToTarget);
     }
     private float GetVelocityAtTime(float time)
     {
