@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "ScriptableObjects/TailEntityBehavior", fileName = "TailEntityBehavior")]
+[CreateAssetMenu(menuName= "ScriptableObjects/Behaviors/Movement/Omnidirectional/TailEntityBehavior", fileName = "TailEntityBehavior")]
 public class TailEntityBehavior : MovementBehavior
 {
     [Header("Tail Entity Settings")]

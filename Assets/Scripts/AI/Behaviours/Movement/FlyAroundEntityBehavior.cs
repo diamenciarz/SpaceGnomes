@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName= "ScriptableObjects/FlyAroundEntityBehavior", fileName = "FlyAroundEntityBehavior")]
+[CreateAssetMenu(menuName= "ScriptableObjects/Behaviors/Movement/Omnidirectional/FlyAroundEntityBehavior", fileName = "FlyAroundEntityBehavior")]
 public class FlyAroundEntityBehavior : ArcMovementBehavior
 {
     [Header("Fly Around Settings")]

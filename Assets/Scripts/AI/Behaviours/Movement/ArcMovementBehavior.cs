@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(menuName= "ScriptableObjects/Behaviors/Movement/Vehicular/ArcMovementBehavior", fileName = "ArcMovementBehavior")]
 public class ArcMovementBehavior : MovementBehavior
 {
     protected Vector2 DetermineWorldTarget(List<Vector2> offsets, Vector2 actualCenter, MovementBehaviorData data, GameObject chaseEntity)

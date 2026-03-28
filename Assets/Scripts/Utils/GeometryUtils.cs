@@ -567,4 +567,8 @@ public static class GeometryUtils
         Vector3 worldDir3 = coordsTransform.TransformDirection(localDir3);
         return new Vector2(worldDir3.x, worldDir3.y);
     }
+    public static Vector2 RotateVector(Vector2 vector, float angle)
+    {
+        return Quaternion.Euler(0,0,angle) * vector;
+    }
 }

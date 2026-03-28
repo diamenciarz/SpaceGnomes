@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "ScriptableObjects/AttackAndRetreatBehavior", fileName = "AttackAndRetreatBehavior")]
+[CreateAssetMenu(menuName= "ScriptableObjects/Behaviors/Movement/Vehicular/AttackAndRetreatBehavior", fileName = "AttackAndRetreatBehavior")]
 public class AttackAndRetreatBehavior : ChaseEntityOmnidirectionalBehavior
 {
     [Header("Retreat Settings")]
