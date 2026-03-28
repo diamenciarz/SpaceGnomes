@@ -18,6 +18,10 @@ public class DamageOnTouch : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        HandleDealingDamage(other);
+    }
+    private void HandleDealingDamage(Collider2D other)
+    {
         if (damageEntityTypes.Count == 0) return;
         
         Health health = other.GetComponent<Health>();

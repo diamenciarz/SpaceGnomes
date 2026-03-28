@@ -8,11 +8,13 @@ public class Health : MonoBehaviour
 
     private float currentHealth;
     private EntityTeam parentEntityTeam;
-    private bool isDead = false;
+    private bool isDestroyed = false;
+    private PooledObjectProperty pooledObjectProperty;
     public EntityTeam.Team team => parentEntityTeam? parentEntityTeam.team : EntityTeam.Team.Neutral;
 
     private void Start()
     {
+        pooledObjectProperty = GetComponent<PooledObjectProperty>();
         currentHealth = maxHealth;
         UpdateParentEntityTeam();
     }
@@ -24,7 +26,7 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        if(isDead) return;
+        if(isDestroyed) return;
         if (isInvulnerable)
         {
             //Debug.Log("Entity is invulnerable, no damage taken.");
@@ -41,9 +43,19 @@ public class Health : MonoBehaviour
 
         if (currentHealth <= 0f)
         {
-            isDead = true;
-            ObjectPoolManager.Instance.Despawn(gameObject);
+            currentHealth = 0f;
+            isDestroyed = true;
+            Despawn();
         }
+    }
+    private void Despawn()
+    {
+        if (pooledObjectProperty == null)
+        {
+            ObjectPoolManager.Instance.Despawn(gameObject);
+            return;
+        }
+        ObjectPoolManager.Instance.Despawn(gameObject, pooledObjectProperty.poolId);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

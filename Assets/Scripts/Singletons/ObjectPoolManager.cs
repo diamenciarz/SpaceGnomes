@@ -170,7 +170,7 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
         if(!initialized) InitializePools();
         if (!pools.ContainsKey(poolId))
         {
-            Debug.LogWarning($"No pool found for ID: {poolId}. Destroying object.");
+            Debug.LogError($"No pool found for ID: {poolId}. Destroying object.");
             Despawn(obj);
             return;
         }
