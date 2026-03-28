@@ -11,7 +11,7 @@ using UnityEngine;
 /// or a visual effect that should be removed when the associated object is removed.
 /// The script also provides methods to add or remove objects from the dependency list at runtime, allowing for dynamic relationships between objects.
 /// </summary>
-public class DestroyWithObjects : MonoBehaviour
+public class DespawnWithObjects : MonoBehaviour
 {
     [SerializeField] List<GameObject> objectsSubscribedTo;
 

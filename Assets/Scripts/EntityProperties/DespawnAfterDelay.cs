@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// This script allows an object to be automatically despawned after a certain amount of time has passed since it was spawned.
 /// </summary>
-public class DestroyAfterDelay : ActivateOnSpawn
+public class DespawnAfterDelay : ActivateOnSpawn
 {
     [SerializeField] private float lifetime = 3f;
 

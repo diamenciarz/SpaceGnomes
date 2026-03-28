@@ -58,7 +58,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\EntityProperties\DespawnOthersOnDespawn.cs" />
     <Compile Include="Assets\Scripts\Singletons\AbstractSingleton.cs" />
-    <Compile Include="Assets\Scripts\EntityProperties\DestroyAfterDelay.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\DespawnAfterDelay.cs" />
     <Compile Include="Assets\Scripts\UI\LineHolder.cs" />
     <Compile Include="Assets\Scripts\Singletons\TeamManager.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\ActivateOnDespawn.cs" />
@@ -118,7 +118,7 @@
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\AbstractWeaponController.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\FollowClosestEntityToTarget.cs" />
     <Compile Include="Assets\Scripts\Physics\EntityControllers\AbstractPhysicsController.cs" />
-    <Compile Include="Assets\Scripts\EntityProperties\DestroyOnCollision.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\DespawnOnCollision.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\MovementBehavior.cs" />
     <Compile Include="Assets\Scripts\Physics\PhysicalForces\RandomInitialVelocity.cs" />
     <Compile Include="Assets\Scripts\Utils\CacheManager.cs" />
@@ -128,7 +128,7 @@
     <Compile Include="Assets\Scripts\Utils\Line2D.cs" />
     <Compile Include="Assets\Scripts\UI\CameraTransformController.cs" />
     <Compile Include="Assets\Scripts\AI\Sensors\CameraSensor.cs" />
-    <Compile Include="Assets\Scripts\EntityProperties\DestroyWithObjects.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\DespawnWithObjects.cs" />
     <Compile Include="Assets\Scripts\Singletons\EntityCounter.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\AutonomousMovementController.cs" />
     <Compile Include="Assets\Scripts\Unused\CellularAutomata\GPUCellularAutomata.cs" />

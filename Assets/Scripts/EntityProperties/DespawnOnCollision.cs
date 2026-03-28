@@ -7,7 +7,7 @@ using System.Linq;
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 
-public class DestroyOnCollision : MonoBehaviour
+public class DespawnOnCollision : MonoBehaviour
 {
     [SerializeField]
     [Tooltip("Ignores ally ships, projectiles, and missiles")] private bool ignoreAllies = false;
