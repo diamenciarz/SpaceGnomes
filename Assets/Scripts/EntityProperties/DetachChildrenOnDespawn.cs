@@ -39,6 +39,7 @@ public class DetachChildrenOnDespawn : ActivateOnDespawn
         float totalRelativeMass = childrenToDetach.Sum(childInfo => childInfo.relativeMass) + myRelativeMass;
         foreach (ChildInfo childInfo in childrenToDetach)
         {
+            if(!childInfo.child) Debug.LogError($"Child object reference is missing in {gameObject.name}'s DetachChildrenOnDespawn script.");
             DetachChildrenOnDespawn script = childInfo.child.GetComponent<DetachChildrenOnDespawn>();
             if (script)
             {
