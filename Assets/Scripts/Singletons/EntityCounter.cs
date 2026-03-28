@@ -78,6 +78,17 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
         }
         return GetEntityParentRecursive(parent);
     }
+    public GameObject GetDummyPointObject(Vector2 position, float rotation)
+    {
+        return GetDummyPointObject(position, Quaternion.Euler(0f, 0f, rotation));
+    }
+    public GameObject GetDummyPointObject(Vector2 position, Quaternion rotation)
+    {
+        if (!dummyPointObject) CreateDummyPointObject();
+        dummyPointObject.transform.position = position;
+        dummyPointObject.transform.rotation = rotation;
+        return dummyPointObject;
+    }
     public GameObject GetDummyPointObject()
     {
         if (!dummyPointObject) CreateDummyPointObject();

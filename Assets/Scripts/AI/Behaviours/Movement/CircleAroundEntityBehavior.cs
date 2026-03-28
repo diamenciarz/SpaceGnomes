@@ -1,7 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// This behavior generates a dynamic arc of points around the target entity and moves towards the next point in the arc, creating a circling movement pattern.
+/// The arc is continuously updated based on the ship's position and the target's position, allowing for smooth circling even if the target moves.
+/// If the ship gets stuck and fails to reach the next point within a certain time, a new arc is generated in an attempt to get unstuck.
+/// </summary>
 [CreateAssetMenu(menuName= "ScriptableObjects/Behaviors/Movement/Omnidirectional/CircleAroundEntityBehavior", fileName = "CircleAroundEntityBehavior")]
 public class CircleAroundEntityBehavior : ArcMovementBehavior
 {
@@ -24,27 +30,33 @@ public class CircleAroundEntityBehavior : ArcMovementBehavior
     private bool addingArcPointsClockwise;
     private float lastArcPointAngle;
 
+    protected override void OnValidate()
+    {
+        base.OnValidate();
+        if (randomPositionMaxRadius < randomPositionMinRadius) randomPositionMaxRadius = randomPositionMinRadius;
+    }
+
     protected override Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity)
     {
         chaseEntity = EntityCounter.Instance.GetEntityParent(chaseEntity);
         int entityId = chaseEntity.GetInstanceID();
-
-        Vector2 actualCenter = (Vector2)chaseEntity.transform.position;
-        List<Vector2> offsets = GetOrCreateArcOffsets(entityId, chaseEntity, data, actualCenter);
+        GameObject chaseParent = EntityCounter.Instance.GetEntityParent(chaseEntity);
+        Vector2 actualChaseEntityCenter = chaseParent.transform.position;
+        List<Vector2> offsets = GetOrCreateArcOffsets(entityId, chaseEntity, data, actualChaseEntityCenter);
 
         Vector2 shipPos = (Vector2)data.transform.position;
-        PruneArc(offsets, actualCenter, shipPos, entityId);
-        AdvanceArc(offsets, actualCenter, shipPos, entityId);
+        PruneArc(offsets, actualChaseEntityCenter, shipPos, data, chaseEntity);
+        AdvanceArc(offsets, actualChaseEntityCenter, shipPos, data, chaseEntity);
 
         arcOffsetsByEntity[entityId] = offsets;
 
-        Vector2 worldTarget = DetermineWorldTarget(offsets, actualCenter, data, chaseEntity);
+        Vector2 worldTarget = DetermineWorldTargetPosition(offsets, actualChaseEntityCenter, data, chaseEntity);
 
-        DrawDebugLines(data, worldTarget, offsets, actualCenter);
+        DrawDebugLines(data, worldTarget, offsets, actualChaseEntityCenter);
 
         return worldTarget - shipPos;
     }
-    private List<Vector2> GetOrCreateArcOffsets(int entityId, GameObject chaseEntity, MovementBehaviorData data, Vector2 actualCenter)
+    private List<Vector2> GetOrCreateArcOffsets(int entityId, GameObject chaseEntity, MovementBehaviorData data, Vector2 actualChaseEntityCenter)
     {
         if (!lastNewOffsetTimes.TryGetValue(entityId, out var lastNewOffsetTime))
         {
@@ -55,63 +67,64 @@ public class CircleAroundEntityBehavior : ArcMovementBehavior
         {
             // Reset the arc in an opposite direction to try to get unstuck
             addingArcPointsClockwise = !addingArcPointsClockwise;
-            InitializeNewArc(entityId, chaseEntity, data, actualCenter);
+            CreateNewArc(entityId, chaseEntity, data, actualChaseEntityCenter);
             return arcOffsetsByEntity[entityId];
         }
 
         bool arcExists = arcOffsetsByEntity.TryGetValue(entityId, out var existing);// && existing != null && existing.Count > 0;
         if (!arcExists)
         {
-            InitializeNewArc(entityId, chaseEntity, data, actualCenter);
+            CreateNewArc(entityId, chaseEntity, data, actualChaseEntityCenter);
         }
 
         return arcOffsetsByEntity[entityId];
     }
-    private void InitializeNewArc(int entityId, GameObject chaseEntity, MovementBehaviorData data, Vector2 actualCenter)
+    private void CreateNewArc(int entityId, GameObject chaseEntity, MovementBehaviorData data, Vector2 actualChaseEntityCenter)
     {
         // Instantiate a new arc by adding current ship position
-        float startAngle = AngleDegFromVector((Vector2) data.transform.position - actualCenter);
+        float startAngle = AngleDegFromVector((Vector2) data.transform.position - actualChaseEntityCenter);
         float initialRadius = Random.Range(randomPositionMinRadius, randomPositionMaxRadius);
-        Vector2 p = VectorFromAngleDeg(startAngle, initialRadius);
+        Vector2 p = VectorFromAngleDeg(startAngle, GetOffsetRadius(chaseEntity, data, initialRadius, startAngle));
         arcOffsetsByEntity[entityId] = new List<Vector2> { p };
         lastArcPointAngle = startAngle;
 
         // Then one more point in the direction of the arc
-        AddArcPoint(arcOffsetsByEntity[entityId], actualCenter, entityId);
+        AddArcPoint(arcOffsetsByEntity[entityId], actualChaseEntityCenter, data, chaseEntity);
     }
-    private void PruneArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, int entityId)
+    
+    private void PruneArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, MovementBehaviorData data, GameObject chaseEntity)
     {
         int closestIndex = FindClosestPointIndex(offsets, actualCenter, shipPos);
         if (closestIndex > 0)
         {
             offsets.RemoveRange(0, closestIndex);
             // Add one new point at the end of the arc
-            AddArcPoint(offsets, actualCenter, entityId);
+            AddArcPoint(offsets, actualCenter, data, chaseEntity);
         }
     }
 
-    private void AdvanceArc(List<Vector2> offsets, Vector2 actualCenter, Vector2 shipPos, int entityId)
+    private void AdvanceArc(List<Vector2> offsets, Vector2 actualChaseEntityCenter, Vector2 shipPos, MovementBehaviorData data, GameObject chaseEntity)
     {
         if (offsets.Count >= 2)
         {
-            float shipAngle = AngleDegFromVector(shipPos - actualCenter);
+            float shipAngle = AngleDegFromVector(shipPos - actualChaseEntityCenter);
             float secondAngle = AngleDegFromVector(offsets[1]);
             if (Mathf.Abs(Mathf.DeltaAngle(shipAngle, secondAngle)) <= advanceAngleThreshold)
             {
                 offsets.RemoveAt(0);
-                AddArcPoint(offsets, actualCenter, entityId);
+                AddArcPoint(offsets, actualChaseEntityCenter, data, chaseEntity);
             }
         }
     }
-    private void AddArcPoint(List<Vector2> offsets, Vector2 actualCenter, int entityId)
+    private void AddArcPoint(List<Vector2> offsets, Vector2 actualCenter, MovementBehaviorData data, GameObject chaseEntity)
     {
         float deltaAngle = addingArcPointsClockwise ? -arcAngularStep : arcAngularStep;
         float angle = lastArcPointAngle + deltaAngle;
         angle = Mathf.Repeat(angle, 360f);
-        float radius = offsets[0].magnitude;
-        Vector2 p = VectorFromAngleDeg(angle, radius);
+        float initialRadius = Random.Range(randomPositionMinRadius, randomPositionMaxRadius);
+        Vector2 p = VectorFromAngleDeg(angle, GetOffsetRadius(chaseEntity, data, initialRadius, angle));
         offsets.Add(p);
         lastArcPointAngle = angle;
-        lastNewOffsetTimes[entityId] = Time.time;
+        lastNewOffsetTimes[chaseEntity.GetInstanceID()] = Time.time;
     }
 }

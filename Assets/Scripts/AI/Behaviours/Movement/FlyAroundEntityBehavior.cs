@@ -32,6 +32,11 @@ public class FlyAroundEntityBehavior : ArcMovementBehavior
     private Dictionary<int, List<Vector2>> arcOffsetsByEntity = new Dictionary<int, List<Vector2>>();
     private Dictionary<int, float> lastNewOffsetTimes = new Dictionary<int, float>();
 
+    protected override void OnValidate()
+    {
+        base.OnValidate();
+        if (randomPositionMaxRadius < randomPositionMinRadius) randomPositionMaxRadius = randomPositionMinRadius;
+    }
     protected override Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity)
     {
         chaseEntity = EntityCounter.Instance.GetEntityParent(chaseEntity);
@@ -46,7 +51,7 @@ public class FlyAroundEntityBehavior : ArcMovementBehavior
 
         arcOffsetsByEntity[entityId] = offsets;
 
-        Vector2 worldTarget = DetermineWorldTarget(offsets, actualCenter, data, chaseEntity);
+        Vector2 worldTarget = DetermineWorldTargetPosition(offsets, actualCenter, data, chaseEntity);
 
         DrawDebugLines(data, worldTarget, offsets, actualCenter);
 
@@ -103,7 +108,7 @@ public class FlyAroundEntityBehavior : ArcMovementBehavior
 
         // Generate new arc
         Vector2 newDelta = GenerateDeltaOffset();
-        List<Vector2> newOffsets = BuildArcOffsets(actualCenter, (Vector2)data.transform.position, newDelta);
+        List<Vector2> newOffsets = BuildArcOffsets(actualCenter, newDelta, chaseEntity, data);
         arcOffsetsByEntity[entityId] = newOffsets;
         lastNewPositionTimes[entityId] = Time.time;
         lastNewOffsetTimes[entityId] = Time.time;
@@ -112,28 +117,28 @@ public class FlyAroundEntityBehavior : ArcMovementBehavior
 
     protected Vector2 GenerateDeltaOffset()
     {
-        // Pick an angle within the configured arc. 0 degrees is treated as "up" (world +Y).
-        float angleOffset = Random.Range(0f, arcWidth);
-        float angle = startingAngle + angleOffset;
-        angle = Mathf.Repeat(angle, 360f);
+        float angleOffset = Random.Range(0f, arcWidth)-arcWidth/2;
+        float angle = Mathf.Repeat(startingAngle + angleOffset, 360f);
 
         float distance = Random.Range(randomPositionMinRadius, randomPositionMaxRadius);
-
-        // Convert to radians and rotate so that 0 degrees maps to world up (0,1).
-        float rad = (angle + 90f) * Mathf.Deg2Rad;
-        Vector2 delta = new Vector2(distance * Mathf.Cos(rad), distance * Mathf.Sin(rad));
-        return delta;
+        return VectorFromAngleDeg(angle, distance);
     }
 
-    // Build arc offsets (relative to center) that move from the ship's current angular position to the desired delta offset.
-    protected virtual List<Vector2> BuildArcOffsets(Vector2 center, Vector2 myPos, Vector2 deltaOffset)
+    /// <summary>
+    /// Builds a list of offsets along an arc from the current position to the desired deltaOffset around the center.
+    /// The radius of the arc is determined by the magnitude of deltaOffset plus the thickness of the target's collider.
+    /// </summary>
+    /// <param name="center"></param>
+    /// <param name="deltaOffset"></param>
+    /// <param name="chaseEntity"></param>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    protected virtual List<Vector2> BuildArcOffsets(Vector2 center, Vector2 deltaOffset, GameObject chaseEntity, MovementBehaviorData data)
     {
         float radius = deltaOffset.magnitude;
-        if (radius <= Mathf.Epsilon)
-        {
-            return new List<Vector2> { deltaOffset };
-        }
+        if (radius <= Mathf.Epsilon) return new List<Vector2> { deltaOffset };
 
+        Vector2 myPos = (Vector2)data.transform.position;
         float startAngle = AngleDegFromVector(myPos - center);
         float endAngle = AngleDegFromVector(deltaOffset);
         float deltaAngle = Mathf.DeltaAngle(startAngle, endAngle);
@@ -144,15 +149,10 @@ public class FlyAroundEntityBehavior : ArcMovementBehavior
         List<Vector2> offsets = new List<Vector2>(steps);
         for (int i = 1; i <= steps; i++)
         {
-            float angle = startAngle + angleStep * i;
-            angle = Mathf.Repeat(angle, 360f);
-            Vector2 p = VectorFromAngleDeg(angle, radius);
-            offsets.Add(p);
+            float angle = Mathf.Repeat(startAngle + angleStep * i, 360f);
+            Vector2 offset = VectorFromAngleDeg(angle, GetOffsetRadius(chaseEntity, data, radius, angle));
+            offsets.Add(offset);
         }
-
-        // Ensure final point exactly equals the desired deltaOffset (avoid floating error)
-        offsets[offsets.Count - 1] = deltaOffset;
         return offsets;
     }
-
 }

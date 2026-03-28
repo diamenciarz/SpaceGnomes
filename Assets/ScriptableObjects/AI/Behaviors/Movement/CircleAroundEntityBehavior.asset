@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: CircleAroundEntityBehavior
   m_EditorClassIdentifier: 
   chaseRange: 100
-  stopChaseRange: 0
-  retreatRange: 0
+  stopChaseRange: 3
+  retreatRange: 3
   onlyRetreatFromEnemies: 1
   maxCollisionAvoidanceWeight: 0.7
   maxEntityRetreatWeight: 0.7
@@ -24,11 +24,11 @@ MonoBehaviour:
   chaseEntityTypes: 01000000
   avoidEntityTypes: 0000000001000000
   retreatFromEntityTypes: 01000000
-  debugCollisions: 0
+  debugCollisions: 1
   debugMovementVectors: 1
   debugConsideredDistances: 0
-  randomPositionMinRadius: 6
-  randomPositionMaxRadius: 3
-  arcAngularStep: 30
-  advanceAngleThreshold: 60
+  randomPositionMinRadius: 4
+  randomPositionMaxRadius: 4
+  arcAngularStep: 10
+  advanceAngleThreshold: 10
   regenerateArcIfStuckFor: 2

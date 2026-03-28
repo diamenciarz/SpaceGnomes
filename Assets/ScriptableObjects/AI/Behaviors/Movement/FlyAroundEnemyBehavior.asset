@@ -28,11 +28,11 @@ MonoBehaviour:
   debugMovementVectors: 1
   debugConsideredDistances: 0
   findNewPositionDelay: 6
-  randomPositionMinRadius: 4
-  randomPositionMaxRadius: 8
-  startingAngle: 0
-  arcWidth: 360
-  arcAngularStep: 20
-  advanceAngleThreshold: 20
+  randomPositionMinRadius: 10
+  randomPositionMaxRadius: 10
+  startingAngle: 180
+  arcWidth: 180
+  arcAngularStep: 10
+  advanceAngleThreshold: 10
   regenerateArcOnReachingTarget: 1
   regenerateArcIfStuckFor: 2

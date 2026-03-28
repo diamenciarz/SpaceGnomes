@@ -1,14 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(menuName= "ScriptableObjects/Behaviors/Movement/Vehicular/ArcMovementBehavior", fileName = "ArcMovementBehavior")]
-public class ArcMovementBehavior : MovementBehavior
+public abstract class ArcMovementBehavior : MovementBehavior
 {
-    protected Vector2 DetermineWorldTarget(List<Vector2> offsets, Vector2 actualCenter, MovementBehaviorData data, GameObject chaseEntity)
+    /// <summary>
+    /// A large radius value used for raycasting to determine the thickness of the chase entity's collider when calculating the offset radius.
+    /// </summary>
+    private const float RADIUS_OF_THE_LARGEST_SHIP = 10000f;
+
+    /// <summary>
+    /// Determines the world target position to move towards based on the provided arc offsets and chase mode.
+    /// If chase mode is set to ExtrapolateAndCollideWithTarget and the chase entity has a Trajectory component, it will predict the future position of the target and use that as the center for the arc offsets.
+    /// Otherwise, it will use the current position of the chase entity as the center for the arc offsets.
+    /// </summary>
+    /// <param name="offsets"></param>
+    /// <param name="actualCenter"></param>
+    /// <param name="data"></param>
+    /// <param name="chaseEntity"></param>
+    /// <returns></returns>
+    protected Vector2 DetermineWorldTargetPosition(List<Vector2> offsets, Vector2 actualCenter, MovementBehaviorData data, GameObject chaseEntity)
     {
+        if(!data.myRigidbody2D) Debug.LogError($"ArcMovementBehavior requires a Rigidbody2D component on {data.gameObject} using it.");
+        if(!chaseEntity.TryGetComponent(out Trajectory targetTrajectory)) Debug.LogError($"ArcMovementBehavior requires a Trajectory component on {data.gameObject} using it.");
+        
         Vector2 targetOffset = offsets[0];
-        if (chaseMode == ChaseMode.ExtrapolateAndCollideWithTarget && chaseEntity.TryGetComponent(out Trajectory targetTrajectory) && data.myRigidbody2D)
+        if (chaseMode == ChaseMode.ExtrapolateAndCollideWithTarget && targetTrajectory && data.myRigidbody2D)
         {
             Vector2 myVelocity = data.myRigidbody2D.velocity;
             const float MINIMUM_SPEED = 2f;
@@ -30,9 +48,8 @@ public class ArcMovementBehavior : MovementBehavior
             Debug.DrawLine(data.transform.position, worldTarget, Color.green);
             for (int i = 0; i < offsets.Count; i++)
             {
-                Vector2 p = actualCenter + offsets[i];
-                Debug.DrawLine(actualCenter, p, Color.yellow);
-                Debug.DrawLine(p, p + Vector2.up * 0.01f, Color.cyan);
+                Vector2 targetPositions = actualCenter + offsets[i];
+                Debug.DrawLine(actualCenter, targetPositions, Color.yellow);
             }
         }
     }
@@ -57,15 +74,31 @@ public class ArcMovementBehavior : MovementBehavior
     protected float AngleDegFromVector(Vector2 v)
     {
         if (v.sqrMagnitude == 0) return 0f;
-        float ang = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
-        ang = ang - 90f; // convert so 0 = up
-        return Mathf.Repeat(ang, 360f);
+        return GeometryUtils.DirectionVectorToAngle(v);
     }
 
     // Convert angle (0 = up) and radius to vector
     protected Vector2 VectorFromAngleDeg(float angleDeg, float radius)
     {
-        float rad = (angleDeg + 90f) * Mathf.Deg2Rad;
-        return new Vector2(radius * Mathf.Cos(rad), radius * Mathf.Sin(rad));
+        return GeometryUtils.AngleToDirectionVector(angleDeg) * radius;
+    }
+    protected float GetOffsetRadius(GameObject chaseEntity, MovementBehaviorData data, float initialRadius, float offsetAngle)
+    {
+        // Calculate the radius needed to avoid colliding with the chase entity,
+        // by raycasting from the center of the chase entity in the direction of the offset and checking how thick is its collider.
+        // We add this extra radius to the initial radius to ensure we don't collide with the chase entity.
+        GameObject chaseParent = EntityCounter.Instance.GetEntityParent(chaseEntity);
+        Vector2 hitPoint = GetParentShipColliderHitPoint(chaseParent, offsetAngle);
+        float deltaColliderRadius = ((Vector2)chaseParent.transform.position - hitPoint).magnitude;
+
+        return initialRadius + deltaColliderRadius;
+    }
+    private Vector2 GetParentShipColliderHitPoint(GameObject chaseParent, float offsetAngle)
+    {
+        Vector2 offsetDirection = (Vector2)chaseParent.transform.position + VectorFromAngleDeg(offsetAngle, RADIUS_OF_THE_LARGEST_SHIP);
+        RaycastHit2D[] hits = GeometryUtils.RaycastInLine(chaseParent.transform.position, offsetDirection, RADIUS_OF_THE_LARGEST_SHIP);
+        // Select the hit that corresponds to the chaseParent's collider
+        RaycastHit2D chaseParentHit = hits.First(hit => hit.collider && hit.collider.gameObject == chaseParent);
+        return chaseParentHit.point;
     }
 }
