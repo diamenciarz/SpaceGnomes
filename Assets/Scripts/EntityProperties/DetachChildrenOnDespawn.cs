@@ -23,9 +23,9 @@ public class DetachChildrenOnDespawn : ActivateOnDespawn
     }
 
     [SerializeField] private List<ChildInfo> childrenToDetach;
-    [SerializeField] private DetachChildrenOnDespawn parentScript; // Make private after testing
     [SerializeField] private float myRelativeMass = 1f; // Small fraction for itself
 
+    private DetachChildrenOnDespawn parentScript; // Make private after testing
     private Rigidbody2D topRigidbody2D; // Make private after testing
     private float totalMass; // Make private after testing
     public void SetParentScript(DetachChildrenOnDespawn parent)
