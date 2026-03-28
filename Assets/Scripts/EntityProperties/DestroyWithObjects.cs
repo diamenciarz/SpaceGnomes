@@ -13,7 +13,7 @@ using UnityEngine;
 /// </summary>
 public class DestroyWithObjects : MonoBehaviour
 {
-    [SerializeField] List<GameObject> objectsToDependOn;
+    [SerializeField] List<GameObject> objectsSubscribedTo;
 
     private PooledObjectProperty pooledObjectProperty;
     private bool isDestroyed = false;
@@ -21,18 +21,16 @@ public class DestroyWithObjects : MonoBehaviour
     void Start()
     {
         pooledObjectProperty = GetComponent<PooledObjectProperty>();
-        foreach (GameObject obj in objectsToDependOn)
+        objectsSubscribedTo.ForEach(obj => SubscribeToObject(obj));
+    }
+    public void SubscribeToObject(GameObject obj)
+    {
+        if (objectsSubscribedTo.Contains(obj))
         {
-            SubscribeToObject(obj);
+            Debug.LogError($"Attempted to subscribe to object {obj.name} which is already in the dependency list.");
+            return;
         }
-    }
-    public void AddObjectToDependOn(GameObject obj)
-    {
-        objectsToDependOn.Add(obj);
-        SubscribeToObject(obj);
-    }
-    private void SubscribeToObject(GameObject obj)
-    {
+        objectsSubscribedTo.Add(obj);
         ActivateOnDespawn[] despawnComponents = obj.GetComponents<ActivateOnDespawn>();
         if (despawnComponents.Length == 0)
         {
@@ -40,13 +38,14 @@ public class DestroyWithObjects : MonoBehaviour
         }
         despawnComponents[0].OnDespawned += DestroyTogether;
     }
-    public void RemoveObjectToDependOn(GameObject obj)
-    {
-        objectsToDependOn.Remove(obj);
-        UnsubscribeFromObject(obj);
-    }
     public void UnsubscribeFromObject(GameObject obj)
     {
+        if (!objectsSubscribedTo.Contains(obj))
+        {
+            Debug.LogError($"Attempted to unsubscribe from object {obj.name} which is not in the dependency list.");
+            return;
+        }
+        objectsSubscribedTo.Remove(obj);
         ActivateOnDespawn[] despawnComponents = obj.GetComponents<ActivateOnDespawn>();
         foreach (ActivateOnDespawn script in despawnComponents)
         {

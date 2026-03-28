@@ -14,7 +14,7 @@ public abstract class AbstractSingleton<T> : MonoBehaviour where T : AbstractSin
             if (isDestroyed) return null;
             if (instance == null)
             {
-                Debug.LogWarning($"Singleton instance of {typeof(T).Name} not found. Creating a new one.");
+                //Debug.LogWarning($"Singleton instance of {typeof(T).Name} not found. Creating a new one.");
                 instance = FindObjectOfType<T>();
                 if (instance == null)
                 {
@@ -35,7 +35,7 @@ public abstract class AbstractSingleton<T> : MonoBehaviour where T : AbstractSin
         if (instance == null)
         {
             instance = (T)this;
-            Debug.Log($"Singleton instance of {typeof(T).Name} created.");
+            //Debug.Log($"Singleton instance of {typeof(T).Name} created.");
             if (transform.parent != null)
             {
                 transform.SetParent(null);

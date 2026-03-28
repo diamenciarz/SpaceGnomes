@@ -73,11 +73,11 @@
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\ShipWeaponManager.cs" />
     <Compile Include="Assets\Scripts\AI\Sensors\AbstractSensor.cs" />
     <Compile Include="Assets\Scripts\Effects\SetRandomScale.cs" />
-    <Compile Include="Assets\Scripts\Damage\Health.cs" />
+    <Compile Include="Assets\Scripts\Fighting\Damage\Health.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\ISettableTarget.cs" />
     <Compile Include="Assets\Scripts\Utils\Cone.cs" />
     <Compile Include="Assets\Scripts\Effects\DamagePopup.cs" />
-    <Compile Include="Assets\Scripts\Damage\DamageOnTouch.cs" />
+    <Compile Include="Assets\Scripts\Fighting\Damage\DamageOnTouch.cs" />
     <Compile Include="Assets\Scripts\Singletons\DebrisGenerator.cs" />
     <Compile Include="Assets\Scripts\UI\CameraFocusManager.cs" />
     <Compile Include="Assets\Scripts\Physics\EntityControllers\StraightLineMovementController.cs" />
@@ -97,8 +97,8 @@
     <Compile Include="Assets\Scripts\Singletons\UIManager.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\TailEntityBehavior.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\AttackAndRetreatBehavior.cs" />
-    <Compile Include="Assets\Scripts\Damage\IDamage.cs" />
-    <Compile Include="Assets\Scripts\Damage\DamageCounter.cs" />
+    <Compile Include="Assets\Scripts\Fighting\Damage\IDamage.cs" />
+    <Compile Include="Assets\Scripts\Fighting\Damage\DamageCounter.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\PooledObjectProperty.cs" />
     <Compile Include="Assets\Scripts\UI\ParallaxScroller.cs" />
     <Compile Include="Assets\Scripts\Unused\CellularAutomata\CPUCellularAutomata.cs" />
@@ -113,7 +113,7 @@
     <Compile Include="Assets\Scripts\Physics\EntityControllers\VehicularController.cs" />
     <Compile Include="Assets\Scripts\Singletons\ForceManager.cs" />
     <Compile Include="Assets\Scripts\Input\KeyListener.cs" />
-    <Compile Include="Assets\Scripts\EntityProperties\DetachChildrenOnDestroy.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\DetachChildrenOnDespawn.cs" />
     <Compile Include="Assets\Scripts\Utils\MathUtils.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\AbstractWeaponController.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\FollowClosestEntityToTarget.cs" />
@@ -135,6 +135,10 @@
     <Compile Include="Assets\Scripts\EntityProperties\EntityPositionTracker.cs" />
     <Compile Include="Assets\Scripts\Effects\SetRandomSpriteColor.cs" />
     <Compile Include="Assets\Scripts\Effects\ScaleWithCamera.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\SpawnOnDespawn.cs" />
+    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableGroup.cs" />
+    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableArcGroup.cs" />
+    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableLineGroup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\GridDisplay.shader" />

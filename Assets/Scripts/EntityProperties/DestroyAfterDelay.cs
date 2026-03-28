@@ -20,7 +20,6 @@ public class DestroyAfterDelay : ActivateOnSpawn
     public override void Activate()
     {
         timer = 0f;
-        //Debug.Log("Enabled: " + gameObject.name);
     }
 
     private void Update()

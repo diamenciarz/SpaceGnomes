@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 102313384607550153}
   - component: {fileID: 312429289421503905}
   - component: {fileID: 889484533115138402}
+  - component: {fileID: 489812936842790198}
   m_Layer: 5
   m_Name: FieldOfView
   m_TagString: Untagged
@@ -133,6 +134,18 @@ MonoBehaviour:
   deltaPosition: {x: 0, y: 0, z: 0}
   deltaAngle: 0
   rotateWithParent: 1
+--- !u!114 &489812936842790198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1698827673125149811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 022b52bb5b7bbc94097d37ade39664ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5144326948476530306
 GameObject:
   m_ObjectHideFlags: 0
@@ -160,7 +173,7 @@ RectTransform:
   m_GameObject: {fileID: 5144326948476530306}
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.41, y: 0.41, z: 0.41}
+  m_LocalScale: {x: 1.08, y: 1.08, z: 1.08}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1604498519284617726}

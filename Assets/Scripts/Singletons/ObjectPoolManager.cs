@@ -8,7 +8,6 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
     [System.Serializable]
     public class PoolConfig
     {
-        public string poolId; // Unique identifier for the pool
         public GameObject prefab; // Prefab to pool
         public int initialSize = 10; // Initial number of objects to create
         public int expansionSize = 5; // Number of objects to add if pool runs out
@@ -35,14 +34,20 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
 
         foreach (PoolConfig config in poolConfigs)
         {
-            if (config.prefab == null || string.IsNullOrEmpty(config.poolId))
+            if (config.prefab == null)
             {
-                Debug.LogWarning($"Invalid pool config: {config.poolId}");
+                Debug.LogWarning($"Pooled object is null: {config.prefab.name}");
+                continue;
+            }
+            PooledObjectProperty property = config.prefab.GetComponent<PooledObjectProperty>();
+            if (!property)
+            {
+                Debug.LogWarning($"Missing pool config: {config.prefab.name}");
                 continue;
             }
 
             // Store config for expansion
-            configMap[config.poolId] = config;
+            configMap[property.poolId] = config;
 
             // Create pool
             Queue<GameObject> pool = new Queue<GameObject>();
@@ -51,7 +56,7 @@ public class ObjectPoolManager : AbstractSingleton<ObjectPoolManager>
                 GameObject obj = CreatePooledObject(config.prefab);
                 pool.Enqueue(obj);
             }
-            pools[config.poolId] = pool;
+            pools[property.poolId] = pool;
         }
     }
 

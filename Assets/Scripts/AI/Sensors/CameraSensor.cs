@@ -47,6 +47,7 @@ public class CameraSensor : AbstractSensor
     }
     void Start()
     {
+        if(!sensorViewPoint) sensorViewPoint = transform; // Default to the GameObject's transform if no specific viewpoint is assigned
         entityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
         if (!entityTeam) Debug.LogError("CameraSensor could not find EntityTeam on parent!");
         if (displayFOV) fovScript = UIManager.Instance.InstantiateFieldOfView(sensorViewPoint.gameObject, range, fov, fov / 2, true);

@@ -8,6 +8,7 @@ public class Health : MonoBehaviour
 
     private float currentHealth;
     private EntityTeam parentEntityTeam;
+    private bool isDead = false;
     public EntityTeam.Team team => parentEntityTeam? parentEntityTeam.team : EntityTeam.Team.Neutral;
 
     private void Start()
@@ -23,6 +24,7 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        if(isDead) return;
         if (isInvulnerable)
         {
             //Debug.Log("Entity is invulnerable, no damage taken.");
@@ -39,6 +41,7 @@ public class Health : MonoBehaviour
 
         if (currentHealth <= 0f)
         {
+            isDead = true;
             ObjectPoolManager.Instance.Despawn(gameObject);
         }
     }

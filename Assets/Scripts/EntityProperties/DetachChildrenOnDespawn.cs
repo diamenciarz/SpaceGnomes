@@ -5,14 +5,14 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static DetachChildrenOnDestroy;
+using static DetachChildrenOnDespawn;
 
 /// <summary>
 /// This script allows an object to automatically detach specified child objects when it is despawned.
 /// Each child object will be given a portion of the parent's mass based on their relativeMass value,
 /// and will be detached with the same velocity and angular velocity as the parent at the moment of despawn.
 /// </summary>
-public class DetachChildrenOnDestroy : ActivateOnDespawn
+public class DetachChildrenOnDespawn : ActivateOnDespawn
 {
     [System.Serializable]
     public struct ChildInfo
@@ -23,12 +23,12 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
     }
 
     [SerializeField] private List<ChildInfo> childrenToDetach;
-    [SerializeField] private DetachChildrenOnDestroy parentScript; // Make private after testing
+    [SerializeField] private DetachChildrenOnDespawn parentScript; // Make private after testing
     [SerializeField] private float myRelativeMass = 1f; // Small fraction for itself
 
     private Rigidbody2D topRigidbody2D; // Make private after testing
     private float totalMass; // Make private after testing
-    public void SetParentScript(DetachChildrenOnDestroy parent)
+    public void SetParentScript(DetachChildrenOnDespawn parent)
     {
         parentScript = parent;
     }
@@ -39,7 +39,7 @@ public class DetachChildrenOnDestroy : ActivateOnDespawn
         float totalRelativeMass = childrenToDetach.Sum(childInfo => childInfo.relativeMass) + myRelativeMass;
         foreach (ChildInfo childInfo in childrenToDetach)
         {
-            DetachChildrenOnDestroy script = childInfo.child.GetComponent<DetachChildrenOnDestroy>();
+            DetachChildrenOnDespawn script = childInfo.child.GetComponent<DetachChildrenOnDespawn>();
             if (script)
             {
                 script.SetParentScript(this);
