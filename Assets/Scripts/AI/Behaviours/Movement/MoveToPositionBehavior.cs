@@ -5,15 +5,16 @@ using UnityEngine;
 [CreateAssetMenu(menuName= "ScriptableObjects/Behaviors/Movement/Omnidirectional/MoveToPositionBehavior", fileName = "MoveToPositionBehavior")]
 public class MoveToPositionBehavior : MovementBehavior
 {
-    // Start is called before the first frame update
-    void Start()
+    protected override Vector2 CalculateChaseVector(MovementBehaviorData data)
     {
-        
-    }
+        GameObject chaseEntity = UpdateCurrentTarget(data);
+        if (!chaseEntity) return Vector2.zero;
+        Vector2 directionToTarget = CalculateDirectionToTarget(data, chaseEntity);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (debugMovementVectors) Debug.DrawRay(data.transform.position, directionToTarget, Color.white);
+
+        if (directionToTarget.magnitude > 1) directionToTarget.Normalize();
+        return directionToTarget;
+
     }
 }

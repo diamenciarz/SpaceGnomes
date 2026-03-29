@@ -369,7 +369,7 @@ public static class GeometryUtils
     {
         direction = direction.normalized;
         List<Vector2> points = GetColliderPoints(collider2D, direction);
-
+        
         if (points.Count == 0)
         {
             return null;

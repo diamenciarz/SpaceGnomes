@@ -20,9 +20,9 @@ public class AIControlInput : ControlInput
     }
 
     [SerializeField] MovementBehavior movementBehavior;
+    [SerializeField][Range(1,10)] int behaviorUpdatesPerSecond = 5;
 
-    private Vector2 controlVector = Vector2.zero;
-    private bool calculatedControlThisFrame = false;
+    private Cache<Vector2> controlVectorCache;
     private Rigidbody2D myRigidbody2D;
     private EntityTeam myTeam;
 
@@ -31,20 +31,27 @@ public class AIControlInput : ControlInput
     {
         myTeam = GetComponent<EntityTeam>();
         myRigidbody2D = GetComponentInParent<Rigidbody2D>();
+        controlVectorCache = CacheManager.Instance.CreateCache<Vector2>(CacheBehavior.Interval, 1f / behaviorUpdatesPerSecond);
     }
 
     // Ignore bool iAmVehicularController, it's only used by the keyboard input
     public override float GetHorizontalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local, bool iAmVehicularController = false)
     {
-        if (!calculatedControlThisFrame) controlVector = movementBehavior.CalculateControlVector(CreateMovementBehaviorData());
-        Debug.DrawRay(transform.position, controlVector, Color.yellow);
-        return mode == ControlVectorCoordinates.Local ? GeometryUtils.WorldCoordsToLocal(controlVector, transform).x : controlVector.x;
+        if (!controlVectorCache.isCached)
+        {
+            controlVectorCache.Set(movementBehavior.CalculateControlVector(CreateMovementBehaviorData()));
+        }
+        Debug.DrawRay(transform.position, controlVectorCache.Get(), Color.yellow);
+        return mode == ControlVectorCoordinates.Local ? GeometryUtils.WorldCoordsToLocal(controlVectorCache.Get(), transform).x : controlVectorCache.Get().x;
     }
 
     public override float GetVerticalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local, bool iAmVehicularController = false)
     {
-        if (!calculatedControlThisFrame) controlVector = movementBehavior.CalculateControlVector(CreateMovementBehaviorData());
-        return mode == ControlVectorCoordinates.Local ? GeometryUtils.WorldCoordsToLocal(controlVector, transform).y : controlVector.y;
+        if (!controlVectorCache.isCached)
+        {
+            controlVectorCache.Set(movementBehavior.CalculateControlVector(CreateMovementBehaviorData()));
+        }
+        return mode == ControlVectorCoordinates.Local ? GeometryUtils.WorldCoordsToLocal(controlVectorCache.Get(), transform).y : controlVectorCache.Get().y;
     }
 
     public override float GetRotationInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local, bool iAmVehicularController = false)
@@ -62,9 +69,5 @@ public class AIControlInput : ControlInput
             myRigidbody2D = myRigidbody2D,
             myTrajectory = GetComponent<Trajectory>()
         };
-    }
-    void Update()
-    {
-        calculatedControlThisFrame = false;
     }
 }

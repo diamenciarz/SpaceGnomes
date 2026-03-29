@@ -34,6 +34,7 @@ public class FlyAroundEntityBehavior : ArcMovementBehavior
 
     protected override void OnValidate()
     {
+        // Currently frames drop when a large ship is flying around another ship. Avoiding collisions is not laggy.
         base.OnValidate();
         if (randomPositionMaxRadius < randomPositionMinRadius) randomPositionMaxRadius = randomPositionMinRadius;
     }

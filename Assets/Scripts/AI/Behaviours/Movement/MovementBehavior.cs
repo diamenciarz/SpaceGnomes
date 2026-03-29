@@ -30,9 +30,7 @@ public abstract class MovementBehavior : ScriptableObject
     protected bool onlyRetreatFromEnemies = true;
     [SerializeField][Range(0, 1)] protected float maxCollisionAvoidanceWeight = 0.7f;
     [SerializeField][Range(0, 1)] protected float maxEntityRetreatWeight = 0.7f;
-    [SerializeField]
-    [Range(0, 50f)]
-    [Tooltip("Obstacles moving relatively towards us faster than this will be avoided")]
+    [SerializeField][Range(0, 50f)][Tooltip("Obstacles moving relatively towards us faster than this will be avoided")]
     protected float dangerousObstacleSpeed = 0f;
     [SerializeField] protected ChaseMode chaseMode = ChaseMode.DirectlyToTarget;
     [SerializeField][Range(1f, 5f)] protected float avoidCollisionLookaheadTime = 2f;
@@ -67,7 +65,7 @@ public abstract class MovementBehavior : ScriptableObject
         if (debugMovementVectors)
         {
             Debug.DrawRay(data.transform.position, avoidanceVector, Color.blue);
-        } 
+        }
 
         Vector2 scaledAvoidance = avoidanceVector * maxCollisionAvoidanceWeight; // 0 -> 0.7
         Vector2 scaledRetreat = retreatVector * (1 - scaledAvoidance.magnitude) * maxEntityRetreatWeight; // 0 -> ((1 -> 0.3) * 0.7) => 0 -> (0.7 -> 0.21)
@@ -162,7 +160,7 @@ public abstract class MovementBehavior : ScriptableObject
                 GeometryUtils.CollidingPoints collidingPoints = GeometryUtils.CalculateClosestDistanceBetweenColliders(obstacle, data.gameObject);
                 Debug.DrawLine(collidingPoints.toPoint, collidingPoints.fromPoint, Color.cyan);
             }
-         
+
             Trajectory obstacleTrajectory = obstacle.GetComponent<Trajectory>();
             Trajectory.CollisionInfo? crossingInfo = data.myTrajectory.WillObjectsCollide(obstacleTrajectory, avoidCollisionLookaheadTime, data.myTrajectory.collisionCheckPointCount);
             if (!crossingInfo.HasValue) continue; // No collision predicted
@@ -209,7 +207,27 @@ public abstract class MovementBehavior : ScriptableObject
         const float MAX_ENTITY_SIZE = 5f;
         List<GameObject> entities = GeometryUtils.GetVisibleObjects(data.gameObject.transform.position, data.myTeam.team, avoidEntityTypes, chaseRange + MAX_ENTITY_SIZE, ignoreObject: data.gameObject);
         // Remove my own ship parts
-        return EntityCounter.Instance.ExcludeMyChildren(data.gameObject, entities);
+        List<GameObject> otherEntities = EntityCounter.Instance.ExcludeMyChildren(data.gameObject, entities);
+        return FilterEntitiesWithinDangerousRange(data, otherEntities);
     }
+    private List<GameObject> FilterEntitiesWithinDangerousRange(MovementBehaviorData data, List<GameObject> entities)
+    {
+        List<GameObject> filtered = new List<GameObject>();
+        foreach (GameObject entity in entities)
+        {
+            Vector2 myVelocity = data.myTrajectory.GetVelocity();
+            Vector2 otherVelocity = entity.GetComponent<Trajectory>().GetVelocity();
+            float distance = Vector2.Distance(data.transform.position, entity.transform.position);
+            Vector2 relativeVelocity = otherVelocity - myVelocity;
+            // If collision cannot occur within avoidCollisionLookaheadTime, or if both entities are stationary or moving very slowly, we consider it not a threat
+            if(distance/relativeVelocity.magnitude > avoidCollisionLookaheadTime) continue; // Not closing in fast enough to be a threat within the lookahead time
 
+            // If both entities are moving further away from each other calculated with dot product of relative velocity and position difference, we consider it not a threat
+            Vector2 positionDifference = entity.transform.position - data.transform.position;
+            if (Vector2.Dot(relativeVelocity, positionDifference) >= 0) continue; // Moving away or perpendicular, not a threat
+            
+            filtered.Add(entity);
+        }
+        return filtered;
+    }
 }
