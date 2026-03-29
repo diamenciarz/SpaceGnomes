@@ -15,9 +15,6 @@ public class ProgressBar : MonoBehaviour
     [SerializeField][Tooltip("Once full progress, will wait delayBeforeDisappear and disappear over disappearDuration")]
     bool disappearOnlyWhenFullProgress = false;
 
-    [Header("Color Transition Settings")]
-    [SerializeField][Range(0f, 10f)][Tooltip("0 is instant")] float colorTransitionDuration = 1f;
-
 
     private Slider slider;
     private Image fillImage;
