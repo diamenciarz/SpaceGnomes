@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveStates: 10
-  collisionCheckPointCount: 20
+  collisionCheckPointCount: 5
 --- !u!1 &2369128004041744743
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,122 +361,122 @@ CompositeCollider2D:
   - m_Collider: {fileID: 5133975644343501789}
     m_ColliderPaths:
     - - X: -7759998
-        Y: -5879999
+        Y: -5880005
       - X: -5465775
-        Y: -5579394
+        Y: -5579399
       - X: -6006807
-        Y: -3644741
+        Y: -3644746
       - X: -2701032
-        Y: -2421033
+        Y: -2421038
       - X: -1959998
-        Y: 8120000
+        Y: 8119995
       - X: -5508440
-        Y: 8061245
+        Y: 8061241
       - X: -10130515
-        Y: 2091122
+        Y: 2091117
   - m_Collider: {fileID: 5671065295789464785}
     m_ColliderPaths:
-    - - X: 1940006
-        Y: 8169627
-      - X: 2860632
-        Y: -2561132
-      - X: 5940335
-        Y: -3494972
-      - X: 5527010
-        Y: -5492903
-      - X: 7600518
-        Y: -5886229
-      - X: 10119669
-        Y: 2215538
-      - X: 5461992
-        Y: 8061245
+    - - X: 1939997
+        Y: 8169622
+      - X: 2860623
+        Y: -2561137
+      - X: 5940325
+        Y: -3494977
+      - X: 5527000
+        Y: -5492908
+      - X: 7600509
+        Y: -5886234
+      - X: 10119660
+        Y: 2215533
+      - X: 5461982
+        Y: 8061241
   - m_Collider: {fileID: 7063446210809736147}
     m_ColliderPaths:
-    - - X: -5899409
-        Y: 2763976
-      - X: -6884623
-        Y: 1650889
-      - X: -6909991
-        Y: -4641396
-      - X: -5071788
-        Y: -6716624
-      - X: -2941184
-        Y: -6716624
-      - X: -1122589
-        Y: -4664733
-      - X: -1141179
-        Y: 1638599
-      - X: -2208706
-        Y: 2756624
+    - - X: -5899418
+        Y: 2763957
+      - X: -6884632
+        Y: 1650870
+      - X: -6910001
+        Y: -4641415
+      - X: -5071797
+        Y: -6716643
+      - X: -2941193
+        Y: -6716642
+      - X: -1122599
+        Y: -4664752
+      - X: -1141188
+        Y: 1638581
+      - X: -2208716
+        Y: 2756605
   - m_Collider: {fileID: 6577324679013694679}
     m_ColliderPaths:
     - - X: 2100583
-        Y: 2763976
+        Y: 2763957
       - X: 1115369
-        Y: 1650889
+        Y: 1650870
       - X: 1090000
-        Y: -4641396
+        Y: -4641415
       - X: 2928204
-        Y: -6716624
+        Y: -6716643
       - X: 5058808
-        Y: -6716624
+        Y: -6716642
       - X: 6877403
-        Y: -4664733
+        Y: -4664752
       - X: 6858813
-        Y: 1638599
+        Y: 1638581
       - X: 5791286
-        Y: 2756624
+        Y: 2756605
   - m_Collider: {fileID: 5033700563489854107}
     m_ColliderPaths:
-    - - X: 985567
-        Y: 3784783
-      - X: 2951947
-        Y: 5088334
-      - X: 2238315
-        Y: 7982534
-      - X: 10621
-        Y: 10493073
-      - X: -2205680
-        Y: 8085248
-      - X: -3065850
-        Y: 5088488
-      - X: -1032028
-        Y: 3776009
+    - - X: 985563
+        Y: 3784800
+      - X: 2951942
+        Y: 5088352
+      - X: 2238310
+        Y: 7982552
+      - X: 10616
+        Y: 10493093
+      - X: -2205685
+        Y: 8085266
+      - X: -3065855
+        Y: 5088505
+      - X: -1032032
+        Y: 3776027
   - m_Collider: {fileID: 8196803837620988013}
     m_ColliderPaths:
-    - - X: 4355005
-        Y: 4131667
-      - X: 1571502
-        Y: 6157033
-      - X: -1535788
-        Y: 6162925
-      - X: -4341513
-        Y: 4208594
-      - X: -1861495
-        Y: -6839163
-      - X: 1873332
-        Y: -6846203
+    - - X: 4355001
+        Y: 4131685
+      - X: 1571497
+        Y: 6157051
+      - X: -1535793
+        Y: 6162943
+      - X: -4341518
+        Y: 4208612
+      - X: -1861500
+        Y: -6839145
+      - X: 1873327
+        Y: -6846185
   m_CompositePaths:
     m_Paths:
-    - - {x: 0.1873108, y: -0.6846202}
-      - {x: 0.211159, y: -0.5794713}
-      - {x: 0.2928322, y: -0.6716624}
-      - {x: 0.5058887, y: -0.6716536}
-      - {x: 0.605483, y: -0.5593025}
-      - {x: 0.7600594, y: -0.5885985}
-      - {x: 1.011958, y: 0.2215647}
-      - {x: 0.5461871, y: 0.8061247}
-      - {x: 0.2075939, y: 0.81655264}
-      - {x: 0.0010398, y: 1.0492829}
-      - {x: -0.2177111, y: 0.8116405}
-      - {x: -0.5508518, y: 0.8061145}
-      - {x: -1.0130477, y: 0.2090992}
-      - {x: -0.7759758, y: -0.5879968}
-      - {x: -0.6015251, y: -0.5651507}
-      - {x: -0.507167, y: -0.6716624}
-      - {x: -0.2941105, y: -0.6716536}
-      - {x: -0.2101494, y: -0.5770037}
-      - {x: -0.186127, y: -0.6839164}
+    - - {x: 0.18731031, y: -0.6846184}
+      - {x: 0.211158, y: -0.5794721}
+      - {x: 0.2928322, y: -0.6716643}
+      - {x: 0.5058887, y: -0.6716554}
+      - {x: 0.6054839, y: -0.5593034}
+      - {x: 0.7600585, y: -0.588599}
+      - {x: 1.0119572, y: 0.2215642}
+      - {x: 0.5461861, y: 0.8061243}
+      - {x: 0.2075956, y: 0.816552}
+      - {x: 0.0010393, y: 1.0492849}
+      - {x: -0.2177137, y: 0.81164}
+      - {x: -0.5508518, y: 0.80611414}
+      - {x: -1.0130477, y: 0.2090987}
+      - {x: -0.7759758, y: -0.58799744}
+      - {x: -0.60152704, y: -0.5651515}
+      - {x: -0.50716794, y: -0.6716643}
+      - {x: -0.2941114, y: -0.6716554}
+      - {x: -0.2101494, y: -0.57700443}
+      - {x: -0.1861275, y: -0.6839146}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
 --- !u!114 &6968070201716844009
@@ -491,8 +491,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b331eacbaeec4714c853133ac52712dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectsToDependOn:
-  - {fileID: 7228385878822119569}
+  objectsSubscribedTo: []
 --- !u!114 &2405805016719162628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,6 +518,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementBehavior: {fileID: 11400000, guid: eb80449c995c44d4aac720d30c3e1b96, type: 2}
+  behaviorUpdatesPerSecond: 5
 --- !u!114 &8076816269696358030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,8 +532,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isControlledByPlayer: 0
-  predictTrajectories: 0
-  weaponGroups: []
+  predictTrajectories: 1
+  weaponGroups:
+  - sensors:
+    - {fileID: 1554176347}
+    weapons:
+    - weaponController: {fileID: 5947397178258161119}
+      rotator: {fileID: 5671608571878104450}
 --- !u!114 &463842373566036617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -741,7 +746,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveStates: 10
-  collisionCheckPointCount: 20
+  collisionCheckPointCount: 5
 --- !u!1 &5409615770571366803
 GameObject:
   m_ObjectHideFlags: 0
@@ -937,7 +942,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveStates: 10
-  collisionCheckPointCount: 20
+  collisionCheckPointCount: 5
 --- !u!1 &5641312366177501074
 GameObject:
   m_ObjectHideFlags: 0
@@ -1133,7 +1138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveStates: 10
-  collisionCheckPointCount: 20
+  collisionCheckPointCount: 5
 --- !u!1 &5905030987734287010
 GameObject:
   m_ObjectHideFlags: 0
@@ -1327,7 +1332,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveStates: 10
-  collisionCheckPointCount: 20
+  collisionCheckPointCount: 5
 --- !u!1 &7228385878822119569
 GameObject:
   m_ObjectHideFlags: 0
@@ -1536,7 +1541,6 @@ MonoBehaviour:
     child: {fileID: 2265605512885640490}
   - relativeMass: 1
     child: {fileID: 5641312366177501074}
-  parentScript: {fileID: 0}
   myRelativeMass: 1
 --- !u!114 &6507211662738974301
 MonoBehaviour:
@@ -1551,7 +1555,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   saveStates: 10
-  collisionCheckPointCount: 20
+  collisionCheckPointCount: 5
 --- !u!1 &8662590800914166733
 GameObject:
   m_ObjectHideFlags: 0
@@ -1699,6 +1703,14 @@ PrefabInstance:
       propertyPath: range
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 5217246251960707575, guid: 86fa4c18d0902f94c942d56a31341e5e, type: 3}
+      propertyPath: displayFOV
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5217246251960707575, guid: 86fa4c18d0902f94c942d56a31341e5e, type: 3}
+      propertyPath: detectMouse
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 86fa4c18d0902f94c942d56a31341e5e, type: 3}
 --- !u!4 &1554176346 stripped
@@ -1706,6 +1718,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5217246251960707574, guid: 86fa4c18d0902f94c942d56a31341e5e, type: 3}
   m_PrefabInstance: {fileID: 5217246250813485228}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1554176347 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5217246251960707575, guid: 86fa4c18d0902f94c942d56a31341e5e, type: 3}
+  m_PrefabInstance: {fileID: 5217246250813485228}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0945ed58c25da9409f679f02a980e8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8759245180338159375
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1796,3 +1819,25 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3971881547099849731, guid: d3b6207cce9cfc74aa75e6a6fd488903, type: 3}
   m_PrefabInstance: {fileID: 8759245180338159375}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5671608571878104450 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3979650343880450701, guid: d3b6207cce9cfc74aa75e6a6fd488903, type: 3}
+  m_PrefabInstance: {fileID: 8759245180338159375}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9011330e5b4c2c542a3a7bfac8502fe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5947397178258161119 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3100289828737467088, guid: d3b6207cce9cfc74aa75e6a6fd488903, type: 3}
+  m_PrefabInstance: {fileID: 8759245180338159375}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b74bdb9f49f65b547a9ee87cbee7b447, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

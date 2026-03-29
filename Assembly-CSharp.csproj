@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\Physics\EntityControllers\OmnidirectionalController.cs" />
     <Compile Include="Assets\Scripts\UI\ObjectMissingIcon.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\ObjectFollower.cs" />
+    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableLineGroup.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\ShipWeaponManager.cs" />
     <Compile Include="Assets\Scripts\AI\Sensors\AbstractSensor.cs" />
     <Compile Include="Assets\Scripts\Effects\SetRandomScale.cs" />
@@ -82,9 +83,11 @@
     <Compile Include="Assets\Scripts\UI\CameraFocusManager.cs" />
     <Compile Include="Assets\Scripts\Physics\EntityControllers\StraightLineMovementController.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\Trajectory.cs" />
+    <Compile Include="Assets\Scripts\UI\ContourDrawer.cs" />
     <Compile Include="Assets\Scripts\AI\AIControlInput.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\EntityTypeProperty.cs" />
     <Compile Include="Assets\Scripts\Effects\SetRandomTexture.cs" />
+    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableGroup.cs" />
     <Compile Include="Assets\Scripts\Physics\PhysicalForces\ForceProperty.cs" />
     <Compile Include="Assets\Scripts\UI\BackgroundGenerator.cs" />
     <Compile Include="Assets\Scripts\Unused\TeamSwitcherTest.cs" />
@@ -97,6 +100,7 @@
     <Compile Include="Assets\Scripts\Singletons\UIManager.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\TailEntityBehavior.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\AttackAndRetreatBehavior.cs" />
+    <Compile Include="Assets\Scripts\Effects\SetRandomSpriteColor.cs" />
     <Compile Include="Assets\Scripts\Fighting\Damage\IDamage.cs" />
     <Compile Include="Assets\Scripts\Fighting\Damage\DamageCounter.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\PooledObjectProperty.cs" />
@@ -108,7 +112,9 @@
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\ChaseEntityOmnidirectionalBehavior.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\EntityTeam.cs" />
     <Compile Include="Assets\Scripts\Input\KeyboardControlInput.cs" />
+    <Compile Include="Assets\Scripts\Effects\ScaleWithCamera.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\ActivateOnSpawn.cs" />
+    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableArcGroup.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\FlyAroundEntityBehavior.cs" />
     <Compile Include="Assets\Scripts\Physics\EntityControllers\VehicularController.cs" />
     <Compile Include="Assets\Scripts\Singletons\ForceManager.cs" />
@@ -132,17 +138,33 @@
     <Compile Include="Assets\Scripts\Singletons\EntityCounter.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\AutonomousMovementController.cs" />
     <Compile Include="Assets\Scripts\Unused\CellularAutomata\GPUCellularAutomata.cs" />
-    <Compile Include="Assets\Scripts\EntityProperties\EntityPositionTracker.cs" />
-    <Compile Include="Assets\Scripts\Effects\SetRandomSpriteColor.cs" />
-    <Compile Include="Assets\Scripts\Effects\ScaleWithCamera.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\SpawnOnDespawn.cs" />
-    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableGroup.cs" />
-    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableArcGroup.cs" />
-    <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableLineGroup.cs" />
+    <Compile Include="Assets\Scripts\EntityProperties\EntityPositionTracker.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
+    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Shaders\GridDisplay.shader" />
     <None Include="Assets\Shaders\CellularAutomata.compute" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

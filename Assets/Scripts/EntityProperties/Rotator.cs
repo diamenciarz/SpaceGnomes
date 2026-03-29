@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class Rotator : MonoBehaviour
 {
+    [Header("Rotator settings")]
     [SerializeField] private float maxRotationSpeed = 180f; // degrees per second
     [SerializeField] private bool useCone = true;
     [SerializeField] private float coneAngle = 90f; // total angle of the cone in degrees
+    [SerializeField][Tooltip("If false, the FieldOfView cone will never become visible")] private bool displayCone;
+    [SerializeField][Range(1f,20f)] private float fovConeRadius = 10f;
+
     [Header("Instances")]
     [SerializeField] Transform rotator;
     [Header("Debug")]
@@ -16,6 +20,8 @@ public class Rotator : MonoBehaviour
     private Vector2 targetPosition;
     private bool usePosition = false;
     private Cache<Cone> rotationCone;
+    private ProgressBar fovConeScript;
+
     public Vector2 GetCurrentDirection()
     {
         return GeometryUtils.AngleToDirectionVector(rotator.rotation.eulerAngles.z);
@@ -51,6 +57,11 @@ public class Rotator : MonoBehaviour
     private void Start()
     {
         rotationCone = CacheManager.Instance.CreateCache<Cone>(CacheBehavior.EndOfUpdate);
+        if (displayCone)
+        {
+            fovConeScript = UIManager.Instance.InstantiateRotationCone(gameObject, fovConeRadius, coneAngle, coneAngle / 2, true);
+            fovConeScript.ShowBar();
+        }
     }
     private void Update()
     {

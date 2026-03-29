@@ -45,11 +45,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolConfigs:
-  - poolId: PlasmaBullet
-    prefab: {fileID: 3611232887168421049, guid: 7694e6152e8c0f54b9ab8d6e6d3d59c1, type: 3}
+  - prefab: {fileID: 3611232887168421049, guid: 7694e6152e8c0f54b9ab8d6e6d3d59c1, type: 3}
     initialSize: 10
     expansionSize: 5
-  - poolId: Rocket
-    prefab: {fileID: 3611232887168421049, guid: f8a729e2a1134724ca6154b3320c327b, type: 3}
+  - prefab: {fileID: 3611232887168421049, guid: f8a729e2a1134724ca6154b3320c327b, type: 3}
     initialSize: 10
+    expansionSize: 5
+  - prefab: {fileID: 2685383631660251024, guid: d6e5ce586bda7f14c84081796f03e878, type: 3}
+    initialSize: 5
     expansionSize: 5

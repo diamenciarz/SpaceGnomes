@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 889484533115138402}
   - component: {fileID: 489812936842790198}
   m_Layer: 5
-  m_Name: FieldOfView
+  m_Name: CameraFOV
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,11 +113,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee9f2374037ff394683e4f0d7e770547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _showWhenUpdatingProgress: 0
+  showWhenUpdatingProgress: 0
   delayBeforeDisappear: 1
   disappearDuration: 1
   appearDuration: 1
-  appearAlpha: 0.3
+  appearAlpha: 0.1
   disappearOnlyWhenFullProgress: 0
 --- !u!114 &889484533115138402
 MonoBehaviour:

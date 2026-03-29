@@ -83,7 +83,7 @@ SpriteRenderer:
   m_Size: {x: 0.42, y: 0.42}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &1437697990563623582
@@ -95,9 +95,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5012750832036236270}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15db27726103b6d4b8a28b6174ce42ae, type: 3}
+  m_Script: {fileID: 11500000, guid: ea071962b61b3cf44aa3ac506082735b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  followMouseInstead: 0
+  targetTypesToFollow: 01000000
 --- !u!1 &6263192383216903975
 GameObject:
   m_ObjectHideFlags: 0
@@ -180,7 +182,7 @@ SpriteRenderer:
   m_Size: {x: 0.46, y: 0.46}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &8387643618343885274
@@ -196,3 +198,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   followMouseInstead: 1
+  targetTypesToFollow: 

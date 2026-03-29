@@ -7,7 +7,8 @@ public enum UITypes
 {
     FieldOfView,
     AmmoBar,
-    HealthBar
+    HealthBar,
+    RotationCone,
 }
 
 [System.Serializable]
@@ -102,7 +103,19 @@ public class UIManager : AbstractSingleton<UIManager>
         RemoveFromCache(UITypes.AmmoBar, ammoBarObj);
         Destroy(ammoBarObj);
     }
-
+    public ProgressBar InstantiateRotationCone(GameObject followObj, float radius, float arc = 360f, float deltaAngle = 0f, bool rotateWithParent = true)
+    {
+        GameObject go = InstantiateUI(UITypes.RotationCone, followObj, radius, arc, 360f, rotateWithParent, deltaAngle);
+        if (go == null) return null;
+        // Adjust scale based on camera size to maintain consistent world-space radius regardless of zoom level.
+        return go.GetComponent<ProgressBar>();
+    }
+    public void DestroyRotationCone(GameObject fovObj)
+    {
+        if (fovObj == null) Debug.LogError("UIManager: Attempted to destroy null FOV object!");
+        RemoveFromCache(UITypes.RotationCone, fovObj);
+        Destroy(fovObj);
+    }
     /// <summary>
     /// Factory method: instantiate a UI element of the given type and cache it.
     /// If the prefab contains an ObjectFollower or ProgressBar, this will apply the provided parameters.
@@ -145,8 +158,7 @@ public class UIManager : AbstractSingleton<UIManager>
         ProgressBar barScript = instance.GetComponent<ProgressBar>();
         if (barScript != null)
         {
-            barScript.SetScale(scale);
-            barScript.SetProgress(progress / maxValue);
+            barScript.Initialize(0, scale , progress / maxValue);
         }
     }
     private void AddToCache(UITypes type, GameObject instance)

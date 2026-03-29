@@ -44,4 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a831dbdf2a0ce144b8dd6bd28112fa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fieldOfViewPrefab: {fileID: 1698827673125149811, guid: 09008ffff9d2b8a4191b2205993c2ab1, type: 3}
+  prefabEntries:
+  - type: 0
+    prefab: {fileID: 1698827673125149811, guid: 09008ffff9d2b8a4191b2205993c2ab1, type: 3}
+  - type: 1
+    prefab: {fileID: 1698827673125149811, guid: 3de93c1e9190c1a4cb016bb8e38f2f27, type: 3}
+  - type: 2
+    prefab: {fileID: 1698827673125149811, guid: c5278e7aedfcef14f8888f12b4ca7c60, type: 3}
+  - type: 3
+    prefab: {fileID: 1698827673125149811, guid: dd60fb4868eec7640a205f9e6834f50a, type: 3}

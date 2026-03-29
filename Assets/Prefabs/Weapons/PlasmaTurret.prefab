@@ -48,6 +48,8 @@ MonoBehaviour:
   maxRotationSpeed: 180
   useCone: 1
   coneAngle: 180
+  displayCone: 0
+  fovConeRadius: 8
   rotator: {fileID: 2780088316973426167}
   debug: 0
 --- !u!1 &7466481567582663110
