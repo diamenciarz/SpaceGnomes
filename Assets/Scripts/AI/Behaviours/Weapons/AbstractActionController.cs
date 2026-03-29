@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class AbstractActionController : MonoBehaviour
 {
+    [HideInInspector]
     public bool isControlledByPlayer;
     public abstract void SetAction(bool isOn, GameObject optionalTarget);
     public abstract ShipAction GetActionType();

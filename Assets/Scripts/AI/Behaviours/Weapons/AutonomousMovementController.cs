@@ -4,5 +4,5 @@ using UnityEngine;
 
 public abstract class AutonomousMovementController : ActivateOnSpawn
 {
-    public Func<float, float> VelocityFunction;
+    public abstract float VelocityFunction(float time);
 }

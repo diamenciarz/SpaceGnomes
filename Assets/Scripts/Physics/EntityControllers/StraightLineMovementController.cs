@@ -5,8 +5,6 @@ using UnityEngine;
 public class StraightLineMovementController : AutonomousMovementController
 {
     [SerializeField] private float initialVelocity = 20f;
-
-    public new Func<float, float> VelocityFunction => GetVelocityAtTime;
     
     private Rigidbody2D rb;
 
@@ -23,7 +21,7 @@ public class StraightLineMovementController : AutonomousMovementController
         rb.velocity = transform.right * initialVelocity;
     }
 
-    private float GetVelocityAtTime(float time)
+    public override float VelocityFunction(float time)
     {
         // For a simple bullet, velocity is constant, so we ignore time
         return initialVelocity;

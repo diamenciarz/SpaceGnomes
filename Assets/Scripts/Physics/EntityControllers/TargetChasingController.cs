@@ -35,9 +35,6 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     [Tooltip("This value makes force calculation match the desired deltaVelocity")] 
     private float THRUST_MULTIPLIER = 45f;
 
-
-    public new Func<float, float> VelocityFunction => GetVelocityAtTime;
-
     private Rigidbody2D rb2d;
     private GameObject target;
     private float lastFixedVelocity;
@@ -212,7 +209,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         Vector2 directionToTarget = (Vector2)target.transform.position - rb2d.position;
         return Vector2.SignedAngle(transform.right, directionToTarget);
     }
-    private float GetVelocityAtTime(float time)
+    public override float VelocityFunction(float time)
     {
         float mass = rb2d.mass;
         if (time < accelerationDelay)
