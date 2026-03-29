@@ -99,10 +99,12 @@ public class CameraSensor : AbstractSensor
             if (DetectMouse(out GameObject mouseFollower))
             {
                 result = new List<GameObject> { mouseFollower };
+                if (fovScript) fovScript.ShowBar();
             }
             else
             {
                 result = GetVisionCone().GetVisibleEnemiesInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+                if (fovScript) fovScript.HideBar();
             }
             visibleEnemiesCache.Set(result);
         }
@@ -141,10 +143,12 @@ public class CameraSensor : AbstractSensor
             if (DetectMouse(out GameObject mouseFollower))
             {
                 result = mouseFollower;
+                if (fovScript) fovScript.ShowBar();
             }
             else
             {
                 result = GetVisionCone().GetClosestVisibleEnemyInCone(team, detectTypes, GeometryUtils.SensorType.Camera);
+                if (fovScript) fovScript.HideBar();
             }
             closestEnemyCache.Set(result);
         }
