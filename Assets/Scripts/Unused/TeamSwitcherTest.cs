@@ -11,7 +11,7 @@ public class TeamSwitcherTest : AbstractActionController
 
     public override ShipAction GetActionType()
     {
-        return ShipAction.ShootUltimate;
+        return ShipAction.UltimateShipAction;
     }
 
     public override void SetAction(bool isOn, GameObject optionalTarget)

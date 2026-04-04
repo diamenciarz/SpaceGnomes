@@ -1,0 +1,33 @@
+{
+    "bindingData": [
+        {
+            "action": 0,
+            "binding": {
+                "key": 323,
+                "modifiers": []
+            }
+        },
+        {
+            "action": 1,
+            "binding": {
+                "key": 324,
+                "modifiers": []
+            }
+        },
+        {
+            "action": 2,
+            "binding": {
+                "key": 32,
+                "modifiers": []
+            }
+        },
+        {
+            "action": 3,
+            "binding": {
+                "key": 306,
+                "modifiers": []
+            }
+        }
+    ],
+    "savePath": "StanKeybindings.json"
+}

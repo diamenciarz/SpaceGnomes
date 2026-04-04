@@ -2,25 +2,11 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-public enum ShipAction
-{
-    ShootPrimary,
-    ShootSecondary,
-    ShootTernary,
-    ShootUltimate
-}
-
+/// <summary>
+/// KeyListener is responsible for listening to player input and notifying the appropriate action controllers based on the current key bindings defined in KeybindManager.
+/// </summary>
 public class KeyListener : MonoBehaviour
 {
-    [System.Serializable]
-    public struct KeyActionPair
-    {
-        public KeyCode key;
-        public ShipAction action;
-    }
-
-    [SerializeField] private List<KeyActionPair> keyBindings = new List<KeyActionPair>();
-    private Dictionary<KeyCode, ShipAction> keyActionMap = new Dictionary<KeyCode, ShipAction>();
     private Dictionary<ShipAction, List<AbstractActionController>> actionControllers = new Dictionary<ShipAction, List<AbstractActionController>>();
 
     private void Awake()
@@ -40,23 +26,6 @@ public class KeyListener : MonoBehaviour
             ShipAction action = controller.GetActionType();
             actionControllers[action].Add(controller);
         }
-
-        // Initialize key bindings
-        InitializeKeyBindings();
-    }
-
-    private void InitializeKeyBindings()
-    {
-        keyActionMap.Clear();
-        foreach (var binding in keyBindings)
-        {
-            if (keyActionMap.ContainsKey(binding.key))
-            {
-                Debug.LogWarning($"Duplicate key binding for {binding.key} on {gameObject.name}");
-                continue;
-            }
-            keyActionMap[binding.key] = binding.action;
-        }
     }
 
     private void Update()
@@ -68,12 +37,12 @@ public class KeyListener : MonoBehaviour
             activeActions[action] = false;
         }
 
-        // Check key states and update active actions
-        foreach (var kvp in keyActionMap)
+        // Check actions using KeybindManager
+        foreach (ShipAction action in Enum.GetValues(typeof(ShipAction)))
         {
-            if (Input.GetKey(kvp.Key))
+            if (KeybindManager.Instance.IsActionPressed(action))
             {
-                activeActions[kvp.Value] = true;
+                activeActions[action] = true;
             }
         }
 
@@ -84,7 +53,7 @@ public class KeyListener : MonoBehaviour
             {
                 foreach (AbstractActionController controller in actionControllers[action.Key])
                 {
-                    if(controller.isControlledByPlayer) controller.SetAction(action.Value, null);
+                    if (controller.isControlledByPlayer) controller.SetAction(action.Value, null);
                 }
             }
         }
@@ -93,17 +62,18 @@ public class KeyListener : MonoBehaviour
     // Method to dynamically remap keys at runtime
     public void RemapKey(KeyCode oldKey, KeyCode newKey)
     {
-        if (keyActionMap.ContainsKey(oldKey))
+        // Find the action for oldKey
+        foreach (ShipAction action in Enum.GetValues(typeof(ShipAction)))
         {
-            ShipAction action = keyActionMap[oldKey];
-            keyActionMap.Remove(oldKey);
-            keyActionMap[newKey] = action;
-
-            // Update serialized keyBindings
-            var index = keyBindings.FindIndex(b => b.key == oldKey);
-            if (index >= 0)
+            var bindings = KeybindManager.Instance.GetBindings(action);
+            for (int i = 0; i < bindings.Count; i++)
             {
-                keyBindings[index] = new KeyActionPair { key = newKey, action = keyBindings[index].action };
+                if (bindings[i].key == oldKey)
+                {
+                    KeyBinding newBinding = new KeyBinding { key = newKey, modifiers = new KeyCode[0] };
+                    KeybindManager.Instance.SetBinding(action, newBinding, i);
+                    return;
+                }
             }
         }
     }

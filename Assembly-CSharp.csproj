@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\EntityProperties\ActivateOnDespawn.cs" />
     <Compile Include="Assets\Scripts\Singletons\ObjectPoolManager.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\GunController.cs" />
+    <Compile Include="Assets\Scripts\Input\KeyBindings.cs" />
     <Compile Include="Assets\Scripts\UI\ProgressBar.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Weapons\AbstractActionController.cs" />
     <Compile Include="Assets\Scripts\UI\CameraInformation.cs" />
@@ -92,8 +93,10 @@
     <Compile Include="Assets\Scripts\UI\BackgroundGenerator.cs" />
     <Compile Include="Assets\Scripts\Unused\TeamSwitcherTest.cs" />
     <Compile Include="Assets\Scripts\Input\ControlInput.cs" />
+    <Compile Include="Assets\Scripts\Input\PersistentScriptableObject.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\MoveToPositionBehavior.cs" />
     <Compile Include="Assets\Scripts\Utils\GeometryUtils.cs" />
+    <Compile Include="Assets\Scripts\Input\KeybindManager.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\ArcMovementBehavior.cs" />
     <Compile Include="Assets\Scripts\Singletons\MapInformation.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\CircleAroundEntityBehavior.cs" />
@@ -114,6 +117,7 @@
     <Compile Include="Assets\Scripts\Input\KeyboardControlInput.cs" />
     <Compile Include="Assets\Scripts\Effects\ScaleWithCamera.cs" />
     <Compile Include="Assets\Scripts\EntityProperties\ActivateOnSpawn.cs" />
+    <Compile Include="Assets\Scripts\Input\GameActions.cs" />
     <Compile Include="Assets\Scripts\Fighting\InstantiateGroups\InstantiableArcGroup.cs" />
     <Compile Include="Assets\Scripts\AI\Behaviours\Movement\FlyAroundEntityBehavior.cs" />
     <Compile Include="Assets\Scripts\Physics\EntityControllers\VehicularController.cs" />

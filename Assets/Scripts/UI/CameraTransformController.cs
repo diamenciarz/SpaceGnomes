@@ -101,11 +101,14 @@ public class CameraTransformController : MonoBehaviour
     private Vector3 CalculateAveragePosition(List<GameObject> objects)
     {
         Vector3 sum = Vector3.zero;
+        int c = 0;
         foreach (GameObject obj in objects)
         {
+            if(!obj.activeSelf) continue; // Skip inactive objects
             sum += obj.transform.position;
+            c++;
         }
-        return sum / objects.Count;
+        return sum / c;
     }
 
     private void HandleZoom()
