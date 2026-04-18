@@ -242,7 +242,49 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
     {
         return new List<GameObject>(trackers[typeof(EntityTypeProperty.EntityType)][(int)type].AllEntities);
     }
-
+    public List<GameObject> GetEntitiesInRectangle(List<EntityTypeProperty.EntityType> types, Vector2 bottomLeft, Vector2 topRight)
+    {
+        List<GameObject> entities = new List<GameObject>();
+        foreach (EntityTypeProperty.EntityType type in types)
+        {
+            var tracker = trackers[typeof(EntityTypeProperty.EntityType)][(int)type];
+            // Find cells that could intersect the rectangle
+            Vector2Int minCell = new Vector2Int(
+                Mathf.FloorToInt(bottomLeft.x / CellSize),
+                Mathf.FloorToInt(bottomLeft.y / CellSize)
+            );
+            Vector2Int maxCell = new Vector2Int(
+                Mathf.FloorToInt(topRight.x / CellSize),
+                Mathf.FloorToInt(topRight.y / CellSize)
+            );
+            var candidates = new HashSet<GameObject>();
+            for (int x = minCell.x; x <= maxCell.x; x++)
+            {
+                for (int y = minCell.y; y <= maxCell.y; y++)
+                {
+                    Vector2Int cellKey = new Vector2Int(x, y);
+                    if (tracker.Cells.TryGetValue(cellKey, out HashSet<GameObject> cellEntities))
+                    {
+                        foreach (var entity in cellEntities)
+                        {
+                            candidates.Add(entity);
+                        }
+                    }
+                }
+            }
+            // Filter by exact rectangle bounds
+            foreach (var entity in candidates)
+            {
+                Vector2 pos = entity.transform.position;
+                if (pos.x >= bottomLeft.x && pos.x <= topRight.x &&
+                    pos.y >= bottomLeft.y && pos.y <= topRight.y)
+                {
+                    entities.Add(entity);
+                }
+            }
+        }
+        return entities;
+    }
     public List<GameObject> GetNearbyEntities(Vector2 center, List<EntityTypeProperty.EntityType> types, float radius)
     {
         List<GameObject> entities = new List<GameObject>();
