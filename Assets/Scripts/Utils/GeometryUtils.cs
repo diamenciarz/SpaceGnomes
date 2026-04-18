@@ -571,4 +571,13 @@ public static class GeometryUtils
     {
         return Quaternion.Euler(0,0,angle) * vector;
     }
+    public static List<GameObject> GetEntitiesInRectangle(List<GameObject> entities, Rect rect)
+    {
+        return entities.FindAll(entity => rect.Contains(entity.transform.position)).ToList();
+    }
+    public static List<GameObject> GetEntitiesInRectangle(List<EntitySelectionArea> areas, Rect rect)
+    {
+        List<EntitySelectionArea> filteredAreas = areas.FindAll(area => area.RectangleTouchesSelectionArea(rect)).ToList();
+        return filteredAreas.ConvertAll(area => area.gameObject);
+    }
 }

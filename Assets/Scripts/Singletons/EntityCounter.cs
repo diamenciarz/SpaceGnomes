@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor.SearchService;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
@@ -242,7 +243,7 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
     {
         return new List<GameObject>(trackers[typeof(EntityTypeProperty.EntityType)][(int)type].AllEntities);
     }
-    public List<GameObject> GetEntitiesInRectangle(List<EntityTypeProperty.EntityType> types, Vector2 bottomLeft, Vector2 topRight)
+    public List<GameObject> GetEntitiesInRectangle(List<EntityTypeProperty.EntityType> types, Rect rect)
     {
         List<GameObject> entities = new List<GameObject>();
         foreach (EntityTypeProperty.EntityType type in types)
@@ -250,12 +251,12 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
             var tracker = trackers[typeof(EntityTypeProperty.EntityType)][(int)type];
             // Find cells that could intersect the rectangle
             Vector2Int minCell = new Vector2Int(
-                Mathf.FloorToInt(bottomLeft.x / CellSize),
-                Mathf.FloorToInt(bottomLeft.y / CellSize)
+                Mathf.FloorToInt(rect.x / CellSize),
+                Mathf.FloorToInt(rect.y / CellSize)
             );
             Vector2Int maxCell = new Vector2Int(
-                Mathf.FloorToInt(topRight.x / CellSize),
-                Mathf.FloorToInt(topRight.y / CellSize)
+                Mathf.FloorToInt((rect.x + rect.width) / CellSize),
+                Mathf.FloorToInt((rect.y + rect.height) / CellSize)
             );
             var candidates = new HashSet<GameObject>();
             for (int x = minCell.x; x <= maxCell.x; x++)
@@ -265,23 +266,12 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
                     Vector2Int cellKey = new Vector2Int(x, y);
                     if (tracker.Cells.TryGetValue(cellKey, out HashSet<GameObject> cellEntities))
                     {
-                        foreach (var entity in cellEntities)
-                        {
-                            candidates.Add(entity);
-                        }
+                        candidates.AddRange(cellEntities);
                     }
                 }
             }
             // Filter by exact rectangle bounds
-            foreach (var entity in candidates)
-            {
-                Vector2 pos = entity.transform.position;
-                if (pos.x >= bottomLeft.x && pos.x <= topRight.x &&
-                    pos.y >= bottomLeft.y && pos.y <= topRight.y)
-                {
-                    entities.Add(entity);
-                }
-            }
+            entities = GeometryUtils.GetEntitiesInRectangle(candidates.ToList(), rect);
         }
         return entities;
     }

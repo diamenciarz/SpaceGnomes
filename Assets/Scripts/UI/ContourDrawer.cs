@@ -104,11 +104,11 @@ public class ContourDrawer : AbstractSingleton<ContourDrawer>
         lr.SetPositions(points3);
     }
     public void AddAlly(GameObject go) => AddToCategory(selectedAllies, go, allyColor);
-    public void RemoveAlly(GameObject go) => selectedAllies.Remove(go);
+    public void RemoveAlly(GameObject go) => RemoveFromCategory(selectedAllies, go);
     public void AddEnemy(GameObject go) => AddToCategory(selectedEnemies, go, enemyColor);
-    public void RemoveEnemy(GameObject go) => selectedEnemies.Remove(go);
+    public void RemoveEnemy(GameObject go) => RemoveFromCategory(selectedEnemies, go);
     public void AddNeutral(GameObject go) => AddToCategory(selectedNeutrals, go, neutralColor);
-    public void RemoveNeutral(GameObject go) => selectedNeutrals.Remove(go);
+    public void RemoveNeutral(GameObject go) => RemoveFromCategory(selectedNeutrals, go);
 
     private void AddToCategory(List<GameObject> list, GameObject go, Color color)
     {
@@ -119,7 +119,6 @@ public class ContourDrawer : AbstractSingleton<ContourDrawer>
         }
         if (list.Contains(go))
         {
-            Debug.LogWarning($"GameObject {go.name} is already added");
             return;
         }
         list.Add(go);
@@ -127,6 +126,17 @@ public class ContourDrawer : AbstractSingleton<ContourDrawer>
         {
             CreateLineRenderer(go, color);
         }
+        else
+        {
+            LineRenderer lr = contourRenderers[go];
+            lr.gameObject.SetActive(true);
+        }
+    }
+    private void RemoveFromCategory(List<GameObject> list, GameObject go)
+    {
+        LineRenderer lr = contourRenderers[go];
+        lr.gameObject.SetActive(false);
+        list.Remove(go);
     }
     private void CreateLineRenderer(GameObject go, Color color)
     {
