@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static GeometryUtils;
+using static ControlInput;
 using static EntityTypeProperty;
 
 public abstract class MovementBehavior : ScriptableObject
@@ -15,7 +15,16 @@ public abstract class MovementBehavior : ScriptableObject
         public Trajectory myTrajectory;
         public bool makeKeyboardInputLocal;
     }
-
+    protected struct ChaseVector
+    {
+        public ChaseVector(Vector2 vector, Vector2? targetVelocity)
+        {
+            this.vector = vector;
+            this.targetVelocity = targetVelocity;
+        }
+        public Vector2 vector;
+        public Vector2? targetVelocity;
+    }
     public enum ChaseMode
     {
         DirectlyToTarget,
@@ -56,9 +65,9 @@ public abstract class MovementBehavior : ScriptableObject
     Calculate the control vector in world coordinates.
     </summary>
      **/
-    public virtual Vector2 CalculateControlVector(MovementBehaviorData data)
+    public virtual ControlInputData CalculateControlVector(MovementBehaviorData data)
     {
-        Vector2 chaseVector = CalculateChaseVector(data);
+        ChaseVector chaseVector = CalculateChaseVector(data);
         Vector2 retreatVector = CalculateRetreatVector(data);
         Vector2 avoidanceVector = CalculateCollisionAvoidanceVector(data);
         // All are normalized if longer than 1
@@ -69,22 +78,23 @@ public abstract class MovementBehavior : ScriptableObject
 
         Vector2 scaledAvoidance = avoidanceVector * maxCollisionAvoidanceWeight; // 0 -> 0.7
         Vector2 scaledRetreat = retreatVector * (1 - scaledAvoidance.magnitude) * maxEntityRetreatWeight; // 0 -> ((1 -> 0.3) * 0.7) => 0 -> (0.7 -> 0.21)
-        Vector2 scaledChase = chaseVector * (1 - scaledRetreat.magnitude - scaledAvoidance.magnitude); // 1 -> 0.09
+        Vector2 scaledChase = chaseVector.vector * (1 - scaledRetreat.magnitude - scaledAvoidance.magnitude); // 1 -> 0.09
         Vector2 output = scaledAvoidance + scaledRetreat + scaledChase;
         if (output.magnitude > 1) output.Normalize();
         if (debugCollisions) Debug.DrawRay(data.transform.position, output, Color.yellow);
-        return output;
+
+        return new ControlInputData(output, 0f, chaseVector.targetVelocity);
     }
-    protected virtual Vector2 CalculateChaseVector(MovementBehaviorData data)
+    protected virtual ChaseVector CalculateChaseVector(MovementBehaviorData data)
     {
         GameObject chaseEntity = UpdateCurrentTarget(data);
-        if (!chaseEntity) return Vector2.zero;
+        if (!chaseEntity) return new ChaseVector(Vector2.zero, null);
         Vector2 directionToTarget = CalculateDirectionToTarget(data, chaseEntity);
 
         if(debugMovementVectors) Debug.DrawRay(data.transform.position, directionToTarget, Color.white);
 
         if (directionToTarget.magnitude > 1) directionToTarget.Normalize();
-        return directionToTarget;
+        return new ChaseVector(directionToTarget, null);
 
     }
     protected GameObject UpdateCurrentTarget(MovementBehaviorData data)
@@ -95,25 +105,25 @@ public abstract class MovementBehavior : ScriptableObject
     }
     protected virtual Vector2 CalculateRetreatVector(MovementBehaviorData data)
     {
-        if (maxEntityRetreatWeight == 0) return Vector2.zero; // No avoidance if maxAvoidanceFraction is 0 or negative
-        List<GameObject> entities = GetRetreatEntities(data);
-
-        GameObject entityToRetreatFrom = GeometryUtils.FindClosestEntityToPosition(entities, data.transform.position, 0, retreatRange);
+        if (maxEntityRetreatWeight == 0 || retreatRange == 0) return Vector2.zero; // No avoidance if maxAvoidanceFraction or retreatRange is 0
+        GameObject entityToRetreatFrom = GetEntityToRetreatFrom(data);
         if (!entityToRetreatFrom) return Vector2.zero;
 
         Vector2 directionFromEntity = -CalculateDirectionToTarget(data, entityToRetreatFrom);
         if (directionFromEntity.magnitude > 1) directionFromEntity.Normalize();
         return directionFromEntity;
     }
-    protected virtual List<GameObject> GetRetreatEntities(MovementBehaviorData data)
+    protected virtual GameObject GetEntityToRetreatFrom(MovementBehaviorData data)
     {
+        Cone searchCone = new Cone(data.transform.position, data.myTrajectory.GetVelocity().normalized, 360, retreatRange);
         if (onlyRetreatFromEnemies)
         {
-            return TeamManager.Instance.GetNearbyEnemies(data.transform.position, data.myTeam.team, retreatFromEntityTypes, retreatRange);
+            return searchCone.GetClosestVisibleEnemyInCone(data.myTeam.team, retreatFromEntityTypes.ToArray());
         }
-        List<GameObject> entities = EntityCounter.Instance.GetNearbyEntities(data.transform.position, retreatFromEntityTypes, retreatRange);
-        // Retrieves all ship parts. We want to avoid retreating from our own ship parts, so we remove any entities that are part of our own ship (children in the entity hierarchy)
-        return entities.FindAll(entity => EntityCounter.Instance.GetEntityParent(entity) != data.gameObject);
+        List<GameObject> entities = searchCone.GetVisibleObjectsInCone(data.myTeam.team, retreatFromEntityTypes.ToArray());
+        // Retrieves all ship parts. We want to avoid retreaving from our own ship parts, so we remove any entities that are part of our own ship (children in the entity hierarchy)
+        entities = entities.FindAll(entity => EntityCounter.Instance.GetEntityParent(entity) != data.gameObject);
+        return searchCone.GetClosestObject(entities, Cone.ConeDistance.ClosestDistance);
     }
     protected virtual Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity)
     {
@@ -124,8 +134,7 @@ public abstract class MovementBehavior : ScriptableObject
         }
         else
         {
-            CollidingPoints points = CalculateClosestDistanceBetweenColliders(chaseEntity, data.gameObject);
-            return points.toPoint - (Vector2)data.transform.position;
+            return GeometryUtils.GetEntityColliderHitPoint(chaseEntity, data.transform.position) - (Vector2)data.transform.position;
         }
     }
     protected Vector2 PredictHitCoords(Trajectory targetTrajectory, Trajectory myTrajectory, Vector2 myPosition)
@@ -135,9 +144,11 @@ public abstract class MovementBehavior : ScriptableObject
         float simulatedVelocity = Mathf.Max(relativeVelocity.magnitude, MINIMUM_SPEED);
         float reachTime = (targetTrajectory.GetCurrentPosition() - myTrajectory.GetCurrentPosition()).magnitude / simulatedVelocity;
 
-        if(chaseMode == ChaseMode.ExtrapolateAndCollideWithTarget)
+        Vector2 targetHitPoint = GeometryUtils.GetEntityColliderHitPoint(targetTrajectory.gameObject, myPosition);
+        Vector2 targetColliderOffset = targetHitPoint - targetTrajectory.GetCurrentPosition();
+        if (chaseMode == ChaseMode.ExtrapolateAndCollideWithTarget)
         {
-            return targetTrajectory.ExtrapolateFuturePosition(reachTime);
+            return targetTrajectory.ExtrapolateFuturePosition(reachTime) + targetColliderOffset;
         }
         else
         //if(chaseMode == ChaseMode.ExtrapolateAndFollowTarget)
@@ -145,7 +156,7 @@ public abstract class MovementBehavior : ScriptableObject
             Vector2 myFuturePosition = myTrajectory.ExtrapolateFuturePosition(reachTime);
             Vector2 targetFuturePosition = targetTrajectory.ExtrapolateFuturePosition(reachTime);
             float updatedReachTime = (targetFuturePosition - myFuturePosition).magnitude / simulatedVelocity;
-            return targetTrajectory.ExtrapolateFuturePosition(updatedReachTime);
+            return targetTrajectory.ExtrapolateFuturePosition(updatedReachTime) + targetColliderOffset;
         }
     }
     protected virtual Vector2 CalculateCollisionAvoidanceVector(MovementBehaviorData data)

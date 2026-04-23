@@ -4,22 +4,11 @@ using UnityEngine;
 using static EntityTeam;
 public class TeamSwitcherTest : AbstractActionController
 {
-    public override void Detach()
+    public override void Detach() { }
+    public override void Deactivate() { }
+    public override void Activate()
     {
-        
-    }
-
-    public override ShipAction GetActionType()
-    {
-        return ShipAction.UltimateShipAction;
-    }
-
-    public override void SetAction(bool isOn, GameObject optionalTarget)
-    {
-        if (isOn)
-        {
-            EntityTeam entityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
-            TeamManager.Instance.SetEntityTeam(gameObject, entityTeam.team == Team.Team1 ? Team.Team2 : Team.Team1);
-        }
+        EntityTeam entityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
+        TeamManager.Instance.SetEntityTeam(gameObject, entityTeam.team == Team.Team1 ? Team.Team2 : Team.Team1);
     }
 }

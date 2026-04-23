@@ -8,7 +8,6 @@ public abstract class ArcMovementBehavior : MovementBehavior
     /// <summary>
     /// A large radius value used for raycasting to determine the thickness of the chase entity's collider when calculating the offset radius.
     /// </summary>
-    private const float RADIUS_OF_THE_LARGEST_SHIP = 10000f;
 
     /// <summary>
     /// Determines the world target position to move towards based on the provided arc offsets and chase mode.
@@ -73,14 +72,13 @@ public abstract class ArcMovementBehavior : MovementBehavior
     // Map vector to angle degrees where 0 is world-up (+Y)
     protected float AngleDegFromVector(Vector2 v)
     {
-        if (v.sqrMagnitude == 0) return 0f;
         return GeometryUtils.DirectionVectorToAngle(v);
     }
 
     // Convert angle (0 = up) and radius to vector
     protected Vector2 VectorFromAngleDeg(float angleDeg, float radius)
     {
-        return GeometryUtils.AngleToDirectionVector(angleDeg) * radius;
+        return GeometryUtils.AngleToDirectionVector(angleDeg, radius);
     }
     protected float GetOffsetRadius(GameObject chaseEntity, MovementBehaviorData data, float initialRadius, float offsetAngle)
     {
@@ -95,8 +93,8 @@ public abstract class ArcMovementBehavior : MovementBehavior
     }
     private Vector2 GetParentShipColliderHitPoint(GameObject chaseParent, float offsetAngle)
     {
-        Vector2 offsetDirection = (Vector2)chaseParent.transform.position + VectorFromAngleDeg(offsetAngle, RADIUS_OF_THE_LARGEST_SHIP);
-        RaycastHit2D[] hits = GeometryUtils.RaycastInLine(chaseParent.transform.position, offsetDirection, RADIUS_OF_THE_LARGEST_SHIP);
+        Vector2 offsetPosition = (Vector2)chaseParent.transform.position + VectorFromAngleDeg(offsetAngle, GeometryUtils.RADIUS_OF_THE_LARGEST_SHIP);
+        RaycastHit2D[] hits = GeometryUtils.RaycastInLine(chaseParent.transform.position, offsetPosition, GeometryUtils.RADIUS_OF_THE_LARGEST_SHIP);
         // Select the hit that corresponds to the chaseParent's collider
         RaycastHit2D chaseParentHit = hits.First(hit => hit.collider && hit.collider.gameObject == chaseParent);
         return chaseParentHit.point;

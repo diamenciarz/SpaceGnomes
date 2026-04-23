@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -203,6 +204,22 @@ public class Trajectory : MonoBehaviour
 
         // Calculate moving collider collision
         return WillMovingObjectsCollide(pA, vA, trajectory.MyCollider, pB, vB, other.MyCollider, maxTime);
+    }
+    public Vector2 CalculateCoordinatesToHitTrajectory(Vector2 startingPosition, Func<float, float> projectileSpeed, int maxIterations = 5)
+    {
+        if (projectileSpeed(0f) <= 0f) return GetCurrentPosition();
+
+        Vector2 targetPosition = GetCurrentPosition();
+        float distanceToTarget = (targetPosition - startingPosition).magnitude;
+        float deltaTime = distanceToTarget / projectileSpeed(0f);
+        for (int i = 0; i < maxIterations; i++)
+        {
+            if (distanceToTarget <= 0.05f) return targetPosition;
+            targetPosition = ExtrapolateFuturePosition(deltaTime);
+            distanceToTarget = (targetPosition - startingPosition).magnitude;
+            deltaTime = distanceToTarget / projectileSpeed(deltaTime);
+        }
+        return targetPosition;
     }
     private static CollisionInfo? WillObjectsCollideDirectly(TrajectoryInstance myTrajectory, Vector2 myVelocity, Vector2 otherVelocity, TrajectoryInstance otherTrajectory, float maxTime, int collisionCheckPointCount)
     {

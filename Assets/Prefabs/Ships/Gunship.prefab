@@ -208,14 +208,15 @@ GameObject:
   - component: {fileID: 4275953901346360542}
   - component: {fileID: 1741509105870174778}
   - component: {fileID: 827234146337642812}
-  - component: {fileID: 6543003814999245564}
+  - component: {fileID: 5397595940257868952}
+  - component: {fileID: 5747292331280976720}
   - component: {fileID: 4049380779284195394}
   - component: {fileID: 6514658271571309198}
   - component: {fileID: 6968070201716844009}
   - component: {fileID: 2405805016719162628}
-  - component: {fileID: 5747292331280976720}
   - component: {fileID: 8076816269696358030}
   - component: {fileID: 463842373566036617}
+  - component: {fileID: 5863680749512435320}
   m_Layer: 6
   m_Name: Gunship
   m_TagString: Untagged
@@ -278,6 +279,7 @@ MonoBehaviour:
   thrustForce: 4000
   thrustDampingMultiplier: 3
   maxVelocity: 10
+  brakeSpeed: 0.2
   steerTorque: 10000
   maxAngularDampingMultiplier: 2
   maxAngularVelocity: 100
@@ -300,12 +302,13 @@ MonoBehaviour:
   thrustForce: 2400
   thrustDampingMultiplier: 3
   maxVelocity: 10
+  brakeSpeed: 0.2
   perpendicularDamping: 0.1
   steerTorque: 10000
   maxAngularDampingMultiplier: 2
   maxAngularVelocity: 100
   angularDamping: 0.8
---- !u!114 &6543003814999245564
+--- !u!114 &5397595940257868952
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -314,18 +317,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 2369128004041744743}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98c5e7230b949f248aeaa2c3611ba347, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b72d70a2fb1b2842b5ce0a8cbdba488, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  keyBindings:
-  - key: 32
-    action: 0
-  - key: 323
-    action: 1
-  - key: 324
-    action: 2
-  - key: 304
-    action: 3
+  movementToPositionBehavior: {fileID: 11400000, guid: 7dc54a734085ff348b069032bc6ae492, type: 2}
+  defaultMovementBehavior: {fileID: 0}
+--- !u!114 &5747292331280976720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2369128004041744743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ba24750820afc48bf060e1e607809f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementBehavior: {fileID: 11400000, guid: eb80449c995c44d4aac720d30c3e1b96, type: 2}
+  behaviorUpdatesPerSecond: 5
 --- !u!114 &4049380779284195394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -360,123 +370,123 @@ CompositeCollider2D:
   m_ColliderPaths:
   - m_Collider: {fileID: 5133975644343501789}
     m_ColliderPaths:
-    - - X: -7759998
+    - - X: -7760000
         Y: -5880005
-      - X: -5465775
+      - X: -5465777
         Y: -5579399
-      - X: -6006807
+      - X: -6006809
         Y: -3644746
-      - X: -2701032
+      - X: -2701034
         Y: -2421038
-      - X: -1959998
+      - X: -1960000
         Y: 8119995
-      - X: -5508440
+      - X: -5508442
         Y: 8061241
-      - X: -10130515
+      - X: -10130517
         Y: 2091117
   - m_Collider: {fileID: 5671065295789464785}
     m_ColliderPaths:
-    - - X: 1939997
+    - - X: 1939998
         Y: 8169622
       - X: 2860623
         Y: -2561137
-      - X: 5940325
+      - X: 5940326
         Y: -3494977
-      - X: 5527000
+      - X: 5527001
         Y: -5492908
-      - X: 7600509
+      - X: 7600510
         Y: -5886234
       - X: 10119660
         Y: 2215533
-      - X: 5461982
+      - X: 5461983
         Y: 8061241
   - m_Collider: {fileID: 7063446210809736147}
     m_ColliderPaths:
-    - - X: -5899418
-        Y: 2763957
+    - - X: -5899417
+        Y: 2763976
       - X: -6884632
-        Y: 1650870
+        Y: 1650889
       - X: -6910001
-        Y: -4641415
+        Y: -4641396
       - X: -5071797
-        Y: -6716643
+        Y: -6716624
       - X: -2941193
-        Y: -6716642
-      - X: -1122599
-        Y: -4664752
+        Y: -6716623
+      - X: -1122598
+        Y: -4664733
       - X: -1141188
-        Y: 1638581
-      - X: -2208716
-        Y: 2756605
+        Y: 1638600
+      - X: -2208715
+        Y: 2756624
   - m_Collider: {fileID: 6577324679013694679}
     m_ColliderPaths:
-    - - X: 2100583
-        Y: 2763957
-      - X: 1115369
-        Y: 1650870
-      - X: 1090000
-        Y: -4641415
-      - X: 2928204
-        Y: -6716643
-      - X: 5058808
-        Y: -6716642
-      - X: 6877403
-        Y: -4664752
-      - X: 6858813
-        Y: 1638581
-      - X: 5791286
-        Y: 2756605
+    - - X: 2100581
+        Y: 2763976
+      - X: 1115367
+        Y: 1650889
+      - X: 1089998
+        Y: -4641396
+      - X: 2928202
+        Y: -6716624
+      - X: 5058806
+        Y: -6716623
+      - X: 6877401
+        Y: -4664733
+      - X: 6858811
+        Y: 1638600
+      - X: 5791284
+        Y: 2756624
   - m_Collider: {fileID: 5033700563489854107}
     m_ColliderPaths:
-    - - X: 985563
-        Y: 3784800
-      - X: 2951942
-        Y: 5088352
-      - X: 2238310
-        Y: 7982552
-      - X: 10616
-        Y: 10493093
-      - X: -2205685
-        Y: 8085266
-      - X: -3065855
-        Y: 5088505
-      - X: -1032032
-        Y: 3776027
+    - - X: 985562
+        Y: 3784781
+      - X: 2951941
+        Y: 5088333
+      - X: 2238309
+        Y: 7982533
+      - X: 10615
+        Y: 10493073
+      - X: -2205686
+        Y: 8085246
+      - X: -3065856
+        Y: 5088486
+      - X: -1032033
+        Y: 3776008
   - m_Collider: {fileID: 8196803837620988013}
     m_ColliderPaths:
-    - - X: 4355001
-        Y: 4131685
+    - - X: 4355000
+        Y: 4131666
       - X: 1571497
-        Y: 6157051
-      - X: -1535793
-        Y: 6162943
-      - X: -4341518
-        Y: 4208612
+        Y: 6157032
+      - X: -1535794
+        Y: 6162924
+      - X: -4341519
+        Y: 4208593
       - X: -1861500
-        Y: -6839145
+        Y: -6839164
       - X: 1873327
-        Y: -6846185
+        Y: -6846204
   m_CompositePaths:
     m_Paths:
-    - - {x: 0.18731031, y: -0.6846184}
-      - {x: 0.211158, y: -0.5794721}
-      - {x: 0.2928322, y: -0.6716643}
-      - {x: 0.5058887, y: -0.6716554}
-      - {x: 0.6054839, y: -0.5593034}
-      - {x: 0.7600585, y: -0.588599}
+    - - {x: 0.18731031, y: -0.6846203}
+      - {x: 0.2111586, y: -0.5794711}
+      - {x: 0.29283202, y: -0.6716624}
+      - {x: 0.5058885, y: -0.6716535}
+      - {x: 0.6054823, y: -0.5593031}
+      - {x: 0.7600586, y: -0.588599}
       - {x: 1.0119572, y: 0.2215642}
-      - {x: 0.5461861, y: 0.8061243}
-      - {x: 0.2075956, y: 0.816552}
-      - {x: 0.0010393, y: 1.0492849}
-      - {x: -0.2177137, y: 0.81164}
-      - {x: -0.5508518, y: 0.80611414}
-      - {x: -1.0130477, y: 0.2090987}
-      - {x: -0.7759758, y: -0.58799744}
-      - {x: -0.60152704, y: -0.5651515}
-      - {x: -0.50716794, y: -0.6716643}
-      - {x: -0.2941114, y: -0.6716554}
-      - {x: -0.2101494, y: -0.57700443}
-      - {x: -0.1861275, y: -0.6839146}
+      - {x: 0.5461862, y: 0.8061243}
+      - {x: 0.20759371, y: 0.816552}
+      - {x: 0.0010392, y: 1.0492829}
+      - {x: -0.2177119, y: 0.81164}
+      - {x: -0.550852, y: 0.80611414}
+      - {x: -1.0130479, y: 0.2090987}
+      - {x: -0.775976, y: -0.58799744}
+      - {x: -0.6015255, y: -0.56515133}
+      - {x: -0.50716794, y: -0.6716624}
+      - {x: -0.2941114, y: -0.6716535}
+      - {x: -0.21015, y: -0.5770033}
+      - {x: -0.1861275, y: -0.6839165}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
 --- !u!114 &6968070201716844009
@@ -505,20 +515,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myTeam: 2
---- !u!114 &5747292331280976720
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2369128004041744743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91ba24750820afc48bf060e1e607809f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementBehavior: {fileID: 11400000, guid: eb80449c995c44d4aac720d30c3e1b96, type: 2}
-  behaviorUpdatesPerSecond: 5
 --- !u!114 &8076816269696358030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -533,7 +529,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isControlledByPlayer: 0
   predictTrajectories: 1
-  weaponGroups:
+  weaponGroupsWithSharedSensors:
   - sensors:
     - {fileID: 1554176347}
     weapons:
@@ -553,6 +549,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saveStates: 10
   collisionCheckPointCount: 20
+--- !u!114 &5863680749512435320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2369128004041744743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b58991119133624ab4add7ccc0151ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debug: 0
 --- !u!1 &2405233771952785761
 GameObject:
   m_ObjectHideFlags: 0

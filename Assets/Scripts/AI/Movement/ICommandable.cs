@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ISettableTarget
+public interface ICommandable
 {
-    public void SetTarget(GameObject target);
+     void MoveTo(Vector2 position);
 }

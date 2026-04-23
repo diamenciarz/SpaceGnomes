@@ -65,7 +65,7 @@ public struct KeyBindingData
 [CreateAssetMenu(fileName = "KeyBindings", menuName = "ScriptableObjects/Input/KeyBindings")]
 public class KeyBindings : PersistentScriptableObject
 {
-    [SerializeField] private List<KeyBindingData> bindingData = new List<KeyBindingData>();
+    [SerializeField] private List<KeyBindingData> shipActionBindings = new List<KeyBindingData>();
     [SerializeField] public string savePath = "PersistentData/Keybindings/keybindings.json";
 
     // The same action can have multiple bindings, so we use a list for each action
@@ -89,7 +89,7 @@ public class KeyBindings : PersistentScriptableObject
             actionBindings[action] = new List<KeyBinding>();
         }
 
-        foreach (var data in bindingData)
+        foreach (var data in shipActionBindings)
         {
             actionBindings[data.action].Add(data.binding);
         }
@@ -145,12 +145,12 @@ public class KeyBindings : PersistentScriptableObject
 
     private void UpdateBindingData()
     {
-        bindingData.Clear();
+        shipActionBindings.Clear();
         foreach (var kvp in actionBindings)
         {
             foreach (var binding in kvp.Value)
             {
-                bindingData.Add(new KeyBindingData { action = kvp.Key, binding = binding });
+                shipActionBindings.Add(new KeyBindingData { action = kvp.Key, binding = binding });
             }
         }
     }

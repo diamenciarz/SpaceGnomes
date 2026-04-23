@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public class AbstractPhysicsController : MonoBehaviour
+/// <summary>
+/// AbstractPhysicsController is an abstract base class for physics
+/// </summary>
+public abstract class AbstractPhysicsController : MonoBehaviour
 {
     [Header("Instances")]
     [SerializeField] protected ControlInput mainShipControlInput = null;

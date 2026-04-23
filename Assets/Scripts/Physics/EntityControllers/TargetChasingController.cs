@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static ISettableTarget;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class TargetChasingController : AutonomousMovementController, ISettableTarget
@@ -36,13 +37,15 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private float THRUST_MULTIPLIER = 45f;
 
     private Rigidbody2D rb2d;
-    private GameObject target;
+    private TargetInstance? target;
     private float lastFixedVelocity;
     private float lastFixedTime;
     private float startTime;
 
     private bool isInPredatorMode = false;
 
+    #region Public Methods
+    #region ActivateOnSpawn Method
     public override void Activate()
     {
         base.Activate();
@@ -53,6 +56,48 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         startTime = Time.time;
         target = null;
     }
+    #endregion
+
+    #region AutonomousMovementController Method
+    public override float VelocityFunction(float time)
+    {
+        float mass = rb2d.mass;
+        if (time < accelerationDelay)
+        {
+            return initialVelocity;
+        }
+        else if (time < accelerationDelay + accelerationTime)
+        {
+            float t = (time - accelerationDelay) / accelerationTime; // Normalize time to [0, 1]
+            float curveValue = accelerationCurve.Evaluate(t); // Get curve value
+            return Mathf.Lerp(initialVelocity, targetVelocity, curveValue); // Interpolate velocity
+        }
+        else
+        {
+            return targetVelocity; // After acceleration phase, maintain target velocity
+        }
+    }
+    #endregion
+
+    #region ISettableTarget Methods
+    public void SetTarget(GameObject target)
+    {
+        this.target = new TargetInstance(target);
+    }
+    public void SetTarget(Vector2 target)
+    {
+        this.target = new TargetInstance(target);
+    }
+    public TargetInstance? GetTarget()
+    {
+        return target;
+    }
+    public void StopTargetting()
+    {
+        target = null;
+    }
+    #endregion
+    #endregion
     private void Awake()
     {
         rb2d = GetComponent<Rigidbody2D>();
@@ -65,7 +110,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     private void Update()
     {
         UpdateTarget();
-        if(target) Debug.DrawLine(transform.position, target.transform.position, Color.red);
+        if(target.HasValue) Debug.DrawLine(transform.position, target.Value.GetPosition(), Color.red);
     }
     private void ApplyPerpendicularDamping()
     {
@@ -101,7 +146,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         if (target != null) return;
         Cone myDirectionCone = new Cone(transform.position, transform.up, 360f, Mathf.Infinity);
         List<GameObject> detectedObjects = GetDetectedObjects();
-        target = myDirectionCone.GetClosestObjectInCone(detectedObjects, Cone.ConeDistance.SmallestAngle);
+        target = new TargetInstance(myDirectionCone.GetClosestObjectInCone(detectedObjects, Cone.ConeDistance.SmallestAngle));
     }
     private List<GameObject> GetDetectedObjects()
     {
@@ -113,10 +158,6 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         }
         return detectedObjects.Distinct().ToList();
     }
-    public void SetTarget(GameObject target)
-    {
-        this.target = target;
-    }
     private void HandleMovement()
     {
         // Apply thrust according to velocity function
@@ -124,6 +165,9 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
         // Handle rotation torque
         HandleTorque();
     }
+    /// <summary>
+    /// Calculates the thrust force needed to achieve the desired change in velocity for this FixedUpdate based on the VelocityFunction and applies it to the Rigidbody2D.
+    /// </summary>
     private void HandleThrust()
     {
         float fixedDeltaVelocity = CalculateFixedDeltaVelocity();
@@ -133,7 +177,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     }
     private void HandleTorque()
     {
-        if (!target) return;
+        if (!target.HasValue) return;
         float angleToTarget = CalculateAngleToTarget();
         float steerInput = Mathf.Clamp(angleToTarget / 180, -1, 1); // Normalize to [-1, 1]
 
@@ -159,6 +203,9 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     {
         if(Mathf.Abs(rb2d.angularVelocity) > maxAngularVelocity) rb2d.angularVelocity = maxAngularVelocity * Mathf.Sign(rb2d.angularVelocity);
     }
+    /// <summary>
+    /// Calculates the change in velocity that should be applied during this FixedUpdate based on the VelocityFunction and the time elapsed since the last FixedUpdate.
+    /// </summary>
     private float CalculateFixedDeltaVelocity()
     {
         if (lastFixedTime + Time.fixedDeltaTime > startTime + accelerationDelay + accelerationTime)
@@ -206,26 +253,7 @@ public class TargetChasingController : AutonomousMovementController, ISettableTa
     }
     private float CalculateAngleToTarget()
     {
-        Vector2 directionToTarget = (Vector2)target.transform.position - rb2d.position;
+        Vector2 directionToTarget = (Vector2)target.Value.GetPosition() - rb2d.position;
         return Vector2.SignedAngle(transform.right, directionToTarget);
     }
-    public override float VelocityFunction(float time)
-    {
-        float mass = rb2d.mass;
-        if (time < accelerationDelay)
-        {
-            return initialVelocity;
-        }
-        else if (time < accelerationDelay + accelerationTime)
-        {
-            float t = (time - accelerationDelay) / accelerationTime; // Normalize time to [0, 1]
-            float curveValue = accelerationCurve.Evaluate(t); // Get curve value
-            return Mathf.Lerp(initialVelocity, targetVelocity, curveValue); // Interpolate velocity
-        }
-        else
-        {
-            return targetVelocity; // After acceleration phase, maintain target velocity
-        }
-    }
-
 }

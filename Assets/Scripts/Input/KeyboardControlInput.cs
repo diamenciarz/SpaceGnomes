@@ -1,7 +1,9 @@
 using Unity.VisualScripting;
 using UnityEngine;
-using static AIControlInput;
 
+/// <summary>
+/// KeyboardControlInput is a concrete implementation of ControlInput that captures player input from the keyboard for movement and rotation.
+/// </summary>
 public class KeyboardControlInput : ControlInput
 {
     public enum ControlScheme
@@ -17,49 +19,46 @@ public class KeyboardControlInput : ControlInput
     public ControlScheme controlScheme = ControlScheme.WASD;
     public RotationScheme rotationScheme = RotationScheme.Keyboard;
 
-    private Vector2 controlVector = Vector2.zero;
+    private Vector2 worldControlVector = Vector2.zero;
     private bool calculatedControlThisFrame = false;
 
     void Update()
     {
         calculatedControlThisFrame = false;
     }
-
-    public override float GetVerticalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local, bool iAmVehicularController = false)
+    /// <summary>
+    /// When I am asked for local by a vehicular controller, I will return world coordinates instead.
+    /// </summary>
+    public override ControlInputData GetControlInput(ControlVectorCoordinates mode, bool iAmVehicularController = false)
     {
         if (!calculatedControlThisFrame) UpdateControlVector(controlScheme);
         bool shouldUseLocal = mode == ControlVectorCoordinates.Local && !iAmVehicularController;
-        return shouldUseLocal ? GeometryUtils.WorldCoordsToLocal(controlVector, transform).y : controlVector.y;
-    }
-    public override float GetHorizontalInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local, bool iAmVehicularController = false)
-    {
-        if (!calculatedControlThisFrame) UpdateControlVector(controlScheme);
-        bool shouldUseLocal = mode == ControlVectorCoordinates.Local && !iAmVehicularController;
-        return shouldUseLocal ? GeometryUtils.WorldCoordsToLocal(controlVector, transform).x : controlVector.x;
+        Vector2 translatedControlVector = shouldUseLocal ? GeometryUtils.WorldCoordsToLocal(worldControlVector, transform) : worldControlVector;
+        return new ControlInputData(translatedControlVector, GetRotationInput(), null);
     }
     private void UpdateControlVector(ControlScheme controlScheme)
     {
         if (controlScheme == ControlScheme.WASD)
         {
-            controlVector = new Vector2(Input.GetAxisRaw("HorizontalKeys"), Input.GetAxisRaw("VerticalKeys"));
+            worldControlVector = new Vector2(Input.GetAxisRaw("HorizontalKeys"), Input.GetAxisRaw("VerticalKeys"));
         }
         else
         {
-            controlVector = new Vector2(Input.GetAxisRaw("HorizontalArrows"), Input.GetAxisRaw("VerticalArrows"));
+            worldControlVector = new Vector2(Input.GetAxisRaw("HorizontalArrows"), Input.GetAxisRaw("VerticalArrows"));
         }
     }
-     public override float GetRotationInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local, bool iAmVehicularController = false)
+     public float GetRotationInput()
     {
         if (rotationScheme == RotationScheme.Keyboard)
         {
-            return GetKeyboardRotationInput(mode);
+            return GetKeyboardRotationInput();
         }
         else
         {
             return GetMouseRotationInput();
         }
     }
-    private float GetKeyboardRotationInput(ControlVectorCoordinates mode = ControlVectorCoordinates.Local)
+    private float GetKeyboardRotationInput()
     {
         if (controlScheme == ControlScheme.WASD)
         {

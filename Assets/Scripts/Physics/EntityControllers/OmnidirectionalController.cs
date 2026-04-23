@@ -1,6 +1,11 @@
 using UnityEngine;
-using static AIControlInput;
+using static ControlInput;
 
+/// <summary>
+/// OmnidirectionalController is a physics-based controller that allows for movement in any direction and independent rotation.
+/// It applies thrust in the direction of the movement input and applies torque based on the rotation input.
+/// The controller also includes damping to prevent excessive velocity and angular velocity, allowing for precise control of the ship's movement and rotation.
+/// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class OmnidirectionalController: AbstractPhysicsController
 {
@@ -8,6 +13,7 @@ public class OmnidirectionalController: AbstractPhysicsController
     [SerializeField] private float thrustForce = 2000f;
     [SerializeField][Range(1f, 10f)] private float thrustDampingMultiplier = 3f;
     [SerializeField][Range(0f, 20)] float maxVelocity = 10f;
+    [SerializeField][Range(0f, 20)] float brakeSpeed = 0.2f;
 
     [Header("Rotation")]
     [SerializeField] private float steerTorque = 10000f;
@@ -18,6 +24,7 @@ public class OmnidirectionalController: AbstractPhysicsController
 
     private Vector2 movementInput;
     private float rotationInput;
+    private Vector2? targetVelocity;
 
     protected override void Awake()
     {
@@ -47,13 +54,21 @@ public class OmnidirectionalController: AbstractPhysicsController
         ControlInput controlInput = Input.GetKey(alternativeControlKey) ? alternativeShipControlInput : mainShipControlInput;
         if (controlInput != null)
         {
-            movementInput = new Vector2(controlInput.GetHorizontalInput(ControlVectorCoordinates.World), controlInput.GetVerticalInput(ControlVectorCoordinates.World));
-            rotationInput = controlInput.GetRotationInput();
+            ControlInputData controlInputData = controlInput.GetControlInput(ControlVectorCoordinates.World);
+            movementInput = controlInputData.controlVector;
+            rotationInput = controlInputData.rotation;
+            targetVelocity = controlInputData.targetVelocity;
         }
     }
 
     private void HandleMovement()
     {
+        if(ShouldSetVelocityToTarget())
+        {
+            rb2d.velocity = targetVelocity.Value; // Apply brake by reducing velocity
+            return; // Skip applying thrust when braking
+        }
+
         // Apply thrust in the direction of movementInput
         Vector2 thrust = CalculateThrust(movementInput);
         rb2d.AddForce(thrust * Time.fixedDeltaTime);
@@ -66,7 +81,12 @@ public class OmnidirectionalController: AbstractPhysicsController
         float torque = CalculateRotationTorque(rotationInput);
         rb2d.AddTorque(torque * Time.fixedDeltaTime);
     }
-
+    private bool ShouldSetVelocityToTarget()
+    {
+        if (!targetVelocity.HasValue) return false;
+        Vector2 velocityDelta = targetVelocity.Value - rb2d.velocity;
+        return velocityDelta.magnitude < brakeSpeed;
+    }
     private Vector2 CalculateThrust(Vector2 thrustInput)
     {
         Vector2 velocity = rb2d.velocity;

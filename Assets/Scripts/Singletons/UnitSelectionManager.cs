@@ -4,8 +4,8 @@ using UnityEngine;
 public class UnitSelectionManager : AbstractSingleton<UnitSelectionManager>
 {
     [SerializeField] private Color selectionColor = new Color(0.0f, 1.0f, 0.0f, 0.3f);
-    public ShipAction selectAction = ShipAction.PrimaryShipAction;
-    public ShipAction sendAction = ShipAction.SecondaryShipAction;
+    public ShortcutActionSO selectAction;
+    public ShortcutActionSO commandAction;
     //[HideInInspector]
     public List<GameObject> selectedEntities = new List<GameObject>();
 
@@ -16,22 +16,40 @@ public class UnitSelectionManager : AbstractSingleton<UnitSelectionManager>
     private Vector2 selectionStartScreen;
     private Vector2 currentMouseScreen;
 
+    #region Public Methods
+    public void RegisterSelectableEntity(EntitySelectionArea entity)
+    {
+        selectableEntities.Add(entity);
+    }
+    #endregion
+
+    protected override void Awake()
+    {
+        base.Awake();
+        if (selectAction == null) Debug.LogError("Select action not assigned in UnitSelectionManager. Please assign it in the inspector.");
+        if (commandAction == null) Debug.LogError("Command action not assigned in UnitSelectionManager. Please assign it in the inspector.");
+    }
     private void Update()
     {
-        if (KeybindManager.Instance.IsActionDown(selectAction))
+        HandleSelection();
+        HandleCommand();
+    }
+    private void HandleSelection()
+    {
+        if (selectAction.IsDown())
         {
             selectionStart = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             selectionStartScreen = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
             isSelecting = true;
         }
 
-        if (isSelecting && KeybindManager.Instance.IsActionPressed(selectAction))
+        if (isSelecting && selectAction.IsPressed())
         {
             currentMouseScreen = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
             // While selecting, could draw rectangle here if needed
         }
 
-        if (KeybindManager.Instance.IsActionUp(selectAction) && isSelecting)
+        if (isSelecting && selectAction.IsUp())
         {
             Vector2 selectionEnd = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             RemoveOldContours();
@@ -40,15 +58,26 @@ public class UnitSelectionManager : AbstractSingleton<UnitSelectionManager>
             isSelecting = false;
         }
     }
+    private void HandleCommand()
+    {
+        if (commandAction.IsDown() && selectedEntities.Count > 0)
+        {
+            Vector2 targetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            foreach (var entity in selectedEntities)
+            {
+                ICommandable commandable = entity.GetComponent<ICommandable>();
+                if (commandable != null)
+                {
+                    commandable.MoveTo(targetPosition);
+                }
+            }
+        }
+    }
 
     private void RemoveOldContours() => selectedEntities.ForEach(entity => ContourDrawer.Instance.RemoveAlly(entity));
 
     private void SetNewContours() => selectedEntities.ForEach(entity => ContourDrawer.Instance.AddAlly(entity));
 
-    public void RegisterSelectableEntity(EntitySelectionArea entity)
-    {
-        selectableEntities.Add(entity);
-    }
 
     private void OnGUI()
     {

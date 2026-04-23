@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static ControlInput;
 
 [CreateAssetMenu(menuName= "ScriptableObjects/Behaviors/Movement/Vehicular/AttackAndRetreatBehavior", fileName = "AttackAndRetreatBehavior")]
 public class AttackAndRetreatBehavior : ChaseEntityOmnidirectionalBehavior
@@ -57,9 +58,9 @@ public class AttackAndRetreatBehavior : ChaseEntityOmnidirectionalBehavior
         }
     }
     // Just add the current target to the list of entities it retreats from ignoring the retreatList.
-    public override Vector2 CalculateControlVector(MovementBehaviorData data)
+    public override ControlInputData CalculateControlVector(MovementBehaviorData data)
     {
-        Vector2 chaseVector = CalculateChaseVector(data);
+        ChaseVector chaseVector = CalculateChaseVector(data);
         Vector2 retreatVector = CalculateRetreatVector(data);
         Vector2 avoidanceVector = CalculateCollisionAvoidanceVector(data);
         // All are normalized if longer than 1
@@ -67,27 +68,28 @@ public class AttackAndRetreatBehavior : ChaseEntityOmnidirectionalBehavior
 
         Vector2 scaledAvoidance = avoidanceVector * maxCollisionAvoidanceWeight; // 0 -> 0.7
         Vector2 scaledRetreat = retreatVector * (1 - scaledAvoidance.magnitude) * maxEntityRetreatWeight; // 0 -> ((1 -> 0.3) * 0.7) => 0 -> (0.7 -> 0.21)
-        Vector2 scaledChase = chaseVector * (1 - scaledRetreat.magnitude - scaledAvoidance.magnitude); // 1 -> 0.09
+        Vector2 scaledChase = chaseVector.vector * (1 - scaledRetreat.magnitude - scaledAvoidance.magnitude); // 1 -> 0.09
         Vector2 output = scaledAvoidance + scaledRetreat + scaledChase;
         if (output.magnitude > 1) output.Normalize();
         if (debugCollisions) Debug.DrawRay(data.transform.position, output, Color.yellow);
-        return output;
+
+        return new ControlInputData(output, 0f, null);
     }
-    protected override Vector2 CalculateChaseVector(MovementBehaviorData data)
+    protected override ChaseVector CalculateChaseVector(MovementBehaviorData data)
     {
         int entityId = data.gameObject.GetInstanceID();
         UpdateCurrentTarget(data, entityId);
-        if (!currentTarget[entityId]) return Vector2.zero;
+        if (!currentTarget[entityId]) return new ChaseVector(Vector2.zero, null);
 
         Vector2 directionBetweenColliders = GeometryUtils.CalculateVectorBetweenColliderEdges(currentTarget[entityId], data.gameObject);
         Vector2 directionToTarget = CalculateDirectionToTarget(data, currentTarget[entityId], directionBetweenColliders);
         UpdateRetreatSetting(data, directionToTarget, directionBetweenColliders);
 
-        if (targetRetreatDistance[entityId] != 0) return Vector2.zero;
+        if (targetRetreatDistance[entityId] != 0) return new ChaseVector(Vector2.zero, null);
         if (debugMovementVectors) Debug.DrawRay(data.transform.position, directionToTarget, directionBetweenColliders.magnitude <= minDistanceToStartRetreating ? Color.magenta : Color.white);
 
         if (directionToTarget.magnitude > 1) directionToTarget.Normalize();
-        return directionToTarget;
+        return new ChaseVector(directionToTarget, null);
     }
     private Vector2 CalculateDirectionToTarget(MovementBehaviorData data, GameObject chaseEntity, Vector2 directionBetweenColliders)
     {
@@ -115,8 +117,7 @@ public class AttackAndRetreatBehavior : ChaseEntityOmnidirectionalBehavior
         int entityId = data.gameObject.GetInstanceID();
 
         if (maxEntityRetreatWeight == 0) return Vector2.zero; // No avoidance if maxAvoidanceFraction is 0 or negative
-        List<GameObject> entities = GetRetreatEntities(data);
-        GameObject entityToRetreatFrom = GeometryUtils.FindClosestEntityToPosition(entities, data.transform.position, 0, retreatRange);
+        GameObject entityToRetreatFrom = GetEntityToRetreatFrom(data);
 
         Vector2 directionBetweenColliders;
         if (!entityToRetreatFrom)

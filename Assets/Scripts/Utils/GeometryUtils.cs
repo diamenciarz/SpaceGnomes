@@ -12,6 +12,8 @@ using System;
 
 public static class GeometryUtils
 {
+    public const float RADIUS_OF_THE_LARGEST_SHIP = 10000f;
+
     public enum SensorType
     {
         Camera,
@@ -45,13 +47,20 @@ public static class GeometryUtils
         }
         return visibleObjects;
     }
-    public static Vector2 AngleToDirectionVector(float zAngle)
+    /// <summary>
+    /// Angle in degrees
+    /// </summary>
+    public static Vector2 AngleToDirectionVector(float zAngle, float radius=1f)
     {
         float radians = zAngle * Mathf.Deg2Rad;
-        return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
+        return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius;
     }
+    /// <summary>
+    /// Angle in degrees
+    /// </summary>
     public static float DirectionVectorToAngle(Vector2 direction)
     {
+        if (direction.sqrMagnitude == 0) return 0f;
         return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
     }
     public static bool PointBetweenTwoPoints(Vector2 point, Vector2 A, Vector2 B)
@@ -122,6 +131,23 @@ public static class GeometryUtils
         }
         return true;
     }
+    public static bool IsPositionVisible(Vector2 to, Vector2 from, EntityTeam.Team myTeam, float maxDistance=float.MaxValue, SensorType sensorType = SensorType.Camera, GameObject ignoreObject = null)
+    {
+        // There is no need to check for allies using Raycast, as they can be checked using distance alone
+        RaycastHit2D[] hits = RaycastInLine(to, from, maxDistance, sensorType);
+        float distanceToTarget = (to-from).magnitude;
+        
+        // Allies do not block the view
+        RaycastHit2D[] enemyHits = RemoveAllies(hits, myTeam, ignoreObject);
+        foreach (RaycastHit2D hit in enemyHits)
+        {
+            if (hit.distance < distanceToTarget - 0.001f)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     private static RaycastHit2D[] RemoveAllies(RaycastHit2D[] hits, Team myTeam, GameObject ignoreObject = null)
     {
         List<RaycastHit2D> nonAllies = new List<RaycastHit2D>();
@@ -146,6 +172,13 @@ public static class GeometryUtils
     public static RaycastHit2D[] RaycastInLine(Vector2 to, Vector2 from, float maxDistance=float.MaxValue, SensorType sensorType=SensorType.Camera)
     {
         return Physics2D.RaycastAll(from, to-from, maxDistance, GetSensorMask(sensorType));
+    }
+    public static Vector2 GetEntityColliderHitPoint(GameObject targetEntity, Vector2 startPosition)
+    {
+        RaycastHit2D[] hits = GeometryUtils.RaycastInLine(targetEntity.transform.position, startPosition);
+        // Select the hit that corresponds to the chaseParent's collider
+        RaycastHit2D chaseParentHit = hits.First(hit => hit.collider && hit.collider.gameObject == targetEntity);
+        return chaseParentHit.point;
     }
     private static int GetSensorMask(SensorType sensorType)
     {
@@ -238,22 +271,6 @@ public static class GeometryUtils
             }
         }
         return closest;
-    }
-    public static Vector2 CalculateTrajectoryHitCoordinates(Trajectory targetTrajectory, Vector2 startingPosition, Func<float, float> projectileSpeed, int maxIterations=5)
-    {
-        if (projectileSpeed(0f) <= 0f) return targetTrajectory.GetCurrentPosition();
-
-        Vector2 targetPosition = targetTrajectory.GetCurrentPosition();
-        float distanceToTarget = (targetPosition - startingPosition).magnitude;
-        float deltaTime = distanceToTarget / projectileSpeed(0f);
-        for (int i = 0; i < maxIterations; i++)
-        {
-            if (distanceToTarget <= 0.05f) return targetPosition;
-            targetPosition = targetTrajectory.ExtrapolateFuturePosition(deltaTime);
-            distanceToTarget = (targetPosition - startingPosition).magnitude;
-            deltaTime = distanceToTarget / projectileSpeed(deltaTime);
-        }
-        return targetPosition;
     }
     public static Collider2D GetNonCompositeCollider(GameObject obj)
     {

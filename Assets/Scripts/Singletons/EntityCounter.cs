@@ -158,11 +158,10 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
             }
         }
     }
-
     private List<GameObject> GetNearby(System.Type enumType, int enumValue, Vector2 center, float radius)
     {
         var tracker = trackers[enumType][enumValue];
-        var candidates = new HashSet<GameObject>();
+        var candidates = new List<GameObject>();
 
         // Find cells that intersect the query circle
         Vector2Int minCell = GetCellKey(center - Vector2.one * (radius*1.41f));
@@ -196,7 +195,6 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
 
         return nearby;
     }
-
     public void RegisterEntity(GameObject obj)
     {
         EntityTypeProperty hasEntityType = obj.GetComponent<EntityTypeProperty>();
@@ -232,13 +230,6 @@ public class EntityCounter : AbstractSingleton<EntityCounter>
     {
         Unregister(obj, typeof(ForceManager.ForceType), (int)type);
     }
-
-    // It looks like this method is not needed since we handle force updates in UpdateEntityPosition
-    //public void UpdateForceEntityPosition(GameObject obj, ForceManager.ForceType type)
-    //{
-    //    UpdatePosition(obj, typeof(ForceManager.ForceType), (int)type);
-    //}
-
     public List<GameObject> GetEntities(EntityTypeProperty.EntityType type)
     {
         return new List<GameObject>(trackers[typeof(EntityTypeProperty.EntityType)][(int)type].AllEntities);

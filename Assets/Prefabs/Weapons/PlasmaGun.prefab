@@ -162,11 +162,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isControlledByPlayer: 0
+  activateOnShortcut: {fileID: 11400000, guid: 6741211155565214ca99e9aad71a0408, type: 2}
   bulletPoolId: PlasmaBullet
   firePoint: {fileID: 2539842589358749238}
   maxAmmo: 10
   replenishTimePerBullet: 0.1
   waitForFullAmmo: 0
   fireRate: 0.2
-  activateOn: 0
   addMyVelocityToProjectile: 0

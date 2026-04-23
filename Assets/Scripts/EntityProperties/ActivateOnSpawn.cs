@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// This component is designed to be attached to entities that are part of an object pooling system and need to perform an action immediately upon spawning.
+/// </summary>
 public class ActivateOnSpawn : MonoBehaviour
 {
     // This event is intended to be subscribed to by other components

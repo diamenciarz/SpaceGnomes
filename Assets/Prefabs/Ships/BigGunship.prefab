@@ -97,7 +97,6 @@ GameObject:
   - component: {fileID: 4275953901346360542}
   - component: {fileID: 1741509105870174778}
   - component: {fileID: 827234146337642812}
-  - component: {fileID: 6543003814999245564}
   - component: {fileID: 4049380779284195394}
   - component: {fileID: 6514658271571309198}
   - component: {fileID: 6968070201716844009}
@@ -194,27 +193,6 @@ MonoBehaviour:
   maxAngularDampingMultiplier: 2
   maxAngularVelocity: 100
   angularDamping: 0.8
---- !u!114 &6543003814999245564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2369128004041744743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98c5e7230b949f248aeaa2c3611ba347, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  keyBindings:
-  - key: 32
-    action: 0
-  - key: 323
-    action: 1
-  - key: 324
-    action: 2
-  - key: 304
-    action: 3
 --- !u!114 &4049380779284195394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -499,6 +477,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementBehavior: {fileID: 11400000, guid: eb80449c995c44d4aac720d30c3e1b96, type: 2}
+  behaviorUpdatesPerSecond: 5
 --- !u!114 &8076816269696358030
 MonoBehaviour:
   m_ObjectHideFlags: 0

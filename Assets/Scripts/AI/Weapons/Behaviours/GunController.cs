@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using static ISettableTarget;
 
 public class GunController : AbstractWeaponController
 {
@@ -9,7 +10,6 @@ public class GunController : AbstractWeaponController
     [SerializeField] private float replenishTimePerBullet = 0.5f; // Time to replenish one bullet
     [SerializeField] private bool waitForFullAmmo = false; // Wait for all ammo to replenish?
     [SerializeField] private float fireRate = 0.2f; // Time between shots
-    [SerializeField] ShipAction activateOn;
     [SerializeField] bool addMyVelocityToProjectile = false;
 
     private EntityTeam parentEntityTeam;
@@ -17,25 +17,39 @@ public class GunController : AbstractWeaponController
     private float replenishTimer;
     private float fireTimer;
     private bool isShooting;
-    private GameObject optionalTarget;
     private Rigidbody2D parentRB2D;
 
-    public override ShipAction GetActionType() => activateOn;
+    #region Public Methods
+    #region AbstractWeaponController Methods
     public override Transform GetShootingPointTransform() => firePoint;
     public override Func<float, float> GetProjectileSpeed() => ObjectPoolManager.Instance.GetObjectSpeed(bulletPoolId);
+    #endregion
+
+    #region AbstractActionController Methods
+    public override void Detach()
+    {
+        //gameObject.SetActive(false);
+        isShooting = false;
+    }
+    public override void Activate()
+    {
+        this.isShooting = true;
+    }
+    public override void Deactivate()
+    {
+        this.isShooting = false;
+    }
+    #endregion
+    #endregion
 
     private void Start()
     {
         currentAmmo = maxAmmo;
         replenishTimer = 0f;
         fireTimer = 0f;
-        UpdateParentEntityTeam();
+        parentEntityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
         parentRB2D  = EntityCounter.Instance.GetEntityParent(gameObject).GetComponent<Rigidbody2D>();
         if (!parentRB2D) Debug.LogWarning("Parent entity does not have a Rigidbody2D component!");
-    }
-    public void UpdateParentEntityTeam()
-    {
-        parentEntityTeam = TeamManager.Instance.GetParentEntityTeam(gameObject);
     }
     private void Update()
     {
@@ -61,20 +75,6 @@ public class GunController : AbstractWeaponController
             }
         }
     }
-
-    public override void Detach()
-    {
-        //gameObject.SetActive(false);
-        isShooting = false;
-    }
-
-
-    public override void SetAction(bool isShooting, GameObject optionalTarget)
-    {
-        this.isShooting = isShooting;
-        this.optionalTarget = optionalTarget;
-    }
-
     private bool CanShoot()
     {
         if (waitForFullAmmo)
@@ -83,7 +83,6 @@ public class GunController : AbstractWeaponController
         }
         return currentAmmo > 0;
     }
-
     private void Shoot()
     {
         if (firePoint == null)
@@ -96,15 +95,17 @@ public class GunController : AbstractWeaponController
         currentAmmo--;
         GameObject projectile = ObjectPoolManager.Instance.Spawn(bulletPoolId, firePoint.position, firePoint.rotation);
         EntityTeam entityTeam = projectile.GetComponentInParent<EntityTeam>();
-        if (entityTeam)
-        {
-            TeamManager.Instance.SetEntityTeam(projectile, parentEntityTeam.team);
-        }
+        
+        if (entityTeam) TeamManager.Instance.SetEntityTeam(projectile, parentEntityTeam.team);
+        
         if (addMyVelocityToProjectile)
         {
             Rigidbody2D projectileRB2D = projectile.GetComponent<Rigidbody2D>();
             if(!projectileRB2D) Debug.LogWarning("Projectile does not have a Rigidbody2D component!");
             projectileRB2D.velocity += parentRB2D.velocity;
         }
+
+        if (!targettedObject.HasValue) return;
+        if (projectile.TryGetComponent<ISettableTarget>(out ISettableTarget settableTarget)) settableTarget.SetTarget(targettedObject.Value.GetTargetObject());
     }
 }

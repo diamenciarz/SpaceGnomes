@@ -6,7 +6,7 @@ using UnityEngine;
 /// This class is responsible for spawning entities when the object is despawned from the pool.
 /// It uses weighted random selection to determine which group of entities to spawn, and it can also target the closest visible enemy based on the provided sensors.
 /// </summary>
-public class SpawnOnDespawn : ActivateOnDespawn
+public class SpawnEntitiesOnDespawn : ActivateOnDespawn
 {
     [SerializeField] private List<InstantiableGroup> instantiateGroups = new List<InstantiableGroup>();
     [SerializeField] private List<float> weights = new List<float>();

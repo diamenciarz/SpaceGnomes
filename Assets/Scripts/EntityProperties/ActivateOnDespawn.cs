@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+/// <summary>
+/// This class is designed to be attached to GameObjects that are part of an object pooling system.
+/// </summary>
 public class ActivateOnDespawn : MonoBehaviour
 {
     // This event is intended to be subscribed to by other components

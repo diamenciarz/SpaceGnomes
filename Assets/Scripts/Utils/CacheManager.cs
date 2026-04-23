@@ -18,7 +18,7 @@ public abstract class CacheBase
     {
         behavior = b;
         interval = i;
-        lastResetTime = Time.time;
+        lastResetTime = Time.time + Random.Range(0,interval);
     }
 
     public abstract void Reset();

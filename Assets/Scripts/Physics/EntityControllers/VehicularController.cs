@@ -1,6 +1,9 @@
 using UnityEngine;
-using static AIControlInput;
+using static ControlInput;
 
+/// <summary>
+/// VehicularController is a physics-based controller that allows for movement primarily in the forward direction with rotation based on steering input.
+/// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class VehicularController: AbstractPhysicsController
 {
@@ -8,6 +11,7 @@ public class VehicularController: AbstractPhysicsController
     [SerializeField] private float thrustForce = 2400f;
     [SerializeField][Range(1f, 10f)] private float thrustDampingMultiplier = 3f;
     [SerializeField][Range(0f, 20)] float maxVelocity = 10f;
+    [SerializeField][Range(0f, 20)] float brakeSpeed = 0.2f;
 
     [SerializeField, Range(0f, 1f)] private float perpendicularDamping = 0.1f;
     [Header("Rotation")]
@@ -19,6 +23,7 @@ public class VehicularController: AbstractPhysicsController
 
     private float thrustInput;
     private float steerInput;
+    private Vector2? targetVelocity;
 
     protected override void Awake()
     {
@@ -39,8 +44,10 @@ public class VehicularController: AbstractPhysicsController
         ControlInput controlInput = Input.GetKey(alternativeControlKey) ? alternativeShipControlInput : mainShipControlInput;
         if (controlInput != null)
         {
-            thrustInput = controlInput.GetVerticalInput(ControlVectorCoordinates.Local, true);
-            steerInput = controlInput.GetHorizontalInput(ControlVectorCoordinates.Local, true);
+            ControlInputData controlInputData = controlInput.GetControlInput(ControlVectorCoordinates.Local, true);
+            thrustInput = controlInputData.controlVector.y;
+            steerInput = controlInputData.controlVector.x;
+            targetVelocity = controlInputData.targetVelocity;
         }
     }
 
@@ -55,6 +62,12 @@ public class VehicularController: AbstractPhysicsController
 
     private void HandleMovement()
     {
+        if (ShouldSetVelocityToTarget())
+        {
+            rb2d.velocity = targetVelocity.Value; // Apply brake by reducing velocity
+            return; // Skip applying thrust when braking
+        }
+
         // Apply thrust (forward/backward)
         Vector2 thrust = CalculateThrust(thrustInput);
         rb2d.AddForce(thrust * Time.fixedDeltaTime);
@@ -87,7 +100,12 @@ public class VehicularController: AbstractPhysicsController
         // Otherwise, apply standard thrust
         return thrustDirection;
     }
-
+    private bool ShouldSetVelocityToTarget()
+    {
+        if (!targetVelocity.HasValue) return false;
+        Vector2 velocityDelta = targetVelocity.Value - rb2d.velocity;
+        return velocityDelta.magnitude < brakeSpeed;
+    }
     private float CalculateRotationTorque(float steerInput)
     {
         float angularVelocity = rb2d.angularVelocity;
